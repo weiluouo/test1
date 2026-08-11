@@ -35,9 +35,26 @@
             /* 最小 16px，隨螢幕縮放，最大 24px */
             font-size: clamp(16px, 2vw, 24px);
             text-align: left;
-            
             /* 中文行距 */
             line-height: 1.8;
+        }
+        .link-button {
+            display: inline-block;
+            padding: 12px 24px;
+
+            background-color: #555;
+            color: white;
+
+            text-decoration: none;
+            border-radius: 8px;
+
+            font-size: clamp(16px, 1.5vw, 20px);
+
+            transition: 0.2s;
+        }
+
+        .link-button:hover {
+            background-color: #333;
         }
     </style>
 </head>
@@ -68,5 +85,13 @@
     
     石神父子，相隔3700年，在宇宙中，看著同樣的景色，吃了宇宙拉麵，想著地面，想著對方。<br><br>
     </p>
+    <a
+        href="https://www.threads.com/@x000404d?igshid=NTc4MTIwNjQ2YQ=="
+        target="_blank"
+        rel="noopener noreferrer"
+        class="link-button"
+    >
+        我的Threads
+    </a>
 </body>
 </html>
