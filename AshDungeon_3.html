@@ -169,7 +169,7 @@ function enemyAct(e){if(!run||run.done||e.dead)return;const px=run.player.x,py=r
 }
 function realtimeUpdate(){if(!run||run.done||$('gameScreen').classList.contains('hidden'))return;if(!$('modal').classList.contains('hidden'))return;const now=Date.now();if(now>=run.nextRegenAt){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);floatDamage(run.player,run.hp-before,true);addLog(`自然恢復：生命 +${(run.hp-before).toFixed(1)}。`)}run.nextRegenAt=now+REGEN_INTERVAL;render()}
  if(now>=run.nextEnemyAt){for(const e of aliveEnemies())enemyAct(e);run.nextEnemyAt=now+ENEMY_ACTION_INTERVAL;render();if(run.hp<=0){finish(false);return}}
- const btn=$('attackBtn');const left=Math.max(0,run.nextAttackAt-now);btn.textContent=left>0?`⚔ 攻擊冷卻 ${(left/1000).toFixed(1)} 秒`:'⚔ 攻擊射程內最近敵人';btn.disabled=left>0||!nearestEnemyInRange();const pt=$('potionBtn');pt.disabled=run.pots<=0||run.hp>=run.maxHp;
+ const btn=$('attackBtn');const left=Math.max(0,run.nextAttackAt-now);btn.textContent=left>0?`⚔ 攻擊冷卻 ${(left/1000).toFixed(1)} 秒`:'⚔ 攻擊鄰近敵人';btn.disabled=left>0||!nearestEnemyInRange();const pt=$('potionBtn');pt.disabled=run.pots<=0||run.hp>=run.maxHp;
 }
 // Touch / mouse virtual joystick; diagonal movement is supported, keyboard controls remain unchanged.
 (function(){const joy=$('joystick'),thumb=$('joystickThumb');if(!joy||!thumb)return;function reset(){joystickVector={x:0,y:0};thumb.style.left='50%';thumb.style.top='50%';joystickPointer=null;if(joystickMoveTimer){clearInterval(joystickMoveTimer);joystickMoveTimer=null}}
