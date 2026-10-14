@@ -24,3 +24,10 @@
 .fx-bullet{font-size:19px;color:#e5e7eb;text-shadow:0 0 7px #fff,0 0 15px #cbd5e1}
 .fx-energy{font-size:42px;color:#91fff4;animation:energyPulse .5s ease-out both}
 @keyframes energyPulse{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}45%{opacity:1;transform:translate(-50%,-50%) scale(1.5)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+
+
+/* 權杖：鎖定蓄力與落雷光束 */
+.fx-magic{font-size:38px;color:#a9f2ff;text-shadow:0 0 8px #82eaff,0 0 18px #7d74ff,0 0 34px #fff;animation:magicCharge 3s ease-in-out both}
+.fx-magic-beam{font-size:0;width:18px;height:230px;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,.98) 0%,rgba(130,239,255,.92) 28%,rgba(106,125,255,.62) 65%,rgba(120,100,255,0) 100%);box-shadow:0 0 12px #9bf4ff,0 0 25px #817aff,0 0 46px #88eaff;transform-origin:bottom center;animation:magicBeam .7s cubic-bezier(.15,.7,.25,1) both}
+@keyframes magicCharge{0%{opacity:.2;transform:translate(-50%,-50%) scale(.35) rotate(0)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(65deg)}50%{opacity:.8;transform:translate(-50%,-50%) scale(.78) rotate(150deg)}75%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(245deg)}100%{opacity:.95;transform:translate(-50%,-50%) scale(1.1) rotate(360deg)}}
+@keyframes magicBeam{0%{opacity:0;transform:translate(-50%,-100%) scaleY(.05)}15%{opacity:1;transform:translate(-50%,-100%) scaleY(1.08)}65%{opacity:.95;transform:translate(-50%,-100%) scaleY(1)}100%{opacity:0;transform:translate(-50%,-100%) scaleY(.02)}}

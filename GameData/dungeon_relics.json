@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "遺物獨立資料表。effect.type 由 HTML 中 applyRelicDefinition 函式解讀，新增效果類型需要擴充該函式。 icon 欄位同時支援文字／Emoji 與 PNG 檔名；若使用「xxxx.png」，請將圖片放在 HTML 同一資料夾（或在欄位填相對路徑），遺物標題會顯示圖片，圖片失敗時自動回退為符號。",
+  "description": "遺物獨立資料表。單一效果可使用 effect 物件；多效果可使用 effects 陣列，HTML 會依序套用所有效果。effect.type 包含 crit_add、potion_heal_add、guard_add（每層首次減傷）、fixed_guard_add（每次受傷適用的固定減傷）等。圖示支援文字／Emoji 與 PNG 檔名；PNG 請放在 GameData 資料夾，失敗時會使用 fallbackIcon。",
   "relics": [
     {
       "id": "wolf-fang-pendant",
@@ -17,15 +17,20 @@
     {
       "id": "copperwall-charm",
       "name": "銅壁護符",
-      "desc": "最大生命 +8，並回復 8",
+      "desc": "每層首次減傷 +3，固定減傷 +1",
       "icon": "盾",
       "weight": 1,
-      "effect": {
-        "type": "max_hp_heal",
-        "value": 8,
-        "heal": 8
-      },
-      "fallbackIcon": "盾"
+      "fallbackIcon": "盾",
+      "effects": [
+        {
+          "type": "guard_add",
+          "value": 3
+        },
+        {
+          "type": "fixed_guard_add",
+          "value": 1
+        }
+      ]
     },
     {
       "id": "hunter-eye",
@@ -42,14 +47,16 @@
     {
       "id": "alchemy-vial",
       "name": "煉金瓶",
-      "desc": "藥水治療量提升至 18",
+      "desc": "藥水治療量 +3",
       "icon": "瓶",
       "weight": 1,
-      "effect": {
-        "type": "potion_heal_set",
-        "value": 18
-      },
-      "fallbackIcon": "瓶"
+      "fallbackIcon": "瓶",
+      "effects": [
+        {
+          "type": "potion_heal_add",
+          "value": 3
+        }
+      ]
     },
     {
       "id": "swift-boots",
@@ -66,14 +73,16 @@
     {
       "id": "ember-core",
       "name": "餘燼核心",
-      "desc": "暴擊機率提高至至少 25%",
+      "desc": "暴擊率 +5%",
       "icon": "火",
       "weight": 1,
-      "effect": {
-        "type": "crit_set",
-        "value": 0.25
-      },
-      "fallbackIcon": "火"
+      "fallbackIcon": "火",
+      "effects": [
+        {
+          "type": "crit_add",
+          "value": 0.05
+        }
+      ]
     },
     {
       "id": "cursed-iron-shackles",

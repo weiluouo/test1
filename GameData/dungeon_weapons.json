@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "武器由此檔管理。icon 可填文字／Emoji 或 GameData 內的 PNG 檔名；cooldown 單位毫秒，range 單位為地圖格距（每格 100 世界單位）。",
+  "description": "武器由此檔管理。icon 可填文字／Emoji 或 GameData 內的 PNG 檔名；cooldown 單位毫秒，range 單位為地圖格距（每格 100 世界單位）。attackFx 可定義既有戰鬥行為：fx-short 流血、fx-long 雙目標橫斬、fx-spear 範圍震盪、fx-magic 三秒鎖定蓄力光束。長槍 splashRangeCells 可設定濺射半徑，未設定時預設 10 格。",
   "weapons": [
     {
       "id": "short",
@@ -61,6 +61,18 @@
       "wall": false,
       "attackFx": "fx-bullet",
       "description": "低傷害、長射程、短冷卻的子彈射擊。"
+    },
+    {
+      "id": "staff",
+      "name": "權杖",
+      "icon": "權杖.png",
+      "fallbackIcon": "🪄",
+      "mult": 2,
+      "range": 3,
+      "cooldown": 3500,
+      "wall": false,
+      "attackFx": "fx-magic",
+      "description": "鎖定射程內單一敵人，蓄力 3 秒後召下光束；鎖定後即使敵人離開射程仍會命中。"
     }
   ]
 }
