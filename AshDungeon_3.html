@@ -98,7 +98,8 @@ let expeditionScenarioStatus='loading';
 let expeditionScenarioError='';
 let contentDataStatus='loading';
 let contentDataError='';
-function applyRelicDefinition(def,r){const effect=def.effect||{};const v=Number(effect.value)||0;switch(effect.type){case'attack_add':r.atk+=v;break;case'max_hp_heal':r.maxHp+=v;r.hp=Math.min(r.maxHp,r.hp+(Number(effect.heal)||0));break;case'bonus_shard_add':r.bonusShard+=v;break;case'potion_heal_set':r.potHeal=v;break;case'guard_set':r.guard=v;break;case'crit_set':r.crit=Math.max(r.crit||0,v);break;case'speed_percent_add':case'change_speed_percent':applySpeedPercent(r,v);break;default:console.warn('未知遺物效果：',effect.type)}}
+function applyOneRelicEffect(effect,r){if(!effect||!effect.type)return;const v=Number(effect.value)||0;switch(effect.type){case'attack_add':r.atk=(Number(r.atk)||0)+v;break;case'max_hp_heal':r.maxHp=(Number(r.maxHp)||0)+v;r.hp=Math.min(r.maxHp,(Number(r.hp)||0)+(Number(effect.heal)||0));break;case'bonus_shard_add':r.bonusShard=(Number(r.bonusShard)||0)+v;break;case'potion_heal_add':r.potHeal=(Number(r.potHeal)||0)+v;break;case'potion_heal_set':r.potHeal=v;break;case'guard_add':r.guardLayer=(Number(r.guardLayer)||0)+v;break;case'fixed_guard_add':r.guardBase=(Number(r.guardBase)||0)+v;break;case'guard_set':r.guardLayer=v;break;case'crit_add':r.crit=Math.max(0,Math.min(.75,(Number(r.crit)||0)+v));break;case'crit_set':r.crit=Math.max(r.crit||0,v);break;case'speed_percent_add':case'change_speed_percent':applySpeedPercent(r,v);break;default:console.warn('未知遺物效果：',effect.type)}}
+function applyRelicDefinition(def,r){const effects=Array.isArray(def.effects)?def.effects:(Array.isArray(def.effect)?def.effect:(def.effect?[def.effect]:[]));for(const effect of effects)applyOneRelicEffect(effect,r)}
 async function loadExternalGameData(){
  expeditionScenarioStatus='loading';contentDataStatus='loading';
  try{
@@ -346,17 +347,45 @@ function emitFx(kind,from,to,label=''){
   const a=elAtWorld('map',from),b=elAtWorld('map',to);if(!a||!b)return;const el=document.createElement('div');el.className='combat-fx '+kind;el.textContent=label||({'fx-short':'⚔','fx-long':'✦','fx-spear':'➤','fx-arrow':'➶','fx-bullet':'●','fx-bite':'☻','fx-slash':'╱','fx-hit':'✹','fx-heal':'✚','fx-energy':'✧'}[kind]||'✦');
   let origin=a;if(['fx-short','fx-long','fx-spear','fx-hit','fx-bite','fx-slash'].includes(kind)){origin={x:(a.x+b.x)/2,y:(a.y+b.y)/2}}
   el.style.left=origin.x+'px';el.style.top=origin.y+'px';document.body.appendChild(el);
-  if(['fx-arrow','fx-spear','fx-bullet','fx-enemy-projectile'].includes(kind)){const dx=b.x-origin.x,dy=b.y-origin.y,angle=Math.atan2(dy,dx)*180/Math.PI;el.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;const duration=(kind==='fx-bullet'||kind==='fx-enemy-projectile')?240:Math.max(180,Math.min(380,Math.hypot(dx,dy)*.55));el.animate([{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(0)`},{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(${Math.hypot(dx,dy)}px)`}],{duration,easing:'cubic-bezier(.18,.7,.25,1)'});setTimeout(()=>el.remove(),duration+60)}else setTimeout(()=>el.remove(),kind==='fx-energy'?560:470);
+  if(['fx-arrow','fx-spear','fx-bullet','fx-enemy-projectile'].includes(kind)){const dx=b.x-origin.x,dy=b.y-origin.y,angle=Math.atan2(dy,dx)*180/Math.PI;el.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;const duration=(kind==='fx-bullet'||kind==='fx-enemy-projectile')?240:Math.max(180,Math.min(380,Math.hypot(dx,dy)*.55));el.animate([{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(0)`},{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(${Math.hypot(dx,dy)}px)`}],{duration,easing:'cubic-bezier(.18,.7,.25,1)'});setTimeout(()=>el.remove(),duration+60)}else setTimeout(()=>el.remove(),kind==='fx-magic'?3060:kind==='fx-magic-beam'?760:kind==='fx-energy'?560:470);
+ return el;
 }
 function floatDamage(entity,n,heal=false){const p=elAtWorld('map',entity);if(!p)return;const el=document.createElement('div');el.className='combat-number '+(heal?'healing':'damage');el.textContent=(heal?'+':'−')+Number(n).toFixed(n%1?1:0);el.style.left=p.x+'px';el.style.top=p.y+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),850)}
 function currentWeaponFx(){const w=getWeapon();if(w.attackFx)return w.attackFx;const id=w.id;return id==='short'?'fx-short':id==='long'?'fx-long':id==='spear'?'fx-spear':id==='bow'?'fx-arrow':'fx-bullet'}
-function triggerAttack(){if(!run||run.done||Date.now()<(run.nextAttackAt||0))return;const now=Date.now(),w=getWeapon(),target=nearestEnemyInRange();if(!target){const penalty=Math.max(1,Math.round(w.cooldown*.4));run.nextAttackAt=now+penalty;const facing=run.playerFacing||{x:1,y:0};const mag=Math.hypot(facing.x,facing.y)||1;const end={x:run.player.x+facing.x/mag*Math.min(weaponRangePx(w),85),y:run.player.y+facing.y/mag*Math.min(weaponRangePx(w),85)};emitFx(currentWeaponFx(),run.player,end);addLog(`空揮！${w.name}未命中，承受原冷卻 40% 的懲罰：${(penalty/1000).toFixed(2)} 秒。`);render();return}fight(target)}
-fight=function(e){if(!run||run.done||!e||e.dead||Date.now()<(run.nextAttackAt||0))return;e.aggro=true;const w=getWeapon();if(!inRange(e,w)){addLog('目標超出武器攻擊半徑或被牆壁阻擋。');return}const now=Date.now();run.nextAttackAt=now+w.cooldown;const target={x:e.x,y:e.y},from={x:run.player.x,y:run.player.y};emitFx(currentWeaponFx(),from,target);let dmg=Math.max(1,Math.round(run.atk*w.mult)+(Math.random()<run.crit?4:0));
-  if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog('魔王「轉能」將你的 '+dmg+' 點攻擊轉化為恢復，生命 +'+healed+'。');}
-  else{e.hp-=dmg;floatDamage(e,dmg);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`)}
-  if(e.hp<=0){e.hp=0;e.dead=true;run.kills++;const kh=meta.up.underworld;if(kh){run.hp=Math.min(run.maxHp,run.hp+kh);floatDamage(run.player,kh,true)}const reward=Math.max(1,Math.round((2+run.floor*.5)*run.diff.reward))+run.bonusShard;run.shards+=reward;addLog(`${e.name}倒下了，取得 ${reward} 枚律質。`);if(Math.random()<.05){const relic=RELICS[Math.floor(Math.random()*RELICS.length)];relic.apply(run);run.relics.push(relic);addLog(`稀有掉落：${relic.name}！`)}if(Math.random()<.05){run.pots++;addLog('稀有掉落：怪物留下了一瓶藥水。')}if(e.boss){render();finish(true);return}}
-  render();if(run.hp<=0)finish(false)
+function triggerAttack(){
+ if(!run||run.done||Date.now()<(run.nextAttackAt||0)||run.magicCharge)return;
+ const now=Date.now(),w=getWeapon(),target=nearestEnemyInRange();
+ if(!target){const penalty=Math.max(1,Math.round(w.cooldown*.4));run.nextAttackAt=now+penalty;const facing=run.playerFacing||{x:1,y:0};const mag=Math.hypot(facing.x,facing.y)||1;const end={x:run.player.x+facing.x/mag*Math.min(weaponRangePx(w),85),y:run.player.y+facing.y/mag*Math.min(weaponRangePx(w),85)};emitFx(currentWeaponFx(),run.player,end);addLog(`空揮！${w.name}未命中，承受原冷卻 40% 的懲罰：${(penalty/1000).toFixed(2)} 秒。`);render();return}
+ if(w.attackFx==='fx-magic'){
+  run.nextAttackAt=now+Math.max(Number(w.cooldown)||3500,3000);
+  run.magicCharge={targetUid:target.uid,targetName:target.name,startedAt:now,fireAt:now+3000,atk:Number(run.atk)||1,crit:Number(run.crit)||0,mult:Number(w.mult)||1,weaponName:w.name||'權杖'};
+  emitFx('fx-magic',target,target,'✧');
+  addLog(`權杖鎖定「${target.name}」，開始蓄力 3 秒；蓄力完成時即使目標已離開射程，光束仍會命中。`);render();return;
+ }
+ fight(target);
+}
+function weaponBaseDamage(mult,critChance){return Math.max(1,Math.round((Number(run.atk)||1)*(Number(mult)||1))+(Math.random()<(Number(critChance)||0)?4:0))}
+function handleEnemyDefeat(e){if(!run||!e||e.dead||Number(e.hp)>0)return false;e.hp=0;e.dead=true;run.kills++;const kh=Number(meta.up.underworld)||0;if(kh){run.hp=Math.min(run.maxHp,run.hp+kh);if(kh>0)floatDamage(run.player,kh,true)}const reward=Math.max(1,Math.round((2+run.floor*.5)*run.diff.reward))+run.bonusShard;run.shards+=reward;addLog(`${e.name}倒下了，取得 ${reward} 枚律質。`);if(Math.random()<.05&&RELICS.length){const relic=RELICS[Math.floor(Math.random()*RELICS.length)];relic.apply(run);run.relics.push(relic);addLog(`稀有掉落：${relic.name}！`)}if(Math.random()<.05){run.pots++;addLog('稀有掉落：怪物留下了一瓶藥水。')}if(e.boss){render();finish(true)}return true}
+function applyWeaponHit(e,dmg,w,now){if(!run||!e||e.dead)return false;const target={x:e.x,y:e.y};if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog(`魔王「轉能」將對${e.name}的 ${dmg} 點攻擊轉化為恢復，生命 +${healed}。`);return false}e.hp-=dmg;floatDamage(e,dmg);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`);if(w.attackFx==='fx-short'&&e.hp>0){e.bleedUntil=now+5000;e.nextBleedAt=now+1000;addLog(`${e.name}陷入流血：每秒損失 1 點生命，持續 5 秒；再次命中會刷新時間，不會疊加。`)}if(e.hp<=0)handleEnemyDefeat(e);return true}
+fight=function(e){
+ if(!run||run.done||!e||e.dead||Date.now()<(run.nextAttackAt||0))return;e.aggro=true;const w=getWeapon();if(!inRange(e,w)){addLog('目標超出武器攻擊半徑或被牆壁阻擋。');return}
+ const now=Date.now(),from={x:run.player.x,y:run.player.y},fx=w.attackFx||currentWeaponFx();run.nextAttackAt=now+(Number(w.cooldown)||1500);
+ let targets=[e],sameDamage=false,longSweep=false;
+ if(fx==='fx-long'){
+  targets=aliveEnemies().filter(other=>inRange(other,w)).sort((a,b)=>dist(a,run.player)-dist(b,run.player)).slice(0,2);if(!targets.includes(e))targets=[e,...targets].slice(0,2);longSweep=targets.length>1;
+ }else if(fx==='fx-spear'){
+  const splashCells=Math.max(0,Number(w.splashRangeCells??10));const radius=splashCells*WORLD.cell;targets=aliveEnemies().filter(other=>dist(other,e)<=radius);if(!targets.includes(e))targets.unshift(e);sameDamage=targets.length>1;
+ }
+ const firstDamage=weaponBaseDamage(fx==='fx-long'&&longSweep?1:w.mult,run.crit);
+ emitFx(fx,from,{x:e.x,y:e.y});
+ if(fx==='fx-long'&&longSweep)addLog('長劍橫斬同時命中兩個目標，每個目標承受 1 倍攻擊力傷害。');
+ if(fx==='fx-spear'&&targets.length>1)addLog(`長槍貫穿震盪，波及目標周遭 ${Number(w.splashRangeCells??10)} 小格內的 ${targets.length} 名敵人。`);
+ for(const target of targets){if(!target||target.dead||run.done)continue;const dmg=sameDamage?firstDamage:(fx==='fx-long'&&longSweep?weaponBaseDamage(1,run.crit):firstDamage);applyWeaponHit(target,dmg,w,now);if(run.done)break}
+ render();if(run.hp<=0)finish(false)
 };
+function updateEnemyBleeds(now){if(!run||run.done)return;for(const e of aliveEnemies()){if(!e.bleedUntil||!e.nextBleedAt)continue;while(!e.dead&&now>=e.nextBleedAt&&e.nextBleedAt<=e.bleedUntil){e.hp-=1;e.nextBleedAt+=1000;floatDamage(e,1);if(e.hp<=0){addLog(`${e.name}因流血失去最後 1 點生命。`);handleEnemyDefeat(e);if(run.done)return;break}}if(now>e.bleedUntil){e.bleedUntil=0;e.nextBleedAt=0}}}
+function updateWeaponCharge(now){if(!run||run.done||!run.magicCharge||now<run.magicCharge.fireAt)return;const charge=run.magicCharge;run.magicCharge=null;const target=run.enemies.find(e=>e.uid===charge.targetUid&&!e.dead&&e.hp>0);if(!target){addLog(`權杖蓄力完成，但「${charge.targetName}」已不在戰場，光束失去目標。`);render();return}emitFx('fx-magic-beam',target,target,'✦');const dmg=weaponBaseDamageFromSnapshot(charge);const landed=applyWeaponHit(target,dmg,{name:charge.weaponName,attackFx:'fx-magic'},now);if(!run.done){if(landed)addLog(`權杖光束落下，造成 ${dmg} 點傷害。`);render()}if(run.hp<=0)finish(false)}
+function weaponBaseDamageFromSnapshot(charge){return Math.max(1,Math.round(charge.atk*charge.mult)+(Math.random()<charge.crit?4:0))}
 function addArenaNode(parent,cls,html=''){const el=document.createElement('div');el.className=cls;el.innerHTML=html;parent.appendChild(el);return el}
 function pctX(x){return `${x/WORLD.width*100}%`}function pctY(y){return `${y/WORLD.height*100}%`}
 function applySpeedPercent(r,delta){
@@ -439,10 +468,11 @@ function moveEnemies(dt,now){const list=aliveEnemies();for(const e of list){if(e
   // 小怪初始保持休眠；玩家進入索敵半徑，或攻擊命中時才醒來。
   if(!e.aggro&&d<=(e.aggroRange||230)){e.aggro=true;addLog(`${e.name}發現了你！`)}if(!e.aggro)continue;
   const ranged=e.classType==='ranged';const touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+7;
-  if(ranged){const canShoot=d<=(e.attackRange||260)&&lineClearForEnemy(e);if(canShoot){if(now>=(e.nextAttackAt||0)){damagePlayerFromEnemy(e,now,true)}continue;}
-   // 遠程敵人若被逼近會拉開距離；遇到牆或沒有視線則依 BFS 繞路找射線。
-   let waypoint;if(d<(e.keepDistance||155)&&lineClearForEnemy(e)){waypoint={x:e.x+(e.x-run.player.x)/Math.max(1,d)*WORLD.cell,y:e.y+(e.y-run.player.y)/Math.max(1,d)*WORLD.cell};}
-   else waypoint=findPathWaypoint(e);if(!waypoint)continue;const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;const speed=e.speed||64;moveActor(e,dx/len*Math.min(speed*dt,len),dy/len*Math.min(speed*dt,len),e.radius||WORLD.enemyRadius,'enemy');continue;
+  if(ranged){const canShoot=d<=(e.attackRange||260)&&lineClearForEnemy(e);const keep=Math.max(e.keepDistance||155,touch+12);
+   // 遠程敵人優先拉開距離；即使眼前可射擊，也不會因為能攻擊而停在玩家身邊。
+   if(d<keep){const speed=e.speed||64,inv=Math.max(1,d),ux=(e.x-run.player.x)/inv,uy=(e.y-run.player.y)/inv;const dirs=[[ux,uy],[ux,0],[0,uy],[-uy,ux],[uy,-ux]];let retreated=false;for(const [ax,ay] of dirs){const len=Math.hypot(ax,ay)||1;if(moveActor(e,ax/len*Math.min(speed*dt,Math.max(2,keep-d)),ay/len*Math.min(speed*dt,Math.max(2,keep-d)),e.radius||WORLD.enemyRadius,'enemy')){retreated=true;break}}if(retreated)continue;if(canShoot){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,true);continue;}}
+   if(canShoot){if(now>=(e.nextAttackAt||0)){damagePlayerFromEnemy(e,now,true)}continue;}
+   let waypoint=findPathWaypoint(e);if(!waypoint)continue;const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;const speed=e.speed||64;moveActor(e,dx/len*Math.min(speed*dt,len),dy/len*Math.min(speed*dt,len),e.radius||WORLD.enemyRadius,'enemy');continue;
   }
   if(d<=touch){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,false);continue;}
   const waypoint=findPathWaypoint(e);if(!waypoint)continue;const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;const speed=isBoss?136:(e.speed||76);const step=Math.min(speed*dt,len);const moved=moveActor(e,dx/len*step,dy/len*step,e.radius||WORLD.enemyRadius,'enemy');if(!moved){const alternatives=[[dx/len,0],[0,dy/len],[-dy/len,dx/len],[dy/len,-dx/len]];for(const [ax,ay] of alternatives){if(moveActor(e,ax*speed*dt,ay*speed*dt,e.radius||WORLD.enemyRadius,'enemy'))break}}
@@ -450,7 +480,7 @@ function moveEnemies(dt,now){const list=aliveEnemies();for(const e of list){if(e
 function processRunInteractions(now){for(const c of run.chests){if(!c.open&&dist(run.player,c)<35)openChest(c)}if(run.searchPoint&&!run.roomSearched&&dist(run.player,run.searchPoint)<39){addLog('你接近地圖中的星芒印記，開始調查。');explore()}if(dist(run.player,run.exit)<39&&!run.exitHandled){if(aliveEnemies().length){if(!run.exitWarningAt||now-run.exitWarningAt>2500){addLog('出口仍被敵人封鎖，先擊敗剩餘怪物。');run.exitWarningAt=now}}else{run.exitHandled=true;if(run.floor===10){finish(true);return}if(run.floor%2===1){showExpeditionScenario(()=>advanceToNextFloor());return}advanceToNextFloor();return}}}
 realtimeUpdate=function(){if(!run||run.done||$('gameScreen').classList.contains('hidden'))return;const now=performance.now();if(!run.lastFrame)run.lastFrame=now;const dt=Math.min(.05,Math.max(0,(now-run.lastFrame)/1000));run.lastFrame=now;if(!$('modal').classList.contains('hidden'))return
  const held=[...heldDirections.values()];let vx=0,vy=0;for(const d of held){vx+=dirVectors[d]?.x||0;vy+=dirVectors[d]?.y||0}const vl=Math.hypot(vx,vy);if(vl){vx/=vl;vy/=vl;moveActor(run.player,vx*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,vy*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,WORLD.playerRadius,'player');run.playerFacing={x:vx,y:vy}}
- moveEnemies(dt,Date.now());updateProjectiles(dt,Date.now());updateBoss(Date.now());if(run.hp<=0){finish(false);return}if(Date.now()>=(run.nextRegenAt||0)){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);const gain=run.hp-before;if(gain>0){floatDamage(run.player,gain,true);addLog(`自然恢復：生命 +${gain.toFixed(1)}（每 5 秒）。`)}}run.nextRegenAt=Date.now()+REGEN_INTERVAL}
+ moveEnemies(dt,Date.now());updateEnemyBleeds(Date.now());if(!run||run.done)return;updateWeaponCharge(Date.now());if(!run||run.done)return;updateProjectiles(dt,Date.now());updateBoss(Date.now());if(run.hp<=0){finish(false);return}if(Date.now()>=(run.nextRegenAt||0)){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);const gain=run.hp-before;if(gain>0){floatDamage(run.player,gain,true);addLog(`自然恢復：生命 +${gain.toFixed(1)}（每 5 秒）。`)}}run.nextRegenAt=Date.now()+REGEN_INTERVAL}
  processRunInteractions(Date.now());if(!run||run.done)return;if(run.hp<=0){finish(false);return}render();};
 startRun=function(){if(frameLoop){clearInterval(frameLoop);frameLoop=null}clearHeldDirections();arenaBuiltFloor=-1;uidSequence=0;weaponListSignature='';relicListSignature='__reset__';$('log').innerHTML='';baseStartRun();if(!run||run.done)return;run.nextRegenAt=Date.now()+REGEN_INTERVAL;run.nextAttackAt=0;run.lastFrame=performance.now();frameLoop=setInterval(realtimeUpdate,16);};
 // Keyboard controls: hold for continuous movement; E attacks. Direction sets allow two simultaneous keys.
