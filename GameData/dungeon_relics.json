@@ -74,9 +74,9 @@
       "id": "ember-core",
       "name": "餘燼核心",
       "desc": "暴擊率 +5%",
-      "icon": "火",
+      "icon": "🪔",
       "weight": 1,
-      "fallbackIcon": "火",
+      "fallbackIcon": "🪔",
       "effects": [
         {
           "type": "crit_add",
