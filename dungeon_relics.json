@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "遺物獨立資料表。effect.type 由 HTML 中 applyRelicDefinition 函式解讀，新增效果類型需要擴充該函式。",
+  "description": "遺物獨立資料表。effect.type 由 HTML 中 applyRelicDefinition 函式解讀，新增效果類型需要擴充該函式。 icon 欄位同時支援文字／Emoji 與 PNG 檔名；若使用「xxxx.png」，請將圖片放在 HTML 同一資料夾（或在欄位填相對路徑），遺物標題會顯示圖片，圖片失敗時自動回退為符號。",
   "relics": [
     {
       "id": "wolf-fang-pendant",
@@ -11,7 +11,8 @@
       "effect": {
         "type": "attack_add",
         "value": 2
-      }
+      },
+      "fallbackIcon": "牙"
     },
     {
       "id": "copperwall-charm",
@@ -23,7 +24,8 @@
         "type": "max_hp_heal",
         "value": 8,
         "heal": 8
-      }
+      },
+      "fallbackIcon": "盾"
     },
     {
       "id": "hunter-eye",
@@ -34,7 +36,8 @@
       "effect": {
         "type": "bonus_shard_add",
         "value": 2
-      }
+      },
+      "fallbackIcon": "眼"
     },
     {
       "id": "alchemy-vial",
@@ -45,7 +48,8 @@
       "effect": {
         "type": "potion_heal_set",
         "value": 18
-      }
+      },
+      "fallbackIcon": "瓶"
     },
     {
       "id": "swift-boots",
@@ -56,7 +60,8 @@
       "effect": {
         "type": "guard_set",
         "value": 3
-      }
+      },
+      "fallbackIcon": "靴"
     },
     {
       "id": "ember-core",
@@ -67,7 +72,8 @@
       "effect": {
         "type": "crit_set",
         "value": 0.25
-      }
+      },
+      "fallbackIcon": "火"
     }
   ]
 }

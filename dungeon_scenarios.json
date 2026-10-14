@@ -21,7 +21,8 @@
     "eventSelection": "weighted_random_without_replacement",
     "hideOutcomeUntilChoice": true,
     "writeResultToExpeditionLogOnly": true,
-    "defaultEventWeight": 1
+    "defaultEventWeight": 1,
+    "resultDisplaySeconds": 2
   },
   "effectTypes": [
     {
