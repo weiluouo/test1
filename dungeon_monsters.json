@@ -5,7 +5,7 @@
     {
       "id": "ash-skeleton",
       "name": "灰骸",
-      "icon": "☠",
+      "icon": "近戰.png",
       "hp": 8,
       "atk": 3,
       "xp": 3,
@@ -18,13 +18,13 @@
       "attackCooldown": 1500,
       "attackType": "melee",
       "description": "高傷害、低移動速度；靠近後斬擊。",
-      "mapIconFile": "近戰.png",
+      "mapIconFile": "☠",
       "fallbackIcon": "☠"
     },
     {
       "id": "cave-rat",
       "name": "墮落騎士",
-      "icon": "♞",
+      "icon": "騎兵.png",
       "hp": 6,
       "atk": 2,
       "xp": 2,
@@ -37,13 +37,13 @@
       "attackCooldown": 1050,
       "attackType": "charge",
       "description": "低傷害、高移動速度；貼近後快速啃咬或衝撞。",
-      "mapIconFile": "騎兵.png",
+      "mapIconFile": "♞",
       "fallbackIcon": "♞"
     },
     {
       "id": "fallen-knight",
       "name": "洞穴鼠",
-      "icon": "♟",
+      "icon": "近戰.png",
       "hp": 13,
       "atk": 5,
       "xp": 5,
@@ -56,13 +56,13 @@
       "attackCooldown": 1650,
       "attackType": "melee",
       "description": "重型近戰；耐打但移動較慢。",
-      "mapIconFile": "近戰.png",
+      "mapIconFile": "♟",
       "fallbackIcon": "♟"
     },
     {
       "id": "resentful-wisp",
       "name": "怨火幽魂",
-      "icon": "👻",
+      "icon": "遠程.png",
       "hp": 10,
       "atk": 3,
       "xp": 4,
@@ -77,7 +77,7 @@
       "projectileIcon": "●",
       "keepDistance": 165,
       "description": "遠距離發射投射物；受牆壁阻擋時會嘗試尋路到可射擊位置；投射物速度降低至 200 世界單位／秒，飛行途中可透過走位閃避，攻擊間隔為 1 秒。",
-      "mapIconFile": "遠程.png",
+      "mapIconFile": "👻",
       "fallbackIcon": "👻",
       "projectileSpeed": 200
     }
