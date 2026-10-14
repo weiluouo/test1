@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "武器由此檔管理。icon 可填文字／Emoji 或 GameData 內的 PNG 檔名；cooldown 單位毫秒，range 單位為地圖格距（每格 100 世界單位）。",
+  "weapons": [
+    {
+      "id": "short",
+      "name": "短劍",
+      "icon": "短劍.png",
+      "fallbackIcon": "🗡️",
+      "mult": 1,
+      "range": 1,
+      "cooldown": 1500,
+      "wall": false,
+      "attackFx": "fx-short",
+      "description": "短距離快速斬擊。"
+    },
+    {
+      "id": "long",
+      "name": "長劍",
+      "icon": "長劍.png",
+      "fallbackIcon": "⚔️",
+      "mult": 1.5,
+      "range": 1,
+      "cooldown": 2000,
+      "wall": false,
+      "attackFx": "fx-long",
+      "description": "高傷害近戰斬擊。"
+    },
+    {
+      "id": "spear",
+      "name": "長槍",
+      "icon": "長槍.png",
+      "fallbackIcon": "🔱",
+      "mult": 1,
+      "range": 2,
+      "cooldown": 1800,
+      "wall": false,
+      "attackFx": "fx-spear",
+      "description": "可在較長距離突刺。"
+    },
+    {
+      "id": "bow",
+      "name": "長弓",
+      "icon": "長弓.png",
+      "fallbackIcon": "🏹",
+      "mult": 1,
+      "range": 2,
+      "cooldown": 2000,
+      "wall": true,
+      "attackFx": "fx-arrow",
+      "description": "遠距離射擊，可穿越障礙物。"
+    },
+    {
+      "id": "gunlance",
+      "name": "銃槍",
+      "icon": "銃槍.png",
+      "fallbackIcon": "🔫",
+      "mult": 0.4,
+      "range": 3,
+      "cooldown": 700,
+      "wall": false,
+      "attackFx": "fx-bullet",
+      "description": "低傷害、長射程、短冷卻的子彈射擊。"
+    }
+  ]
+}
