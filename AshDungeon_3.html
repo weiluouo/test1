@@ -326,7 +326,7 @@ makeRoom=function(){
   gridMakeRoomOriginal();
   run.projectiles=[];
   run.player=toWorldEntity(run.player);run.exit=toWorldEntity(run.exit);if(run.floor===10){run.map[3][4]='floor';const bossCell=run.enemies.find(e=>e.boss);if(bossCell){bossCell.x=4;bossCell.y=3;}}
-  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=42;e.attackCooldown=1200;e.nextSkillAt=Date.now()+5000+Math.random()*5000;e.shieldUntil=0;run.bossStatus='魔王尚未施放技能。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier||1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange||40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||155;e.aggro=false;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
+  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=42;e.attackCooldown=1200;e.nextSkillAt=Date.now()+5000+Math.random()*5000;e.shieldUntil=0;run.bossStatus='魔王尚未施放技能。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier||1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange||40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||155;e.aggro=false;e.homeX=e.x;e.homeY=e.y;e.roamStyle=['wander','patrol','restless'][Math.floor(Math.random()*3)];e.roamRadius=e.roamStyle==='restless'?78+Math.random()*18:e.roamStyle==='patrol'?52+Math.random()*12:62+Math.random()*16;e.patrolAxis=Math.random()*Math.PI*2;e.patrolSide=Math.random()<.5?-1:1;e.wanderTarget=null;e.wanderPauseUntil=Date.now()+Math.random()*700;e.wanderExpiresAt=0;e.rangedMoveStyle=['strafe','circle','reposition'][Math.floor(Math.random()*3)];e.rangedMoveTarget=null;e.rangedMoveUntil=0;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
   run.chests.forEach((c,i)=>{toWorldEntity(c);c.uid=`f${run.floor}-c${i}`});if(run.searchPoint)run.searchPoint=toWorldEntity(run.searchPoint);
   run.exitHandled=false;run.bossTelegraph=null;run.floorTransitioning=false;arenaBuiltFloor=-1;
 };
@@ -504,21 +504,117 @@ function damagePlayerFromEnemy(e,now,projectile=false){
 }
 function pointSegmentDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y;const l2=dx*dx+dy*dy;if(!l2)return dist(p,a);const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy))}
 function updateProjectiles(dt,now){if(!run)return;const items=run.projectiles||[];for(const p of items){if(p.dead)continue;const from={x:p.x,y:p.y},to={x:p.x+p.vx*dt,y:p.y+p.vy*dt};if(segmentHitsWall(from,to)||to.x<WORLD.cell||to.x>WORLD.width-WORLD.cell||to.y<WORLD.cell||to.y>WORLD.height-WORLD.cell){p.dead=true;p.el?.remove();continue}p.x=to.x;p.y=to.y;if(p.el)positionNode(p.el,p);if(pointSegmentDistance(run.player,from,to)<=WORLD.playerRadius+(p.radius||8)){p.dead=true;p.el?.remove();applyEnemyDamageToPlayer(p.owner,now,true)}}run.projectiles=items.filter(p=>!p.dead);if(run.hp<=0)finish(false)}
-function moveEnemies(dt,now){const list=aliveEnemies();for(const e of list){if(e.dead)continue;const d=dist(e,run.player);const isBoss=!!e.boss;if(isBoss)e.aggro=true;
-  // 小怪初始保持休眠；玩家進入索敵半徑，或攻擊命中時才醒來。
-  if(!e.aggro&&d<=(e.aggroRange||230)){e.aggro=true;addLog(`${e.name}發現了你！`)}if(!e.aggro)continue;
+function moveTowardPoint(e,target,dt,speed){
+ if(!target||!e)return false;
+ const dx=target.x-e.x,dy=target.y-e.y,len=Math.hypot(dx,dy);
+ if(len<4)return true;
+ const step=Math.min(Math.max(0,speed)*dt,len);
+ if(moveActor(e,dx/len*step,dy/len*step,e.radius||WORLD.enemyRadius,'enemy'))return true;
+ // 遇到角落或怪物互相阻擋時，嘗試沿側向繞行。
+ const ux=dx/len,uy=dy/len;
+ for(const [ax,ay] of [[-uy,ux],[uy,-ux],[ux,0],[0,uy],[-ux,0],[0,-uy]]){
+  if(moveActor(e,ax*step,ay*step,e.radius||WORLD.enemyRadius,'enemy'))return true;
+ }
+ return false;
+}
+function chooseIdleWanderTarget(e,now){
+ const home={x:Number.isFinite(e.homeX)?e.homeX:e.x,y:Number.isFinite(e.homeY)?e.homeY:e.y};
+ const radius=Number(e.roamRadius)||68;
+ for(let i=0;i<28;i++){
+  let angle=Math.random()*Math.PI*2;
+  if(e.roamStyle==='patrol')angle=e.patrolAxis+(e.patrolSide||1)*Math.PI+(Math.random()-.5)*.9;
+  let r=(e.roamStyle==='restless'?.35:.18)*radius+Math.random()*radius*(e.roamStyle==='restless'?.65:.82);
+  r=Math.min(radius,r);
+  const candidate={x:home.x+Math.cos(angle)*r,y:home.y+Math.sin(angle)*r};
+  if(!canOccupy(candidate.x,candidate.y,e.radius||WORLD.enemyRadius,'enemy'))continue;
+  if(segmentHitsWall(e,candidate))continue;
+  e.wanderTarget=candidate;e.wanderExpiresAt=now+1200+Math.random()*2100;
+  if(e.roamStyle==='patrol')e.patrolSide=-(e.patrolSide||1);
+  return true;
+ }
+ e.wanderTarget=null;e.wanderPauseUntil=now+500+Math.random()*900;return false;
+}
+function updateIdleWander(e,dt,now){
+ if(e.wanderPauseUntil&&now<e.wanderPauseUntil)return;
+ if(!e.wanderTarget||dist(e,e.wanderTarget)<8||now>=e.wanderExpiresAt){
+  if(e.wanderTarget&&dist(e,e.wanderTarget)<12&&Math.random()<.4){e.wanderTarget=null;e.wanderPauseUntil=now+300+Math.random()*850;return;}
+  chooseIdleWanderTarget(e,now);
+ }
+ if(!e.wanderTarget)return;
+ const speed=(Number(e.speed)||70)*(e.roamStyle==='restless'?.46:e.roamStyle==='patrol'?.32:.37);
+ moveTowardPoint(e,e.wanderTarget,dt,speed);
+}
+function chooseRangedMoveTarget(e,keep,attackRange,now){
+ const d=dist(e,run.player),baseAngle=Math.atan2(e.y-run.player.y,e.x-run.player.x);
+ const minR=keep+12,maxR=Math.max(minR+8,attackRange-14);
+ for(let i=0;i<30;i++){
+  let angle=Math.random()*Math.PI*2;
+  if(e.rangedMoveStyle==='strafe')angle=baseAngle+(Math.random()<.5?-1:1)*(Math.PI/2+(Math.random()-.5)*.8);
+  else if(e.rangedMoveStyle==='circle')angle=baseAngle+(Math.random()<.5?-1:1)*(.65+Math.random()*1.25);
+  else if(i<12)angle=baseAngle+(Math.random()-.5)*2.3;
+  const r=minR+Math.random()*Math.max(1,maxR-minR);
+  const candidate={x:run.player.x+Math.cos(angle)*r,y:run.player.y+Math.sin(angle)*r};
+  if(!canOccupy(candidate.x,candidate.y,e.radius||WORLD.enemyRadius,'enemy'))continue;
+  if(segmentHitsWall(candidate,run.player))continue;
+  // 目標要落在攻擊與退縮距離構成的環帶內，避免走位把自己帶出有效位置。
+  const cd=dist(candidate,run.player);
+  if(cd<minR-1||cd>maxR+1)continue;
+  e.rangedMoveTarget=candidate;e.rangedMoveUntil=now+900+Math.random()*1500;return true;
+ }
+ e.rangedMoveTarget=null;e.rangedMoveUntil=now+450;return false;
+}
+function updateRangedBandMovement(e,dt,now,keep,attackRange){
+ if(!e.rangedMoveTarget||now>=e.rangedMoveUntil||dist(e,e.rangedMoveTarget)<8){
+  if(!chooseRangedMoveTarget(e,keep,attackRange,now))return;
+ }
+ const speed=(Number(e.speed)||64)*(e.rangedMoveStyle==='reposition'?.82:.58);
+ moveTowardPoint(e,e.rangedMoveTarget,dt,speed);
+}
+function moveEnemies(dt,now){
+ const list=aliveEnemies();
+ for(const e of list){
+  if(e.dead)continue;
+  let d=dist(e,run.player);const isBoss=!!e.boss;if(isBoss)e.aggro=true;
+  // 接近索敵距離才進入戰鬥；尚未警戒時，在出生點附近小幅漫遊。
+  if(!e.aggro&&d<=(e.aggroRange||230)){e.aggro=true;e.wanderTarget=null;e.wanderPauseUntil=0;addLog(`${e.name}發現了你！`)}
+  if(!e.aggro){updateIdleWander(e,dt,now);continue;}
   const ranged=e.classType==='ranged';const touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+7;
-  if(ranged){const keep=Math.max(e.keepDistance||155,touch+12);let retreated=false;
-   // 玩家靠得太近時先後退，但本幀仍會重新判定射程／視線；只要仍能射擊便邊退邊發射。
-   if(d<keep){const speed=e.speed||64,inv=Math.max(1,d),ux=(e.x-run.player.x)/inv,uy=(e.y-run.player.y)/inv;const dirs=[[ux,uy],[ux,0],[0,uy],[-uy,ux],[uy,-ux]];for(const [ax,ay] of dirs){const len=Math.hypot(ax,ay)||1;if(moveActor(e,ax/len*Math.min(speed*dt,Math.max(2,keep-d)),ay/len*Math.min(speed*dt,Math.max(2,keep-d)),e.radius||WORLD.enemyRadius,'enemy')){retreated=true;break}}}
-   const distanceAfterMove=dist(e,run.player);const canShootNow=distanceAfterMove<=(e.attackRange||260)&&lineClearForEnemy(e);
-   if(canShootNow){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,true);continue;}
-   if(retreated)continue;
-   let waypoint=findPathWaypoint(e);if(!waypoint)continue;const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;const speed=e.speed||64;moveActor(e,dx/len*Math.min(speed*dt,len),dy/len*Math.min(speed*dt,len),e.radius||WORLD.enemyRadius,'enemy');continue;
+  if(ranged){
+   const keep=Math.max(e.keepDistance||155,touch+12);
+   const attackRange=Math.max(touch+8,Number(e.attackRange)||260);
+   // 遠程怪會在移動過程中照常攻擊：射擊判定放在本幀移動之前，不因退縮或走位而略過。
+   const canShootNow=d<=attackRange&&lineClearForEnemy(e);
+   if(canShootNow&&now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,true);
+   d=dist(e,run.player);
+   if(d<keep){
+    e.rangedMoveTarget=null;
+    const speed=Number(e.speed)||64,inv=Math.max(1,d),ux=(e.x-run.player.x)/inv,uy=(e.y-run.player.y)/inv;
+    const push=Math.min(speed*dt,Math.max(3,keep-d+3));
+    const dirs=[[ux,uy],[ux,0],[0,uy],[-uy,ux],[uy,-ux],[-uy,-ux],[uy,ux]];
+    let moved=false;
+    for(const [ax,ay] of dirs){const len=Math.hypot(ax,ay)||1;if(moveActor(e,ax/len*push,ay/len*push,e.radius||WORLD.enemyRadius,'enemy')){moved=true;break}}
+    // 若被牆或其他怪卡住，至少仍保留射擊判定，不會整段 AI 直接跳過攻擊。
+    continue;
+   }
+   if(d<=attackRange&&lineClearForEnemy(e)){
+    // 位於退縮距離與攻擊距離之間：按不同走位風格隨機側移、繞行或重新選位，同時維持射擊。
+    updateRangedBandMovement(e,dt,now,keep,attackRange);
+    continue;
+   }
+   // 超出射程或視線被牆阻斷時，向可射擊位置移動；進入環帶後即改為隨機走位。
+   e.rangedMoveTarget=null;
+   const waypoint=findPathWaypoint(e);if(!waypoint)continue;
+   const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
+   const speed=Number(e.speed)||64;moveTowardPoint(e,waypoint,dt,speed);continue;
   }
   if(d<=touch){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,false);continue;}
-  const waypoint=findPathWaypoint(e);if(!waypoint)continue;const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;const speed=isBoss?136:(e.speed||76);const step=Math.min(speed*dt,len);const moved=moveActor(e,dx/len*step,dy/len*step,e.radius||WORLD.enemyRadius,'enemy');if(!moved){const alternatives=[[dx/len,0],[0,dy/len],[-dy/len,dx/len],[dy/len,-dx/len]];for(const [ax,ay] of alternatives){if(moveActor(e,ax*speed*dt,ay*speed*dt,e.radius||WORLD.enemyRadius,'enemy'))break}}
- }}
+  const waypoint=findPathWaypoint(e);if(!waypoint)continue;
+  const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
+  const speed=isBoss?136:(e.speed||76);const step=Math.min(speed*dt,len);
+  const moved=moveActor(e,dx/len*step,dy/len*step,e.radius||WORLD.enemyRadius,'enemy');
+  if(!moved){const alternatives=[[dx/len,0],[0,dy/len],[-dy/len,dx/len],[dy/len,-dx/len]];for(const [ax,ay] of alternatives){if(moveActor(e,ax*speed*dt,ay*speed*dt,e.radius||WORLD.enemyRadius,'enemy'))break}}
+ }
+}
 function processRunInteractions(now){for(const c of run.chests){if(!c.open&&dist(run.player,c)<35)openChest(c)}if(run.searchPoint&&!run.roomSearched&&dist(run.player,run.searchPoint)<39){addLog('你接近地圖中的星芒印記，開始調查。');explore()}if(dist(run.player,run.exit)<39&&!run.exitHandled){if(aliveEnemies().length){if(!run.exitWarningAt||now-run.exitWarningAt>2500){addLog('出口仍被敵人封鎖，先擊敗剩餘怪物。');run.exitWarningAt=now}}else{run.exitHandled=true;if(run.floor===10){finish(true);return}if(run.floor%2===1){showExpeditionScenario(()=>advanceToNextFloor());return}advanceToNextFloor();return}}}
 realtimeUpdate=function(){if(!run||run.done||$('gameScreen').classList.contains('hidden'))return;const now=performance.now();if(!run.lastFrame)run.lastFrame=now;const dt=Math.min(.05,Math.max(0,(now-run.lastFrame)/1000));run.lastFrame=now;if(!$('modal').classList.contains('hidden'))return
  const held=[...heldDirections.values()];let vx=0,vy=0;for(const d of held){vx+=dirVectors[d]?.x||0;vy+=dirVectors[d]?.y||0}const vl=Math.hypot(vx,vy);if(vl){vx/=vl;vy/=vl;moveActor(run.player,vx*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,vy*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,WORLD.playerRadius,'player');run.playerFacing={x:vx,y:vy}}
