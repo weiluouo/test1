@@ -71,7 +71,7 @@
       "attackCooldown": 1000,
       "attackType": "projectile",
       "projectileIcon": "🔥",
-      "keepDistance": 270,
+      "keepDistance": 170,
       "description": "遠距離發射投射物；受牆壁阻擋時會嘗試尋路到可射擊位置；投射物速度降低至 160 世界單位／秒，飛行途中可透過走位閃避，攻擊間隔為 2.5 秒。",
       "mapIconFile": "👻",
       "fallbackIcon": "👻",
