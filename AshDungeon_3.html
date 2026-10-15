@@ -32,7 +32,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
 
 </head><body><div class="wrap">
 <header class="top"><div><div class="eyebrow">THE SILVER SWORD CHRONICLES</div><div class="brand">銀劍的英雄<span class="gold">．夢幻境之旅</span></div><div class="sub">古老羊皮紙記載著旅程；每一次抉擇，都將改寫英雄的傳說。</div></div><div class="badge" id="headerMeta">✦ 0 律質</div></header>
-<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept="application/json,.json" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">升級價格會隨等級逐步增加；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王分為近戰、遠程、騎兵三階段（70%／30% 生命切換）；召喚的支援怪會削弱隨機數值，擊敗後恢復。怪物戰利品會落地，必須走近拾取。</p></div></div></div></section>
+<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept=".ssv,.json,application/json,application/octet-stream" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">升級價格會隨等級逐步增加；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王分為近戰、遠程、騎兵三階段（70%／30% 生命切換）；召喚的支援怪會削弱隨機數值，擊敗後恢復。怪物戰利品會落地，必須走近拾取。</p></div></div></div></section>
 <section id="gameScreen" class="hidden">
 <div class="layout"><div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2 id="roomTitle">第一層：銀霧入口</h2><div class="sub" id="roomDesc">探索道路、搜集戰利品，並尋找通往下一層的出口。</div></div><span class="badge" id="roomBadge">即時戰鬥</span></div><div class="map" id="map" aria-label="地城自由移動地圖"></div>
 <div id="bossInfo" class="boss-info hidden" aria-live="polite"></div>
@@ -396,9 +396,9 @@ function updatePlayerBleed(now){
  if(now>=run.playerBleedUntil){run.playerBleedUntil=0;run.playerBleedNextAt=0;run.playerBleedDamage=0;addLog('你身上的流血效果已止住。');}
  if(run.hp<=0)finish(false);
 }
-function weaponRangePx(w=getWeapon()){const b=run?.weaponBonuses?.[w?.id]||{};return Math.max(0,(Number(w?.range)||0)+(Number(b.rangeAdd)||0))*WORLD.cell}
-function weaponAttackCooldownMs(w=getWeapon()){const b=run?.weaponBonuses?.[w?.id]||{};const speed=Math.max(-0.8,Math.min(3,Number(b.attackSpeedPercentAdd)||0));return Math.max(120,(Number(w?.cooldown)||1500)/(1+Math.max(-0.8,speed)))}
-function weaponDamageBonus(wid){return Number(run?.weaponBonuses?.[wid]?.damagePercentAdd)||0}
+function weaponRangePx(w=getWeapon()){const b=run?.weaponBonuses?.[w?.id]||{},s=run?.synergyWeaponBonuses?.[w?.id]||{};return Math.max(0,(Number(w?.range)||0)+(Number(b.rangeAdd)||0)+(Number(s.rangeAdd)||0))*WORLD.cell}
+function weaponAttackCooldownMs(w=getWeapon()){const b=run?.weaponBonuses?.[w?.id]||{},s=run?.synergyWeaponBonuses?.[w?.id]||{};const speed=Math.max(-0.8,Math.min(3,(Number(b.attackSpeedPercentAdd)||0)+(Number(s.attackSpeedPercentAdd)||0)));return Math.max(120,(Number(w?.cooldown)||1500)/(1+Math.max(-0.8,speed)))}
+function weaponDamageBonus(wid){return (Number(run?.weaponBonuses?.[wid]?.damagePercentAdd)||0)+(Number(run?.synergyWeaponBonuses?.[wid]?.damagePercentAdd)||0)}
 function weaponAbility(w,key){return w?.abilities?.[key]||null}
 function tableInt(min,max){min=Math.ceil(Number(min)||0);max=Math.floor(Number(max??min)||min);if(max<min)[min,max]=[max,min];return Math.floor(Math.random()*(max-min+1))+min}
 function applyWeaponScopedBonus(r,effect,key){const ids=Array.isArray(effect.weaponIds)?effect.weaponIds.filter(Boolean):[];if(!ids.length)return; r.weaponBonuses=r.weaponBonuses||{};for(const id of ids){r.weaponBonuses[id]=r.weaponBonuses[id]||{};r.weaponBonuses[id][key]=(Number(r.weaponBonuses[id][key])||0)+(Number(effect.value)||0);}}
@@ -457,7 +457,7 @@ fight=function(e){
   const sweepMult=longSweep?Math.max(0,Number(sweep?.multiTargetDamageMultiplier??1)||0):1;
   const dmg=weaponBaseDamage((Number(w.mult)||1)*sweepMult,run.crit,w.id);
   const landed=applyWeaponHit(target,dmg,w,now);
-  const knock=weaponAbility(w,'knockback');if(knock&&knock.enabled!==false&&target===e&&landed&&!target.dead){const extra=Number(run.weaponBonuses?.[w.id]?.knockbackCellsAdd)||0;knockbackEnemyOneCell(target,Math.max(.25,(Number(knock.distanceCells)||1)+extra));}
+  const knock=weaponAbility(w,'knockback');if(knock&&knock.enabled!==false&&target===e&&landed&&!target.dead){const extra=(Number(run.weaponBonuses?.[w.id]?.knockbackCellsAdd)||0)+(Number(run.synergyWeaponBonuses?.[w.id]?.knockbackCellsAdd)||0);knockbackEnemyOneCell(target,Math.max(.25,(Number(knock.distanceCells)||1)+extra));}
   if(run.done)break
  }
  render();if(run.hp<=0)finish(false)
@@ -561,7 +561,7 @@ function castBossSkill(boss,now){const choices=bossCandidates(boss);const skill=
  else if(skill==='drain'){const s=aliveEnemies().filter(e=>e.summoned).sort((a,b)=>a.hp-b.hp)[0];if(s){const remaining=Math.max(0,s.hp);s.dead=true;const before=boss.hp;boss.hp=Math.min(boss.maxHp,boss.hp+remaining);run.bossStatus=`吸取：吞噬召喚物，恢復 ${boss.hp-before} 點生命。`;addLog(`魔王施放「吸取」！殺死${s.name}，恢復 ${boss.hp-before} 點生命。`);emitFx('fx-energy',boss,boss)}else run.bossStatus='吸取失敗：沒有可吸取的召喚物。'}
 }
 function updateBoss(now){const boss=aliveEnemies().find(e=>e.boss);if(!boss){run.bossTelegraph=null;return}if(boss.shieldUntil&&now>=boss.shieldUntil){boss.shieldUntil=0;run.bossStatus='轉能護盾消散。';addLog('魔王的「轉能」護盾消散。')}
- if(run.bossTelegraph&&now>=run.bossTelegraph.resolveAt){const t=run.bossTelegraph;let inside=t.orientation==='horizontal'?Math.abs(run.player.y-t.center)<=WORLD.cell*1.5&&run.player.x>=WORLD.cell&&run.player.x<=WORLD.width-WORLD.cell:Math.abs(run.player.x-t.center)<=WORLD.cell*1.5&&run.player.y>=WORLD.cell&&run.player.y<=WORLD.height-WORLD.cell;run.bossTelegraph=null;if(inside){let dmg=Math.max(1,Math.round(boss.atk*1.8*(Number(boss.damageMultiplier)||1)-(run.guardBase||0)-(run.armor||0)));run.hp-=dmg;emitFx('fx-slash',boss,run.player);floatDamage(run.player,dmg);run.bossStatus=`重斬命中：造成 ${dmg} 點傷害。`;addLog(`魔王「重斬」命中你，造成 ${dmg} 點傷害！`)}else{run.bossStatus='重斬落空：你已離開警戒區。';addLog('你及時離開警戒線，躲過魔王的「重斬」。');}}
+ if(run.bossTelegraph&&now>=run.bossTelegraph.resolveAt){const t=run.bossTelegraph;let inside=t.orientation==='horizontal'?Math.abs(run.player.y-t.center)<=WORLD.cell*1.5&&run.player.x>=WORLD.cell&&run.player.x<=WORLD.width-WORLD.cell:Math.abs(run.player.x-t.center)<=WORLD.cell*1.5&&run.player.y>=WORLD.cell&&run.player.y<=WORLD.height-WORLD.cell;run.bossTelegraph=null;if(inside&&Date.now()<(run.invulnerableUntil||0)){run.bossStatus='衝刺無敵：你穿過了重斬的命中時機。';addLog('衝刺無敵生效，你避開了魔王的「重斬」。')}else if(inside){let dmg=Math.max(1,Math.round(boss.atk*1.8*(Number(boss.damageMultiplier)||1)-(run.guardBase||0)-(run.armor||0)));run.hp-=dmg;emitFx('fx-slash',boss,run.player);floatDamage(run.player,dmg);run.bossStatus=`重斬命中：造成 ${dmg} 點傷害。`;addLog(`魔王「重斬」命中你，造成 ${dmg} 點傷害！`)}else{run.bossStatus='重斬落空：你已離開警戒區。';addLog('你及時離開警戒線，躲過魔王的「重斬」。');}}
  if(now>=boss.nextSkillAt&&!run.bossTelegraph)castBossSkill(boss,now)
 }
 function lineClearForEnemy(e){return !segmentHitsWall(e,run.player)}
@@ -720,7 +720,7 @@ startRun=function(){if(frameLoop!==null){cancelAnimationFrame(frameLoop);frameLo
 })();
 // Weapon, potion and exploration controls. E and the on-screen attack button share exactly the same cooldown.
 $('attackBtn').onclick=triggerAttack;
-usePotion=function(){if(!run||run.done||run.pots<=0||run.hp>=run.maxHp)return;run.pots--;const h=Math.min(run.maxHp-run.hp,run.potHeal);run.hp+=h;floatDamage(run.player,h,true);addLog(`你使用藥水，恢復 ${h.toFixed(1)} 點生命。`);render()};$('potionBtn').onclick=usePotion;if($('exploreBtn'))$('exploreBtn').onclick=explore;
+usePotion=function(){if(!run||run.done||run.pots<=0||run.hp>=run.maxHp)return;run.pots--;const h=Math.min(run.maxHp-run.hp,(Number(run.potHeal)||0)+(Number(run.synergyPotionHealBonus)||0));run.hp+=h;floatDamage(run.player,h,true);addLog(`你使用藥水，恢復 ${h.toFixed(1)} 點生命。`);render()};$('potionBtn').onclick=usePotion;if($('exploreBtn'))$('exploreBtn').onclick=explore;
 // Keep a descriptive hint for the new continuous movement and weapon timings.
 const finishBeforeFreeMovement=finish;finish=function(win){if(frameLoop!==null){cancelAnimationFrame(frameLoop);frameLoop=null}clearHeldDirections();if(run?.magicCharge?.marker)run.magicCharge.marker.remove();finishBeforeFreeMovement(win)};
 const hint=document.querySelector('#gameScreen .section p.sub');if(hint)hint.textContent='自由移動：玩家基礎速度 200，可由情境、遺物與搜索效果按百分比變化。按住方向鍵／WASD 移動；E 攻擊、R 使用藥水。空揮冷卻為武器正常冷卻的 40%；武器由 GameData/dungeon_weapons.json 管理。';
@@ -1025,23 +1025,32 @@ renderMeta();
     if(!run)return [];
     const ids=new Set((run.relics||[]).map(r=>r.id));
     const items=[];
-    if(ids.has('wolf-fang-pendant')&&ids.has('blood-rune'))items.push({id:'fang-blood',name:'獵血共鳴',desc:'對流血中的敵人，額外造成 1 點直接傷害。',active:true});
-    else items.push({id:'fang-blood',name:'獵血共鳴',desc:'同時持有「狼牙吊墜」與「血痕符文」即可啟動。',active:false});
-    if(ids.has('copperwall-charm')&&ids.has('silver-oath'))items.push({id:'silver-wall',name:'銀誓壁壘',desc:'額外固定減傷 +1。',active:true});
-    else items.push({id:'silver-wall',name:'銀誓壁壘',desc:'同時持有「銅壁護符」與「銀誓徽章」即可啟動。',active:false});
-    if(ids.has('glass-prism')&&run.weapon==='staff')items.push({id:'prism-staff',name:'光稜聚焦',desc:'裝備權杖時，光束傷害 +15%。',active:true});
-    else items.push({id:'prism-staff',name:'光稜聚焦',desc:'持有「玻璃稜鏡」並裝備權杖即可啟動。',active:false});
+    if(ids.has('wolf-fang-pendant')&&ids.has('blood-rune'))items.push({id:'fang-blood',name:'獵血共鳴',desc:'對流血中的敵人額外造成 1 點直接傷害。'});
+    if(ids.has('copperwall-charm')&&ids.has('silver-oath'))items.push({id:'silver-wall',name:'銀誓壁壘',desc:'額外固定減傷 +1。'});
+    if(ids.has('glass-prism')&&run.weapon==='staff')items.push({id:'prism-staff',name:'光稜聚焦',desc:'裝備權杖時，光束傷害 +15%。'});
+    if(ids.has('eagle-eye-bowstring')&&ids.has('hunter-eye')&&run.weapon==='bow')items.push({id:'bow-hunter',name:'鷹眼獵殺',desc:'裝備長弓時，額外傷害 +10%、射程 +0.25 格。'});
+    if(ids.has('breaker-spear-tassel')&&ids.has("warrior's-knot")&&run.weapon==='spear')items.push({id:'spear-breaker',name:'破陣之勢',desc:'裝備長槍時，額外傷害 +12%、攻擊速度 +10%、擊退距離 +0.5 格。'});
+    if(ids.has('gunlance-ignition-core')&&ids.has('ember-core')&&run.weapon==='gunlance')items.push({id:'gunlance-ignition',name:'赤芯連鎖',desc:'裝備銃槍時，額外傷害 +10%、攻擊速度 +15%。'});
+    if(ids.has('alchemy-vial')&&ids.has('soul-bloom'))items.push({id:'alchemy-soul',name:'魂花藥契',desc:'藥水額外恢復 3 點生命。'});
+    if(ids.has('last-light')&&ids.has('silver-thread'))items.push({id:'last-silver',name:'末光銀絲',desc:'生命低於 35% 時，額外傷害 +10%。'});
     return items;
   }
 let synergyRuntimeRun=null,synergyRuntimeSignature='';
   function applySynergyRuntime(){
     if(!run)return;
     const signature=`${(run.relics||[]).map(r=>r.id).sort().join(',')}|${run.weapon}|${Number(run.buffFangBloodBonus)||0}`;if(synergyRuntimeRun===run&&signature===synergyRuntimeSignature)return;synergyRuntimeRun=run;synergyRuntimeSignature=signature;
-    const active=new Set(currentSynergies().filter(x=>x.active).map(x=>x.id));
+    const active=new Set(currentSynergies().map(x=>x.id));
     run.activeSilverSynergies=active;
     run.fangBloodBonus=(active.has('fang-blood')?1:0)+(Number(run.buffFangBloodBonus)||0);
     run.synergyFixedGuard=active.has('silver-wall')?1:0;
     run.prismStaffBonus=active.has('prism-staff')?.15:0;
+    const wb={};const add=(id,key,value)=>{wb[id]=wb[id]||{};wb[id][key]=(Number(wb[id][key])||0)+value};
+    if(active.has('bow-hunter')){add('bow','damagePercentAdd',.10);add('bow','rangeAdd',.25)}
+    if(active.has('spear-breaker')){add('spear','damagePercentAdd',.12);add('spear','attackSpeedPercentAdd',.10);add('spear','knockbackCellsAdd',.5)}
+    if(active.has('gunlance-ignition')){add('gunlance','damagePercentAdd',.10);add('gunlance','attackSpeedPercentAdd',.15)}
+    run.synergyWeaponBonuses=wb;
+    run.synergyPotionHealBonus=active.has('alchemy-soul')?3:0;
+    run.synergyLowHpDamageBonus=active.has('last-silver')?.10:0;
   }
   function updateBuildPanel(force=false){
     if(!run)return;
@@ -1049,7 +1058,7 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
     const now=performance.now();if(!force&&sig===buildSignature&&now-lastBuildUi<500)return;buildSignature=sig;lastBuildUi=now;
     applySynergyRuntime();
     let panel=$('buildSynergyPanel');if(!panel){panel=document.createElement('div');panel.id='buildSynergyPanel';panel.className='build-panel';panel.innerHTML='<h4>構築與遺物共鳴</h4><div class="synergy-list"></div><p class="save-help">效果會在取得遺物或切換武器後更新。</p>';const relicRoot=$('relics');if(relicRoot?.closest('.section'))relicRoot.closest('.section').insertAdjacentElement('afterend',panel);}
-    const list=panel.querySelector('.synergy-list');list.innerHTML=currentSynergies().map(x=>`<div class="synergy ${x.active?'':'inactive'}"><b>${x.active?'✦':'◇'} ${escapeHtmlText(x.name)}</b><div>${escapeHtmlText(x.desc)}</div></div>`).join('');
+    const list=panel.querySelector('.synergy-list');const unlocked=currentSynergies();panel.classList.toggle('hidden',unlocked.length===0);list.innerHTML=unlocked.map(x=>`<div class="synergy"><b>✦ ${escapeHtmlText(x.name)}</b><div>${escapeHtmlText(x.desc)}</div></div>`).join('');
   }
   const oldRender=render;
   render=function(throttleHud=false){oldRender(throttleHud);if(run){updateTargetUi(!throttleHud);updateWeaponDpsHints(!throttleHud);updateBuildPanel(!throttleHud);const badge=$('roomBadge');if(badge){const txt=`第 ${run.floor} 層 · ${(roomInfo[run.roomType]||roomInfo.combat).name}`;if(badge.textContent!==txt)badge.textContent=txt;}const info=$('bossInfo');const boss=aliveEnemies().find(e=>e.boss);if(boss&&info){const phase=boss.phase||1;const txt=`夢境君王 · 第 ${phase} 階段｜${run.bossStatus||'魔王正在注視你。'}｜下次技能 ${(Math.max(0,(boss.nextSkillAt||Date.now())-Date.now())/1000).toFixed(1)} 秒`;if(info.textContent!==txt)info.textContent=txt;}}};
@@ -1074,14 +1083,14 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
     let base=Math.max(1,Math.round((Number(run?.atk)||1)*(Number(mult)||1)*(1+(Number(run?.attackPercentBonus)||0))*(1+weaponDamageBonus(weaponId))));
     const chance=Math.max(0,Math.min(.85,Number(critChance)||0));
     if(Math.random()<chance)base+=4+(Number(run?.critDamageBonus)||0);
-    if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)));
+    if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)+(Number(run.synergyLowHpDamageBonus)||0)));
     return Math.max(1,base);
   };
   const oldSnapshotDamage=weaponBaseDamageFromSnapshot;
   weaponBaseDamageFromSnapshot=function(charge){
     let base=Math.max(1,Math.round((Number(charge.atk)||1)*(Number(charge.mult)||1)*(1+(Number(run?.attackPercentBonus)||0))*(1+weaponDamageBonus(charge.weaponId||'staff'))));
     if(Math.random()<(Number(charge.crit)||0))base+=4+(Number(run?.critDamageBonus)||0);
-    if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)));
+    if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)+(Number(run.synergyLowHpDamageBonus)||0)));
     if(run?.prismStaffBonus)base=Math.round(base*(1+run.prismStaffBonus));
     return Math.max(1,base);
   };
@@ -1150,23 +1159,55 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
     v.unlockedWeapons=[...new Set(['short',...(Array.isArray(v.unlockedWeapons)?v.unlockedWeapons:[])])].filter(id=>typeof id==='string');
     v.startWeapon=v.unlockedWeapons.includes(v.startWeapon)?v.startWeapon:'short';v.version=2;return v;
   }
-  function exportSave(){
-    const payload={game:'silver-sword-dreamlands',title:'銀劍的英雄．夢幻境之旅',schemaVersion:'2.0.0',exportedAt:new Date().toISOString(),meta:normaliseMeta(meta)};
-    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`銀劍的英雄_進度備份_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const SAVE_ENCRYPTION_FORMAT='silver-sword-save-encrypted';
+  const SAVE_KDF_ITERATIONS=310000;
+  function saveBytesToBase64(bytes){let bin='';for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(bin)}
+  function saveBase64ToBytes(value){const bin=atob(String(value||''));const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);return bytes}
+  async function deriveSaveKey(passphrase,salt,usages){
+    if(!globalThis.crypto?.subtle)throw new Error('目前瀏覽器不支援安全加密，請以最新版 Chrome／Edge 並透過 localhost 或 HTTPS 開啟遊戲。');
+    const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(passphrase),'PBKDF2',false,['deriveKey']);
+    return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:SAVE_KDF_ITERATIONS,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,usages);
   }
-  $('exportSaveBtn')?.addEventListener('click',()=>{try{exportSave();}catch(err){alert('匯出失敗：'+err.message)}});
+  async function exportSave(){
+    const passphrase=prompt('設定進度備份密碼（至少 8 個字元）。忘記密碼將無法還原備份：');
+    if(passphrase===null)return;
+    if(passphrase.length<8){alert('密碼至少需要 8 個字元。');return;}
+    const confirmPass=prompt('請再次輸入相同密碼確認：');
+    if(confirmPass===null)return;
+    if(passphrase!==confirmPass){alert('兩次輸入的密碼不一致，沒有匯出檔案。');return;}
+    const payload={game:'silver-sword-dreamlands',title:'銀劍的英雄．夢幻境之旅',schemaVersion:'2.0.0',exportedAt:new Date().toISOString(),meta:normaliseMeta(meta)};
+    const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveSaveKey(passphrase,salt,['encrypt']);
+    const plaintext=new TextEncoder().encode(JSON.stringify(payload));
+    const ciphertext=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,plaintext);
+    const envelope={format:SAVE_ENCRYPTION_FORMAT,version:1,cipher:'AES-256-GCM',kdf:'PBKDF2-SHA-256',iterations:SAVE_KDF_ITERATIONS,salt:saveBytesToBase64(salt),iv:saveBytesToBase64(iv),ciphertext:saveBytesToBase64(new Uint8Array(ciphertext))};
+    const blob=new Blob([JSON.stringify(envelope)],{type:'application/octet-stream'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`銀劍的英雄_加密進度備份_${new Date().toISOString().slice(0,10)}.ssv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    alert('加密備份已匯出。請妥善保存密碼；遊戲不會儲存或寄送密碼。');
+  }
+  $('exportSaveBtn')?.addEventListener('click',async()=>{try{await exportSave();}catch(err){alert('匯出失敗：'+err.message)}});
   $('importSaveBtn')?.addEventListener('click',()=>$('importSaveFile')?.click());
   $('importSaveFile')?.addEventListener('change',async ev=>{
     const file=ev.target.files?.[0];if(!file)return;
     try{
-      const payload=JSON.parse(await file.text());if(!payload||!payload.meta||!['silver-sword-dreamlands','ashen-dungeon'].includes(payload.game))throw new Error('這不是《銀劍的英雄》或相容版本的進度檔。');
-      if(!confirm('匯入將覆蓋目前的永久鍛造與武器解鎖進度，是否繼續？')){ev.target.value='';return;}
+      const raw=await file.text();let envelope=JSON.parse(raw),payload;
+      if(envelope?.format===SAVE_ENCRYPTION_FORMAT){
+        if(envelope.cipher!=='AES-256-GCM'||envelope.kdf!=='PBKDF2-SHA-256'||Number(envelope.iterations)!==SAVE_KDF_ITERATIONS)throw new Error('加密檔案的格式或安全參數不受支援。');
+        const passphrase=prompt('輸入此加密備份的密碼：');if(passphrase===null)return;
+        try{const salt=saveBase64ToBytes(envelope.salt),iv=saveBase64ToBytes(envelope.iv),ciphertext=saveBase64ToBytes(envelope.ciphertext);const key=await deriveSaveKey(passphrase,salt,['decrypt']);const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ciphertext);payload=JSON.parse(new TextDecoder().decode(plain));}
+        catch{throw new Error('密碼錯誤，或備份檔案已損毀／遭到修改。');}
+      }else{
+        payload=envelope;
+        if(!payload?.meta||!['silver-sword-dreamlands','ashen-dungeon'].includes(payload.game))throw new Error('這不是有效的《銀劍的英雄》進度檔。');
+        if(!confirm('這是舊版未加密 JSON 備份，內容可能被直接編輯。要繼續匯入嗎？'))return;
+      }
+      if(!payload||!payload.meta||!['silver-sword-dreamlands','ashen-dungeon'].includes(payload.game))throw new Error('解密後的內容不是有效的《銀劍的英雄》進度檔。');
+      if(!confirm('匯入將覆蓋目前的永久鍛造與武器解鎖進度，是否繼續？'))return;
       meta=normaliseMeta(payload.meta);saveMeta();renderMeta();refreshStarterWeaponSelect();alert('進度匯入成功。');
     }catch(err){alert('無法匯入進度：'+err.message)}finally{ev.target.value='';}
   });
 
   // Make starting weapon selection available when external JSON has finished loading.
-  $('metaShop')?.insertAdjacentHTML('afterend','<p class="save-help">進度儲存在本機瀏覽器。請定期匯出 JSON 備份；不同瀏覽器與裝置不會自動同步。</p>');
+  $('metaShop')?.insertAdjacentHTML('afterend','<p class="save-help">進度儲存在本機瀏覽器。匯出會建立密碼加密的 .ssv 備份；請牢記密碼，忘記後無法解密。不同瀏覽器與裝置不會自動同步。</p>');
   if(typeof expeditionScenarioPromise!=='undefined') expeditionScenarioPromise.then(()=>{renderMeta();refreshStarterWeaponSelect();}).catch(()=>{});
   renderMeta();refreshStarterWeaponSelect();
 })();
@@ -1396,7 +1437,7 @@ updateBoss=function(now){
     if(t.kind==='charge'){
       const dx=run.player.x-boss.x,dy=run.player.y-boss.y,len=Math.hypot(dx,dy)||1,step=Math.max(0,Math.min(170,len-48));if(step>0)moveActor(boss,dx/len*step,dy/len*step,boss.radius||24,'enemy');
     }
-    if(inside){const layer=!run.guardUsed?(run.guardLayer||0):0;run.guardUsed=true;const mult=t.kind==='charge'?2.05:1.7;const dmg=Math.max(0,Math.round((boss.atk||1)*mult*(boss.damageMultiplier||1)-(run.guardBase||0)-layer-(run.guard||0)-(run.armor||0)));run.guard=0;run.hp-=dmg;emitFx('fx-slash',boss,run.player);floatDamage(run.player,dmg);run.bossStatus=`${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中：造成 ${dmg} 點傷害。`;addLog(`夢境君王的${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中你，造成 ${dmg} 點傷害。`);}
+    if(inside&&Date.now()<(run.invulnerableUntil||0)){run.bossStatus='衝刺無敵：你穿過了攻擊的命中時機。';addLog(`衝刺無敵生效，你避開了夢境君王的${t.kind==='charge'?'騎兵衝鋒':'重斬'}。`);}else if(inside){const layer=!run.guardUsed?(run.guardLayer||0):0;run.guardUsed=true;const mult=t.kind==='charge'?2.05:1.7;const dmg=Math.max(0,Math.round((boss.atk||1)*mult*(boss.damageMultiplier||1)-(run.guardBase||0)-layer-(run.guard||0)-(run.armor||0)));run.guard=0;run.hp-=dmg;emitFx('fx-slash',boss,run.player);floatDamage(run.player,dmg);run.bossStatus=`${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中：造成 ${dmg} 點傷害。`;addLog(`夢境君王的${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中你，造成 ${dmg} 點傷害。`);}
     else{run.bossStatus='魔王攻擊落空：你已離開警戒區。';addLog('你及時離開警戒區，躲過魔王攻擊。');}
   }
   if(now>=(boss.nextSkillAt||0)&&!run.bossTelegraph)castBossSkill(boss,now);
@@ -1510,7 +1551,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
   // Patch the movement scalar in the function's source isn't possible at runtime, so use a temporary moveActor multiplier.
   const baseMoveActor=moveActor;
   moveActor=function(actor,dx,dy,radius,kind){if(run&&actor===run.player&&run._sprintingNow){dx*=4;dy*=4}return baseMoveActor(actor,dx,dy,radius,kind)};
-  function sprint(){if(!run||run.done||!$('modal').classList.contains('hidden'))return;const now=performance.now();if(now<(run.sprintReadyAt||0))return;let dir={x:0,y:0};for(const d of heldDirections.values()){dir.x+=dirVectors[d]?.x||0;dir.y+=dirVectors[d]?.y||0}let len=Math.hypot(dir.x,dir.y);if(len<.01){dir=run.playerFacing||{x:1,y:0};len=Math.hypot(dir.x,dir.y)||1}dir={x:dir.x/len,y:dir.y/len};run.playerFacing=dir;run.sprintVector=dir;run.sprintUntil=now+300;run.sprintReadyAt=now+3000;const sprintDir=dir;const sprintKey='sprint:'+now;heldDirections.set(sprintKey,sprintDir.x===0?(sprintDir.y<0?'up':'down'):sprintDir.y===0?(sprintDir.x<0?'left':'right'):(sprintDir.x<0?'left':'right'));setTimeout(()=>heldDirections.delete(sprintKey),300);const b=$('sprintBtn');if(b){b.disabled=true;b.classList.remove('sprint-ready');b.textContent='💨 衝刺（冷卻）';setTimeout(()=>{if(b){b.disabled=false;b.classList.add('sprint-ready');b.textContent='💨 衝刺'}},3000)}addLog('你向當前方向衝刺：速度提升 4 倍，持續 0.3 秒。');}
+  function sprint(){if(!run||run.done||!$('modal').classList.contains('hidden'))return;const now=performance.now();if(now<(run.sprintReadyAt||0))return;let dir={x:0,y:0};for(const d of heldDirections.values()){dir.x+=dirVectors[d]?.x||0;dir.y+=dirVectors[d]?.y||0}let len=Math.hypot(dir.x,dir.y);if(len<.01){dir=run.playerFacing||{x:1,y:0};len=Math.hypot(dir.x,dir.y)||1}dir={x:dir.x/len,y:dir.y/len};run.playerFacing=dir;run.sprintVector=dir;run.sprintUntil=now+300;run.sprintReadyAt=now+3000;run.invulnerableUntil=Date.now()+300;const sprintDir=dir;const sprintKey='sprint:'+now;heldDirections.set(sprintKey,sprintDir.x===0?(sprintDir.y<0?'up':'down'):sprintDir.y===0?(sprintDir.x<0?'left':'right'):(sprintDir.x<0?'left':'right'));setTimeout(()=>heldDirections.delete(sprintKey),300);const b=$('sprintBtn');if(b){b.disabled=true;b.classList.remove('sprint-ready');b.textContent='💨 衝刺（冷卻）';setTimeout(()=>{if(b){b.disabled=false;b.classList.add('sprint-ready');b.textContent='💨 衝刺'}},3000)}addLog('你向當前方向衝刺：速度提升 4 倍，持續 0.3 秒。');}
   // Sprint vector is applied even when the player is not holding a direction during the burst.
   const sprintTicker=setInterval(()=>{if(!run||!run._sprintingNow||!run.sprintVector)return;},100); // state-only; movement is still handled by the main frame loop
   document.addEventListener('keydown',ev=>{if(ev.code==='ShiftLeft'||ev.code==='ShiftRight'){if(!ev.repeat){ev.preventDefault();sprint()}}});
@@ -1521,10 +1562,27 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
   const merchantBtn=document.createElement('button');merchantBtn.id='merchantBtn';merchantBtn.textContent='♜ 旅人商人';merchantBtn.className='hidden';merchantBtn.style.cssText='display:none;width:100%;margin:8px 0';const targetStatus=$('targetStatus');if(targetStatus)targetStatus.parentNode.insertBefore(merchantBtn,targetStatus.nextSibling);
   function refreshMerchantVisibility(){const show=!!run&&!run.done&&run.roomType==='rest'&&!run.merchantUsed;if(merchantBtn){merchantBtn.style.display=show?'block':'none';merchantBtn.classList.toggle('hidden',!show)}}
   const oldRender=render;render=function(...args){const result=oldRender(...args);refreshMerchantVisibility();return result};
-  function openMerchant(){if(!run||run.roomType!=='rest'||run.merchantUsed)return;run.merchantUsed=true;const mc=RESOURCE_DATA?.merchant||{},count=tableInt(mc.relicOfferMin??2,mc.relicOfferMax??5),pool=[...RELICS],offers=[];while(offers.length<count&&pool.length){const ix=Math.floor(Math.random()*pool.length);offers.push(pool.splice(ix,1)[0])}const relics=(run.relics||[]);const html=`<div class="eyebrow">WAYFARER'S SANCTUARY</div><h2>旅人商人</h2><p class="intro">商人只在旅人聖所現身。你可以出售持有的遺物換取律質，或購買隨機遺物與藥水。</p><h3>購買遺物</h3><div class="upgrade-grid">${offers.map((r,i)=>{const cost=Number(mc.relicCostMin??18)+tableInt(0,mc.relicCostRandomMax??17)+run.floor*Number(mc.perFloorCost??2);r._merchantCost=cost;return `<button class="upgrade" data-buy-relic="${i}"><div class="ico">${escapeHtmlText(r.icon||'✧')}</div><strong>${escapeHtmlText(r.name)}</strong><small>${escapeHtmlText(r.desc||'古老的遺物。')}<br>價格：${cost} 律質</small></button>`}).join('')}</div><div class="actions" style="margin:10px 0"><button id="buyMerchantPotion">購買藥水 · ${Number(mc.potionCost??12)} 律質</button><button id="summonMerchantElite">召喚精英怪 · ${Number(mc.eliteCost??8)} 律質</button></div><h3>出售遺物</h3><div class="skill-list">${relics.length?relics.map((r,i)=>`<div class="weapon-item"><span>${escapeHtmlText(r.name)}</span><button data-sell-relic="${i}">出售 · ${Math.max(Number(mc.sellMin??5),Math.round((Number(r.weight)||1)*Number(mc.sellWeightMultiplier??3)+Number(mc.sellBase??8)))} 律質</button></div>`).join(''):'<p class="sub">目前沒有可出售的遺物。</p>'}</div><button class="primary" id="leaveMerchant" style="width:100%;margin-top:14px">離開商人</button>`;showModal(html);document.querySelectorAll('[data-buy-relic]').forEach(b=>b.onclick=()=>{const r=offers[Number(b.dataset.buyRelic)];const cost=r?Number(r._merchantCost)||25:0;if(!r||run.shards<cost){addLog('律質不足，無法購買這件遺物。');return}run.shards-=cost;r.apply?.(run);run.relics.push(r);addLog(`商人交易：購買遺物「${r.name}」。`);closeModal();render()});document.querySelectorAll('[data-sell-relic]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.sellRelic),r=run.relics[i];if(!r)return;const value=Math.max(Number(mc.sellMin??5),Math.round((Number(r.weight)||1)*Number(mc.sellWeightMultiplier??3)+Number(mc.sellBase??8)));run.relics.splice(i,1);run.shards+=value;addLog(`出售遺物「${r.name}」，獲得 ${value} 枚律質。`);closeModal();render()});$('buyMerchantPotion').onclick=()=>{const cost=Number(mc.potionCost??12);if(run.shards<cost){addLog('律質不足，無法購買藥水。');return}run.shards-=cost;run.pots++;addLog('向商人購買藥水 ×1。');closeModal();render()};$('summonMerchantElite').onclick=()=>{const cost=Number(mc.eliteCost??8);if(run.shards<cost){addLog('律質不足，無法召喚精英怪。');return}run.shards-=cost;const pool=ENEMIES.filter(m=>!m.supportOnly&&m.classType!=='support');const base=pool[Math.floor(Math.random()*pool.length)];const p=findFreeWorldCell();const hp=Math.max(1,Math.round((Number(base.hp)||10)*1.6*(run.diff?.hp||1)));const elite={...base,x:p.x,y:p.y,name:`契約精英・${base.name}`,hp,maxHp:hp,atk:Math.max(1,Math.round((Number(base.atk)||2)*1.25)),elite:true,dead:false,aggro:true,uid:`merchant-elite-${Date.now()}`,radius:WORLD.enemyRadius,speed:Number(base.speed)||72,homeX:p.x,homeY:p.y};run.enemies.push(elite);addLog(`你支付 ${cost} 枚律質，商人召來精英怪「${elite.name}」！擊敗後可獲得額外律質。`);closeModal();render()};$('leaveMerchant').onclick=()=>{closeModal();render()}}
+  function openMerchant(){
+    if(!run||run.roomType!=='rest'||run.merchantUsed)return;
+    run.merchantUsed=true;
+    const mc=RESOURCE_DATA?.merchant||{},count=tableInt(mc.relicOfferMin??2,mc.relicOfferMax??5),pool=[...RELICS],offers=[];
+    while(offers.length<count&&pool.length){const ix=Math.floor(Math.random()*pool.length),relic=pool.splice(ix,1)[0],cost=Number(mc.relicCostMin??18)+tableInt(0,mc.relicCostRandomMax??17)+run.floor*Number(mc.perFloorCost??2);offers.push({relic,cost});}
+    function refreshMerchant(){
+      if(!run||run.done)return;
+      const relics=run.relics||[];
+      const html=`<div class="eyebrow">WAYFARER'S SANCTUARY</div><h2>旅人商人</h2><p class="intro">你可以連續購買、出售或召喚，交易介面會一直開啟；完成後請主動關閉。</p><div class="merchant-wallet">持有律質：<b>✦ ${Math.floor(Number(run.shards)||0)}</b></div><h3>購買遺物（剩餘 ${offers.length} 件）</h3><div class="upgrade-grid merchant-offers">${offers.length?offers.map((o,i)=>{const r=o.relic;return `<button class="upgrade" data-buy-relic="${i}"><div class="ico">${escapeHtmlText(r.icon||'✧')}</div><strong>${escapeHtmlText(r.name)}</strong><small>${escapeHtmlText(r.desc||'古老的遺物。')}<br>價格：${o.cost} 律質</small></button>`}).join(''):'<p class="sub">本次商品已售罄。</p>'}</div><div class="actions merchant-services"><button id="buyMerchantPotion">購買藥水 · ${Number(mc.potionCost??12)} 律質</button><button id="summonMerchantElite">召喚精英怪 · ${Number(mc.eliteCost??8)} 律質</button></div><h3>出售遺物（持有 ${relics.length} 件）</h3><div class="skill-list">${relics.length?relics.map((r,i)=>`<div class="weapon-item"><span>${escapeHtmlText(r.name)}</span><button data-sell-relic="${i}">出售 · ${Math.max(Number(mc.sellMin??5),Math.round((Number(r.weight)||1)*Number(mc.sellWeightMultiplier??3)+Number(mc.sellBase??8)))} 律質</button></div>`).join(''):'<p class="sub">目前沒有可出售的遺物。</p>'}</div><button class="primary" id="leaveMerchant" style="width:100%;margin-top:14px">離開商人</button>`;
+      showModal(html);$('modalContent').classList.add('merchant-scroll');$('modal').classList.add('merchant-modal-open');document.body.classList.add('merchant-open');
+      document.querySelectorAll('[data-buy-relic]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.buyRelic),offer=offers[i];if(!offer)return;if(run.shards<offer.cost){addLog('律質不足，無法購買這件遺物。');return;}run.shards-=offer.cost;const r=offer.relic;r.apply?.(run);run.relics.push(r);offers.splice(i,1);addLog(`商人交易：購買遺物「${r.name}」。`);render();refreshMerchant();});
+      document.querySelectorAll('[data-sell-relic]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.sellRelic),r=run.relics[i];if(!r)return;const value=Math.max(Number(mc.sellMin??5),Math.round((Number(r.weight)||1)*Number(mc.sellWeightMultiplier??3)+Number(mc.sellBase??8)));run.relics.splice(i,1);run.shards+=value;addLog(`出售遺物「${r.name}」，獲得 ${value} 枚律質。`);render();refreshMerchant();});
+      $('buyMerchantPotion').onclick=()=>{const cost=Number(mc.potionCost??12);if(run.shards<cost){addLog('律質不足，無法購買藥水。');return;}run.shards-=cost;run.pots++;addLog('向商人購買藥水 ×1。');render();refreshMerchant();};
+      $('summonMerchantElite').onclick=()=>{const cost=Number(mc.eliteCost??8),pool=ENEMIES.filter(m=>!m.supportOnly&&m.classType!=='support');if(run.shards<cost){addLog('律質不足，無法召喚精英怪。');return;}if(!pool.length){addLog('目前沒有可召喚的精英怪。');return;}run.shards-=cost;const base=pool[Math.floor(Math.random()*pool.length)],p=findFreeWorldCell(),hp=Math.max(1,Math.round((Number(base.hp)||10)*1.6*(run.diff?.hp||1)));const elite={...base,x:p.x,y:p.y,name:`契約精英・${base.name}`,hp,maxHp:hp,atk:Math.max(1,Math.round((Number(base.atk)||2)*1.25)),elite:true,dead:false,aggro:true,uid:`merchant-elite-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,radius:WORLD.enemyRadius,speed:Number(base.speed)||72,homeX:p.x,homeY:p.y};run.enemies.push(elite);addLog(`你支付 ${cost} 枚律質，商人召來精英怪「${elite.name}」！`);render();refreshMerchant();};
+      $('leaveMerchant').onclick=()=>{document.body.classList.remove('merchant-open');closeModal();render();};
+    }
+    refreshMerchant();
+  }
   merchantBtn.onclick=openMerchant;
   // Sanctuary supply: usually helpful, but a small chance of a dangerous explosive cache.
-  const baseExplore3=explore;explore=function(){if(run&&run.roomType==='rest'&&!run.roomSearched){const sanct=RESOURCE_DATA?.sanctuary||{};if(Math.random()<Number(sanct.explosionChance??.12)){run.roomSearched=true;const dmg=Math.min(Math.max(Number(sanct.explosionDamageMin)||3,Math.round(run.maxHp*Number(sanct.explosionDamageMaxHpRatio??.18))),run.hp);run.hp=Math.max(0,run.hp-dmg);addLog(`旅人聖所的補給箱突然爆炸！你受到 ${dmg} 點傷害。`);render();if(run.hp<=0)finish(false);return}return baseExplore3()}return baseExplore3()};
+  const baseExplore3=explore;explore=function(){if(run&&run.roomType==='rest'&&!run.roomSearched){const sanct=RESOURCE_DATA?.sanctuary||{};if(Math.random()<Number(sanct.explosionChance??.12)){run.roomSearched=true;if(Date.now()<(run.invulnerableUntil||0)){addLog('補給箱突然爆炸，但衝刺無敵使你毫髮無傷！');render();return}const dmg=Math.min(Math.max(Number(sanct.explosionDamageMin)||3,Math.round(run.maxHp*Number(sanct.explosionDamageMaxHpRatio??.18))),run.hp);run.hp=Math.max(0,run.hp-dmg);addLog(`旅人聖所的補給箱突然爆炸！你受到 ${dmg} 點傷害。`);render();if(run.hp<=0)finish(false);return}return baseExplore3()}return baseExplore3()};
   // Support marker and enemy warning vanish together on death; avoid orphaned overlays.
   const oldArena=renderArena;renderArena=function(...args){const out=oldArena(...args);if(run){for(const e of run.enemies||[]){if(e.dead){e.warningEl?.remove();e.warningEl=null;if(run.magicCharge?.targetUid===e.uid){run.magicCharge.marker?.remove();run.magicCharge.marker=null;run.magicCharge=null}}}}return out};
   // The merchant may also summon a dangerous elite, as a sanctuary-only service.
@@ -1532,4 +1590,52 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
 })();
 </script>
 
+<style id="silver-sword-final-polish">
+/* 華康超明體優先；若系統沒有安裝，瀏覽器會使用後續可用的襯線字體。 */
+html,body,body *,button,input,select,textarea{font-family:"華康超明體","DFMingStd-W5","華康明體","DFKai-SB","Noto Serif TC",serif!important}
+body.merchant-open{overflow:hidden!important;overscroll-behavior:none}
+#modal.merchant-modal-open{position:fixed!important;inset:0!important;overflow:hidden!important;overscroll-behavior:contain!important;align-items:center!important;justify-content:center!important;padding:12px!important}
+#modalContent.merchant-scroll{max-height:calc(100vh - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;scrollbar-gutter:stable;scrollbar-width:thin;touch-action:pan-y!important;padding-bottom:18px!important}
+#modalContent.merchant-scroll .merchant-offers{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#modalContent.merchant-scroll .upgrade{min-height:100px!important;padding:11px!important}
+#modalContent.merchant-scroll .merchant-wallet{position:sticky;top:-1px;z-index:3;background:#f7e9c7;border:1px solid #c5a979;border-radius:8px;padding:9px 12px;margin:8px 0 12px;color:#493520;box-shadow:0 3px 8px #6d4b241a}
+#modalContent.merchant-scroll .merchant-services{position:sticky;bottom:0;z-index:2;background:#efdfbc;padding:8px 0;box-shadow:0 -5px 10px #efdfbcaa}
+@media(max-width:560px){#modal{padding:6px!important}#modalContent.merchant-scroll{max-height:calc(100vh - 12px)!important;max-height:calc(100dvh - 12px)!important;padding:16px!important}#modalContent.merchant-scroll .merchant-offers{grid-template-columns:1fr!important}#modalContent.merchant-scroll .merchant-services{flex-direction:column}}
+#gameScreen .arena-actor.player .arena-sprite{position:relative!important;overflow:visible!important}
+.hero-held-weapon{position:absolute;z-index:4;right:-6%;bottom:15%;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(13px,2.2vw,23px);line-height:1;filter:drop-shadow(0 2px 1px #57391b) drop-shadow(0 0 2px #fff0bf);transform-origin:70% 80%;pointer-events:none;white-space:nowrap}
+.hero-held-weapon.is-short{transform:rotate(-47deg) translate(1px,-1px)}.hero-held-weapon.is-long{transform:rotate(-40deg) translate(1px,-2px)}.hero-held-weapon.is-spear{transform:rotate(-48deg) scale(.95)}.hero-held-weapon.is-bow{transform:rotate(-15deg) scale(.9)}.hero-held-weapon.is-gunlance{transform:rotate(-33deg) scale(.93)}.hero-held-weapon.is-staff{transform:rotate(-38deg) scale(.95)}
+#gameScreen .arena-actor.player .arena-cooldown-bar{position:absolute;left:50%;top:calc(112% + 8px);transform:translateX(-50%);width:155%;height:4px;border-radius:99px;background:#b1b0aa;border:1px solid #77756f;overflow:hidden;pointer-events:none;box-shadow:0 1px 2px #513d2044;z-index:15}
+#gameScreen .arena-actor.player .arena-cooldown-bar span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#8e8e89,#cecdc7);transition:width .04s linear}
+#gameScreen .arena-actor.player.sprinting .hero-hand{filter:drop-shadow(0 0 5px #fff2a7) drop-shadow(0 0 10px #e5b54f)!important}
+#gameScreen .arena-actor.player.sprinting .hero-held-weapon{filter:drop-shadow(0 0 5px #fff1a0) drop-shadow(0 0 10px #e5b54f)}
+</style>
+<script>
+(function silverSwordFinalPolish(){
+  if(typeof run==='undefined')return;
+  // Sprint i-frames cover melee, projectiles and bleed ticks.
+  const priorEnemyDamage=applyEnemyDamageToPlayer;
+  applyEnemyDamageToPlayer=function(e,now,projectileHit=false){if(run&&Date.now()<(run.invulnerableUntil||0))return 0;return priorEnemyDamage(e,now,projectileHit)};
+  const priorPlayerBleed=updatePlayerBleed;
+  updatePlayerBleed=function(now){if(run&&Date.now()<(run.invulnerableUntil||0)&&run.playerBleedUntil&&run.playerBleedNextAt&&now>=run.playerBleedNextAt){run.playerBleedNextAt=now+1000;return}return priorPlayerBleed(now)};
+  // Mirror the exact fx-magic animation used by a staff's empty swing while charging, following the hero.
+  const priorTriggerAttack=triggerAttack;
+  triggerAttack=function(...args){const out=priorTriggerAttack(...args);const c=run?.magicCharge;if(c&&!c.castFx){const t=run.enemies.find(e=>e.uid===c.targetUid&&!e.dead)||run.player;c.castFx=emitFx('fx-magic',run.player,t,'✦');}return out};
+  const priorChargeUpdate=updateWeaponCharge;
+  updateWeaponCharge=function(now){const c=run?.magicCharge;if(c?.castFx){const pos=elAtWorld('map',run.player);if(pos){c.castFx.style.left=pos.x+'px';c.castFx.style.top=pos.y+'px';}}const out=priorChargeUpdate(now);if(c?.castFx&&!run?.magicCharge)c.castFx.remove();return out};
+  // Player-held weapon and cooldown meter are rendered as part of the actor, not as a separate HUD.
+  const priorArenaRender=renderArena;
+  renderArena=function(...args){const result=priorArenaRender(...args);if(!run)return result;const actor=$('arenaActor-player');if(!actor)return result;
+    const sprite=actor.querySelector('.arena-sprite');if(sprite){let held=sprite.querySelector('.hero-held-weapon');if(!held){held=document.createElement('span');held.className='hero-held-weapon';sprite.appendChild(held)}const w=getWeapon(),glyph=({short:'🗡️',long:'⚔️',spear:'🔱',bow:'🏹',gunlance:'🔫',staff:'🪄'})[w?.id]||w?.fallbackIcon||'⚔️';const cls='hero-held-weapon is-'+String(w?.id||'short');if(held.className!==cls)held.className=cls;if(held.textContent!==glyph)held.textContent=glyph;held.title=w?.name||'裝備武器';}
+    const hp=actor.querySelector('.arena-hp');if(hp){let bar=actor.querySelector('.arena-cooldown-bar');if(!bar){bar=document.createElement('div');bar.className='arena-cooldown-bar hidden';bar.innerHTML='<span></span>';hp.insertAdjacentElement('afterend',bar)}const now=Date.now(),next=Number(run.nextAttackAt)||0;if(run._cooldownObservedNextAt===undefined)run._cooldownObservedNextAt=next;else if(next!==run._cooldownObservedNextAt){run._cooldownObservedNextAt=next;if(next>now)run._cooldownMeter={start:now,end:next,duration:Math.max(1,next-now)}}const cd=run._cooldownMeter,remaining=cd?cd.end-now:0;if(cd&&remaining>0){bar.classList.remove('hidden');bar.firstElementChild.style.width=(Math.max(0,Math.min(1,remaining/Math.max(1,cd.duration)))*100)+'%'}else{bar.classList.add('hidden');if(cd)run._cooldownMeter=null}}
+    actor.classList.toggle('sprinting',Date.now()<(run.invulnerableUntil||0));return result;};
+  // Keep potion count visible on the mobile and desktop healing controls.
+  const priorRender=render;
+  render=function(...args){const out=priorRender(...args);if(run){for(const id of ['potionLeftBtn','potionBtn']){const b=$(id);if(b){const label=`✚ 回血 ×${Math.max(0,Number(run.pots)||0)}`;if(b.textContent!==label)b.textContent=label;b.title=`剩餘藥水：${Math.max(0,Number(run.pots)||0)} 瓶`;}}}return out};
+  // Body scroll must remain locked for the merchant panel only, and be unlocked on every other close path.
+  const priorCloseModal=closeModal;
+  closeModal=function(...args){document.body.classList.remove('merchant-open');$('modal')?.classList.remove('merchant-modal-open');$('modalContent')?.classList.remove('merchant-scroll');return priorCloseModal(...args)};
+  const priorShowModal=showModal;
+  showModal=function(...args){const out=priorShowModal(...args);$('modal')?.classList.toggle('merchant-modal-open',$('modalContent')?.classList.contains('merchant-scroll'));return out};
+})();
+</script>
 </body></html>
