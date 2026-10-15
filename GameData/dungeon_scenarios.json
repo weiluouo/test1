@@ -2978,5 +2978,171 @@
       ]
     }
   ],
-  "description": "《銀劍的英雄．夢幻境之旅》遠征事件資料；採用羊皮紙中世紀冒險視覺主題。"
+  "description": "遠征事件資料；事件、選項、判定、結果與效果都由 JSON 編輯。",
+  "fieldGuide": {
+    "schemaVersion": "資料格式版本，目前為 1.0.0。",
+    "game": "遊戲識別字串。",
+    "language": "資料語言。",
+    "source": "來源備註。",
+    "description": "此檔用途簡述。",
+    "config": "事件觸發與展示設定。",
+    "config.triggerFloors": "會觸發事件的樓層陣列。",
+    "config.oneEventPerTriggeredFloor": "每個觸發樓層是否只出現一個事件。",
+    "config.noRepeatWithinRun": "同一局內是否避免重複事件。",
+    "config.eventSelection": "事件選取策略。",
+    "config.hideOutcomeUntilChoice": "選擇前不顯示結果。",
+    "config.resultDisplaySeconds": "結果展示秒數；由互動介面實際處理。",
+    "effectTypes": [
+      {
+        "type": "heal",
+        "params": "value 或 min/max",
+        "description": "恢復當前生命，不能超過最大生命。"
+      },
+      {
+        "type": "damage",
+        "params": "value 或 min/max",
+        "description": "扣除當前生命；可能導致遠征死亡。"
+      },
+      {
+        "type": "change_shards",
+        "params": "value 或 min/max",
+        "description": "增加或扣除本局律質；不低於 0。"
+      },
+      {
+        "type": "change_potions",
+        "params": "value",
+        "description": "增加或扣除藥水；不低於 0。"
+      },
+      {
+        "type": "change_attack",
+        "params": "value",
+        "description": "改變本局攻擊力；至少保留 1 點。"
+      },
+      {
+        "type": "change_max_hp",
+        "params": "value, healAdded?",
+        "description": "改變本局最大生命；正值可選擇同時恢復等量生命。"
+      },
+      {
+        "type": "change_armor",
+        "params": "value",
+        "description": "改變本局傷害減免；負值代表詛咒／脆弱。"
+      },
+      {
+        "type": "change_crit",
+        "params": "value",
+        "description": "改變本局暴擊率；介於 0 與 0.75。"
+      },
+      {
+        "type": "change_regen",
+        "params": "value",
+        "description": "改變每 5 秒的本局自然恢復量；不低於 0。"
+      },
+      {
+        "type": "change_pot_heal",
+        "params": "value",
+        "description": "改變本局每瓶藥水的治療量；至少為 4。"
+      },
+      {
+        "type": "change_bonus_shard",
+        "params": "value",
+        "description": "改變每次擊殺額外獲得的律質；不低於 0。"
+      },
+      {
+        "type": "random_relic",
+        "params": "無",
+        "description": "從遊戲 HTML 內建 RELICS 遺物池抽取一件遺物並套用。"
+      },
+      {
+        "type": "change_speed_percent",
+        "params": "value 或 min/max（百分點）",
+        "description": "改變本局移動速度百分比；例如 10 代表速度 +10%，-15 代表速度 -15%；以基礎速度 200 計算，累積加成限制在 -60% 至 +100%。"
+      }
+    ],
+    "requirementFields": [
+      {
+        "field": "floor",
+        "description": "目前樓層整數"
+      },
+      {
+        "field": "atk",
+        "description": "本局攻擊力"
+      },
+      {
+        "field": "hp",
+        "description": "當前生命"
+      },
+      {
+        "field": "maxHp",
+        "description": "最大生命"
+      },
+      {
+        "field": "hpRatio",
+        "description": "當前生命／最大生命，0 到 1"
+      },
+      {
+        "field": "pots",
+        "description": "剩餘藥水數"
+      },
+      {
+        "field": "shards",
+        "description": "本局律質"
+      },
+      {
+        "field": "relicCount",
+        "description": "已持有遺物數"
+      },
+      {
+        "field": "weapon",
+        "description": "目前裝備武器 ID"
+      },
+      {
+        "field": "weapons",
+        "description": "已解鎖武器 ID 陣列"
+      },
+      {
+        "field": "speedPercent",
+        "description": "本局累積移動速度加成百分比；例如 15 表示移動速度 +15%。"
+      }
+    ],
+    "events": "事件物件陣列。",
+    "eventFields": {
+      "id": "事件唯一 ID。",
+      "sourceRow": "原始資料列編號（可選）。",
+      "title": "事件標題。",
+      "category": "事件分類。",
+      "story": "事件情境敘述。",
+      "designerNote": "設計備註，不直接影響遊戲。",
+      "weight": "事件抽選權重。",
+      "minFloor": "可出現最低樓層。",
+      "maxFloor": "可出現最高樓層。",
+      "choices": "玩家可選擇的選項陣列。"
+    },
+    "choiceFields": {
+      "id": "選項唯一 ID。",
+      "label": "按鈕文字。",
+      "description": "選項補充說明（可選）。",
+      "cost": "選項代價說明（可選）。",
+      "check": "成功率判定設定；可省略。",
+      "outcomes": "沒有判定時的候選結果陣列。",
+      "check.field": "要檢查的玩家欄位。",
+      "check.target": "目標能力值。",
+      "check.baseChance": "基礎成功率百分比。",
+      "check.perPointBonus": "高於／低於目標時每點調整的成功率百分點。",
+      "check.minChance": "最低成功率百分比。",
+      "check.maxChance": "最高成功率百分比。",
+      "check.success": "判定成功時的結果物件。",
+      "check.failure": "判定失敗時的結果物件。"
+    },
+    "outcomeFields": {
+      "weight": "結果加權抽取權重。",
+      "text": "結果描述文字，只在玩家選擇後顯示。",
+      "effects": "這個結果要執行的效果陣列。",
+      "effects[].type": "效果類型 ID；對應 effectTypes 清單。",
+      "effects[].value": "固定數值參數。",
+      "effects[].min": "隨機數值下限，含端點。",
+      "effects[].max": "隨機數值上限，含端點。",
+      "effects[].healAdded": "部分最大生命效果是否同時恢復生命。"
+    }
+  }
 }

@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "樓層里程碑提供的局內強化表。修改 weight 可調整出現比重，effects 定義套用的數值效果。",
+  "fieldGuide": {
+    "schemaVersion": "格式版本。",
+    "description": "檔案用途簡述。",
+    "upgrades": "可抽取的局內強化列表。",
+    "upgrades[].id": "強化唯一 ID。",
+    "upgrades[].name": "強化名稱。",
+    "upgrades[].desc": "玩家選取畫面顯示的說明。",
+    "upgrades[].icon": "強化卡片圖示。",
+    "upgrades[].weight": "加權抽選權重。",
+    "upgrades[].effects": "選取時套用的效果列表，效果類型沿用遺物效果系統。",
+    "upgrades[].effects[].type": "效果類型 ID；支援 attack_add、armor_add、max_hp_heal、potion_heal_add、bonus_shard_add、crit_add 等遺物效果處理器已支援的類型。",
+    "upgrades[].effects[].value": "效果數值；固定數值直接填數字，比例或百分比的單位依對應 type 定義。",
+    "upgrades[].effects[].heal": "max_hp_heal 效果額外立即恢復的生命量。",
+    "upgrades[].effects[].weaponIds": "武器專屬效果套用的武器 ID 陣列，例如 [\"bow\"]。",
+    "upgrades[].effects[].enabled": "部分特殊效果的啟用開關；未支援 enabled 的一般效果會直接依 type 套用。"
+  },
+  "upgrades": [
+    {
+      "id": "sharp-edge",
+      "name": "銳刃",
+      "desc": "本局攻擊力 +2",
+      "icon": "⚔",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "attack_add",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "thick-armor",
+      "name": "厚甲",
+      "desc": "最大生命 +8，並恢復 8 點生命",
+      "icon": "🛡",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "max_hp_heal",
+          "value": 8,
+          "heal": 8
+        }
+      ]
+    },
+    {
+      "id": "potion-mastery",
+      "name": "藥劑熟練",
+      "desc": "藥水治療量 +6",
+      "icon": "🧪",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "potion_heal_add",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "id": "swift-guard",
+      "name": "迅捷步伐",
+      "desc": "移動速度 +15%",
+      "icon": "🥾",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "speed_percent_add",
+          "value": 15
+        }
+      ]
+    },
+    {
+      "id": "soul-harvest",
+      "name": "靈魂收割",
+      "desc": "每次擊殺額外獲得 3 律質",
+      "icon": "✦",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "bonus_shard_add",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "hunter-instinct",
+      "name": "獵手本能",
+      "desc": "暴擊機率 +15%",
+      "icon": "🎯",
+      "weight": 1,
+      "effects": [
+        {
+          "type": "crit_add",
+          "value": 0.15
+        }
+      ]
+    }
+  ]
+}

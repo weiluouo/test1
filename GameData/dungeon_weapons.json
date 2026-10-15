@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "《銀劍的英雄．夢幻境之旅》武器資料。cooldown 單位毫秒、range 為地圖格距；武器各有不同節奏與特殊效果。",
+  "description": "《銀劍的英雄．夢幻境之旅》武器資料。數字參數以各欄位單位為準；abilities 用來定義每件武器的可調整特殊能力。",
   "weapons": [
     {
       "id": "short",
@@ -13,7 +13,18 @@
       "wall": false,
       "attackFx": "fx-short",
       "description": "快速短距斬擊；命中後施加流血，每秒傷害隨層數提升，最多 3 層、持續 5 秒；再次命中增加層數並刷新時間。",
-      "role": "bleed"
+      "role": "bleed",
+      "abilities": {
+        "bleed": {
+          "enabled": true,
+          "damagePerStack": 1,
+          "maxStacks": 3,
+          "durationMs": 5000,
+          "tickMs": 1000,
+          "stackOnHit": true,
+          "refreshOnHit": true
+        }
+      }
     },
     {
       "id": "long",
@@ -26,7 +37,15 @@
       "wall": false,
       "attackFx": "fx-long",
       "description": "較慢但有力的橫斬；射程內至少兩個目標時，最多命中兩個敵人、各造成 1 倍攻擊力傷害。",
-      "role": "sweep"
+      "role": "sweep",
+      "abilities": {
+        "sweep": {
+          "enabled": true,
+          "maxTargets": 2,
+          "multiTargetDamageMultiplier": 1,
+          "selectNearest": true
+        }
+      }
     },
     {
       "id": "spear",
@@ -39,7 +58,13 @@
       "wall": false,
       "attackFx": "fx-spear",
       "description": "單體長距離突刺；命中後擊退敵人約一格，不會造成全地圖或周遭群傷。",
-      "role": "knockback"
+      "role": "knockback",
+      "abilities": {
+        "knockback": {
+          "enabled": true,
+          "distanceCells": 1
+        }
+      }
     },
     {
       "id": "bow",
@@ -52,7 +77,10 @@
       "wall": true,
       "attackFx": "fx-arrow",
       "description": "長距離單體射擊；可穿越牆壁與障礙，冷卻期間要以走位避開逼近的敵人。",
-      "role": "piercing"
+      "role": "piercing",
+      "abilities": {
+        "pierceWalls": true
+      }
     },
     {
       "id": "gunlance",
@@ -65,20 +93,56 @@
       "wall": false,
       "attackFx": "fx-bullet",
       "description": "高射速、低單發傷害的投射物；適合移動中持續輸出。",
-      "role": "rapid"
+      "role": "rapid",
+      "abilities": {
+        "rapidFire": {
+          "enabled": true
+        }
+      }
     },
     {
       "id": "staff",
       "name": "權杖",
       "icon": "權杖.png",
       "fallbackIcon": "🪄",
-      "mult": 2.5,
-      "range": 2,
+      "mult": 2,
+      "range": 3,
       "cooldown": 3500,
       "wall": false,
       "attackFx": "fx-magic",
       "description": "鎖定射程內單一敵人，蓄力 3 秒後降下光束；蓄力標記持續追蹤，鎖定後即使目標離開射程也會命中。",
-      "role": "delayed-burst"
+      "role": "delayed-burst",
+      "abilities": {
+        "charge": {
+          "durationMs": 3000,
+          "cooldownMinMs": 3000
+        }
+      }
     }
-  ]
+  ],
+  "fieldGuide": {
+    "schemaVersion": "資料格式版本；目前為 1.0.0。",
+    "description": "此檔用途簡述。",
+    "weapons": "武器物件陣列；每件武器以 id 唯一識別。",
+    "weaponFields": {
+      "id": "武器唯一 ID；用於存檔、起始武器與遺物加成目標。",
+      "name": "遊戲介面顯示名稱。",
+      "icon": "圖示檔名或可顯示的符號；圖檔需放在 GameData/ 或遊戲可讀取的路徑。",
+      "fallbackIcon": "圖檔無法載入時顯示的替代符號。",
+      "mult": "基礎攻擊倍率；1 代表以玩家攻擊力為基準。",
+      "range": "基礎攻擊距離，單位為世界格數。",
+      "cooldown": "兩次攻擊的基礎間隔，單位毫秒。",
+      "wall": "true 表示攻擊可穿越牆體；false 會檢查視線。",
+      "attackFx": "攻擊動畫／攻擊行為樣式 ID，例如 fx-short、fx-long、fx-spear、fx-arrow、fx-bullet、fx-magic。",
+      "description": "武器特性說明文字。",
+      "role": "舊版相容用的角色標籤；新版主要能力應放 abilities。",
+      "abilities": "可編輯的特殊能力參數物件；不同武器可使用不同能力，也可調整同能力的強弱。未設定的子能力不啟用。",
+      "abilities.bleed": "流血設定：enabled 是否啟用；damagePerStack 每層每次跳傷害；maxStacks 最大層數；durationMs 持續時間毫秒；tickMs 傷害跳動間隔毫秒；stackOnHit 命中是否增加層數；refreshOnHit 命中是否刷新持續時間。",
+      "abilities.sweep": "橫掃設定：enabled 是否啟用；maxTargets 最多同時命中目標數；multiTargetDamageMultiplier 同時命中多目標時的攻擊倍率。",
+      "abilities.knockback": "擊退設定：enabled 是否啟用；distanceCells 擊退距離，以世界格數計。",
+      "abilities.charge": "蓄力設定：durationMs 蓄力時間毫秒；cooldownMinMs 最小攻擊冷卻毫秒。",
+      "abilities.pierceWalls": "true 代表該武器具有穿牆能力；若設定此欄，程式會優先採用它而非 wall。",
+      "abilities.rapidFire": "連射類標記；實際射速由 cooldown 與可裝備的攻速加成決定。"
+    }
+  }
 }

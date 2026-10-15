@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "搜索結果表。修改 weight 可調整結果出現比重；effects 定義結果套用的數值效果。",
+  "fieldGuide": {
+    "schemaVersion": "格式版本。",
+    "description": "檔案用途簡述。",
+    "outcomes": "普通探索搜索時可能出現的結果列表。",
+    "outcomes[].id": "結果唯一 ID。",
+    "outcomes[].name": "結果名稱。",
+    "outcomes[].description": "結果敘述；可使用 {amount} 插入實際數值、{speed} 插入目前移動速度。",
+    "outcomes[].weight": "加權抽選權重；不必加總成 100。",
+    "outcomes[].effect": "單一效果物件。",
+    "effect.type": "支援的效果類型：heal_random、shards_random、attack_add、speed_percent_random。",
+    "effect.min": "隨機值下限，含端點。",
+    "effect.max": "隨機值上限，含端點。",
+    "effect.difficultyMultiplier": "true 時律質獲得量乘上難度 reward。",
+    "outcomes[].effect.type": "效果類型 ID；需為程式支援的 heal_random、shards_random、attack_add 或 speed_percent_random。",
+    "outcomes[].effect.value": "固定數值效果的值（供對應效果使用）。",
+    "outcomes[].effect.difficultyMultiplier": "true 時把律質獎勵乘上所選難度的 reward 倍率。"
+  },
+  "outcomes": [
+    {
+      "id": "camp-heal",
+      "name": "靜謐火堆",
+      "description": "你找到一處安靜的火堆，恢復 {amount} 點生命。",
+      "weight": 25,
+      "effect": {
+        "type": "heal_random",
+        "min": 1,
+        "max": 8
+      }
+    },
+    {
+      "id": "ancient-offering",
+      "name": "古老祭品",
+      "description": "你翻出古老祭品，獲得 {amount} 枚律質。",
+      "weight": 25,
+      "effect": {
+        "type": "shards_random",
+        "min": 5,
+        "max": 15,
+        "difficultyMultiplier": true
+      }
+    },
+    {
+      "id": "combat-insight",
+      "name": "戰技刻痕",
+      "description": "你從牆上的刻痕領悟戰技，本局攻擊力 +{amount}。",
+      "weight": 18,
+      "effect": {
+        "type": "attack_add",
+        "value": 1
+      }
+    },
+    {
+      "id": "lightstep-seal",
+      "name": "輕盈符印",
+      "description": "搜索結果：找到輕盈符印，移動速度 +{amount}%（目前 {speed} 單位／秒）。",
+      "weight": 16,
+      "effect": {
+        "type": "speed_percent_random",
+        "min": 10,
+        "max": 15
+      }
+    },
+    {
+      "id": "sluggish-ash",
+      "name": "遲滯灰霧",
+      "description": "搜索結果：吸入遲滯灰霧，移動速度 {amount}%（目前 {speed} 單位／秒）。",
+      "weight": 16,
+      "effect": {
+        "type": "speed_percent_random",
+        "min": -15,
+        "max": -8
+      }
+    }
+  ]
+}

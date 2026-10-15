@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "資源／補給表：管理寶箱、擊殺掉落、寶藏室獎勵、旅人聖所與商人的機率與數值。",
+  "fieldGuide": {
+    "schemaVersion": "格式版本。",
+    "description": "檔案用途簡述。",
+    "chest": "普通寶箱掉落規則。",
+    "killDrops": "擊殺時地面掉落規則。",
+    "treasure": "寶藏室三選一與武器研究的預設數值。",
+    "sanctuary": "旅人聖所搜索、爆炸與休整規則。",
+    "merchant": "商人報價、出售公式、藥水與精英召喚價格設定。",
+    "treasureChoices": "寶藏室可選項目的 ID、圖示、標籤與說明；行為 ID 必須為 HTML 支援的 weapon/relic/shards。",
+    "chest.weaponChance": "寶箱提供未持有武器的機率，0 到 1。",
+    "chest.shards.min": "寶箱律質隨機下限。",
+    "chest.shards.max": "寶箱律質隨機上限。",
+    "chest.shards.useDifficultyReward": "是否乘上難度獎勵倍率。",
+    "chest.relicChance": "寶箱提供遺物機率，0 到 1。",
+    "chest.potionChance": "寶箱提供藥水機率，0 到 1。",
+    "killDrops.shardBase": "擊殺律質基礎公式；min + floor*perFloor，再乘 difficulty.reward。",
+    "killDrops.relicChance": "怪物掉落遺物機率。",
+    "killDrops.potionChance": "怪物掉落藥水機率。",
+    "killDrops.eliteBonus": "精英額外律質公式。",
+    "treasure.shards": "寶藏室律質選項獲得的隨機量。",
+    "treasure.weaponFallbackAttack": "所有武器都解鎖後，武器研究轉化為的攻擊力。",
+    "treasure.weaponFallbackShards": "所有武器都解鎖後額外獲得的律質。",
+    "sanctuary.explosionChance": "聖所補給爆炸機率。",
+    "sanctuary.explosionDamageMin": "爆炸最少傷害。",
+    "sanctuary.explosionDamageMaxHpRatio": "爆炸傷害與最大生命的比例；實際傷害取此值與下限比較。",
+    "sanctuary.healMaxHpRatio": "正常休整時，以最大生命比例計算的預期治療量。",
+    "sanctuary.potionChance": "正常休整時找到藥水的機率。",
+    "sanctuary.potionMax": "可透過休整找到藥水的持有上限。",
+    "merchant.relicOfferMin": "商人隨機遺物品項數量下限。",
+    "merchant.relicOfferMax": "商人隨機遺物品項數量上限。",
+    "merchant.relicCostMin": "遺物價格固定起始值。",
+    "merchant.relicCostRandomMax": "遺物基礎價格可增加的隨機量上限（含 0）。",
+    "merchant.perFloorCost": "遺物價格每深入一層增加的律質。",
+    "merchant.potionCost": "藥水價格。",
+    "merchant.eliteCost": "召喚精英怪價格。",
+    "merchant.sellMin": "出售遺物時保證至少獲得的律質。",
+    "merchant.sellBase": "出售遺物價格計算的固定部分。",
+    "merchant.sellWeightMultiplier": "出售遺物價格的權重乘數。",
+    "sanctuary.healMin": "休整時至少希望恢復的生命量；實際恢復不超過最大生命差額。",
+    "sanctuary.potionGain": "休整時成功找到藥水後增加的藥水數量。",
+    "treasureChoices[].id": "獎勵行為 ID；目前支援 weapon、relic、shards。",
+    "treasureChoices[].label": "寶藏室按鈕顯示名稱。",
+    "treasureChoices[].icon": "寶藏室按鈕圖示字元。",
+    "treasureChoices[].description": "寶藏室按鈕顯示說明。"
+  },
+  "chest": {
+    "weaponChance": 0.2,
+    "shards": {
+      "min": 4,
+      "max": 8,
+      "useDifficultyReward": true
+    },
+    "relicChance": 0.45,
+    "potionChance": 0.35
+  },
+  "killDrops": {
+    "shardBase": {
+      "min": 2,
+      "perFloor": 0.5,
+      "useDifficultyReward": true
+    },
+    "relicChance": 0.05,
+    "potionChance": 0.05,
+    "eliteBonus": {
+      "min": 3,
+      "base": 4,
+      "perFloor": 1,
+      "useDifficultyReward": true
+    }
+  },
+  "treasure": {
+    "shards": {
+      "min": 14,
+      "max": 22,
+      "useDifficultyReward": true
+    },
+    "weaponFallbackAttack": 2,
+    "weaponFallbackShards": 10
+  },
+  "sanctuary": {
+    "explosionChance": 0.12,
+    "explosionDamageMin": 3,
+    "explosionDamageMaxHpRatio": 0.18,
+    "healMaxHpRatio": 0.32,
+    "healMin": 6,
+    "potionChance": 0.75,
+    "potionMax": 3,
+    "potionGain": 1
+  },
+  "merchant": {
+    "relicOfferMin": 2,
+    "relicOfferMax": 5,
+    "relicCostMin": 18,
+    "relicCostRandomMax": 17,
+    "perFloorCost": 2,
+    "potionCost": 12,
+    "eliteCost": 8,
+    "sellMin": 5,
+    "sellBase": 8,
+    "sellWeightMultiplier": 3
+  },
+  "treasureChoices": [
+    {
+      "id": "weapon",
+      "label": "武器研究",
+      "icon": "⚔",
+      "description": "獲得一件尚未永久解鎖的武器；全部解鎖後改為攻擊力與律質。"
+    },
+    {
+      "id": "relic",
+      "label": "遺物供奉",
+      "icon": "✧",
+      "description": "取得一件隨機遺物，可能與現有遺物形成協同效果。"
+    },
+    {
+      "id": "shards",
+      "label": "夢境律質",
+      "icon": "✦",
+      "description": "立即取得大量律質，為永久鍛造保留資源。"
+    }
+  ]
+}

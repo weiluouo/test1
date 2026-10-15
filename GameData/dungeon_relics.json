@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "《銀劍的英雄．夢幻境之旅》遺物資料；每件遺物可透過 effects 陣列同時定義多種效果，weight 用於調整掉落權重。",
+  "description": "遺物資料。effects/effect 中可定義多種能力；weaponIds 可將加成限定給指定武器。",
   "relics": [
     {
       "id": "wolf-fang-pendant",
@@ -73,7 +73,7 @@
       "id": "swift-boots",
       "name": "迅捷靴",
       "desc": "移動速度 +15%",
-      "icon": "迅捷靴.png",
+      "icon": "🥾",
       "fallbackIcon": "🥾",
       "weight": 1,
       "tags": [
@@ -88,7 +88,7 @@
       "id": "ember-core",
       "name": "餘燼核心",
       "desc": "暴擊率 +5%",
-      "icon": "火",
+      "icon": "🔥",
       "fallbackIcon": "🔥",
       "weight": 1,
       "tags": [
@@ -102,8 +102,8 @@
     {
       "id": "cursed-iron-shackles",
       "name": "遲滯鐵鐐",
-      "desc": "移動速度 -10%；沉重鐵鏈仍可抵禦部分衝擊",
-      "icon": "鐵鐐.png",
+      "desc": "移動速度 -10%；固定減傷 +1",
+      "icon": "⛓️",
       "fallbackIcon": "⛓️",
       "weight": 0.8,
       "tags": [
@@ -170,10 +170,19 @@
         "magic",
         "staff"
       ],
-      "effect": {
-        "type": "staff_charge_reduction",
-        "value": 500
-      }
+      "effects": [
+        {
+          "type": "weapon_damage_percent_add",
+          "value": 0.15,
+          "weaponIds": [
+            "staff"
+          ]
+        },
+        {
+          "type": "staff_charge_reduction",
+          "value": 500
+        }
+      ]
     },
     {
       "id": "last-light",
@@ -255,6 +264,223 @@
           "value": 1
         }
       ]
+    },
+    {
+      "id": "eagle-eye-bowstring",
+      "name": "鷹眼弦扣",
+      "desc": "裝備長弓時傷害 +20%、射程 +0.25 格。",
+      "icon": "🏹",
+      "fallbackIcon": "🏹",
+      "weight": 0.85,
+      "tags": [
+        "weapon",
+        "bow",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "weapon_damage_percent_add",
+          "value": 0.2,
+          "weaponIds": [
+            "bow"
+          ]
+        },
+        {
+          "type": "weapon_range_add",
+          "value": 0.25,
+          "weaponIds": [
+            "bow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breaker-spear-tassel",
+      "name": "破陣槍穗",
+      "desc": "裝備長槍時傷害 +15%、擊退距離 +0.5 格。",
+      "icon": "🔱",
+      "fallbackIcon": "🔱",
+      "weight": 0.85,
+      "tags": [
+        "weapon",
+        "spear",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "weapon_damage_percent_add",
+          "value": 0.15,
+          "weaponIds": [
+            "spear"
+          ]
+        },
+        {
+          "type": "weapon_knockback_cells_add",
+          "value": 0.5,
+          "weaponIds": [
+            "spear"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gunlance-ignition-core",
+      "name": "銃芯燃火",
+      "desc": "裝備銃槍時攻擊速度 +20%、傷害 +8%。",
+      "icon": "🔥",
+      "fallbackIcon": "🔥",
+      "weight": 0.85,
+      "tags": [
+        "weapon",
+        "gunlance",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "weapon_attack_speed_percent_add",
+          "value": 0.2,
+          "weaponIds": [
+            "gunlance"
+          ]
+        },
+        {
+          "type": "weapon_damage_percent_add",
+          "value": 0.08,
+          "weaponIds": [
+            "gunlance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "silver_sword_shard",
+      "name": "銀劍碎片",
+      "desc": "裝備長劍時攻擊距離 +50%、傷害 +10%。",
+      "icon": "†",
+      "fallbackIcon": "†",
+      "weight": 0.85,
+      "tags": [
+        "weapon",
+        "long",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "weapon_attack_range_percent_add",
+          "value": 0.5,
+          "weaponIds": [
+            "long"
+          ]
+        },
+        {
+          "type": "weapon_damage_percent_add",
+          "value": 0.1,
+          "weaponIds": [
+            "long"
+          ]
+        }
+      ]
     }
-  ]
+  ],
+  "fieldGuide": {
+    "schemaVersion": "資料格式版本，目前為 1.0.0。",
+    "description": "此檔用途簡述。",
+    "relics": "遺物物件陣列。",
+    "relicFields": {
+      "id": "遺物唯一 ID。",
+      "name": "顯示名稱。",
+      "desc": "遊戲內效果說明。",
+      "icon": "圖示字元或檔名。",
+      "fallbackIcon": "圖示失敗的替代符號。",
+      "weight": "加權抽取權重，越高越容易抽中。",
+      "tags": "分類標籤；主要供介面或後續篩選使用。",
+      "effect": "單一效果物件（相容簡寫）。",
+      "effects": "效果物件陣列；可讓一件遺物同時具有多種效果。",
+      "effects[].type": "效果類型 ID；需為 HTML applyOneRelicEffect 已支援的類型。",
+      "effects[].value": "效果數值；比例類效果通常以小數表示，例如 0.15 代表 15%。",
+      "effects[].weaponIds": "可選武器 ID 清單；weapon 專屬加成只套用於列出的武器。"
+    },
+    "effectTypes": [
+      {
+        "type": "attack_add",
+        "value": "攻擊力固定增加。"
+      },
+      {
+        "type": "armor_add",
+        "value": "固定減傷增加；每次受傷時計算，依既有最低傷害規則結算。"
+      },
+      {
+        "type": "attack_percent_add",
+        "value": "全武器攻擊力百分比加成，小數表示。"
+      },
+      {
+        "type": "crit_add",
+        "value": "暴擊率增加，小數表示，例如 0.05 為 +5%。"
+      },
+      {
+        "type": "crit_damage_add",
+        "value": "暴擊時額外傷害。"
+      },
+      {
+        "type": "guard_add",
+        "value": "每層首次減傷增加。"
+      },
+      {
+        "type": "fixed_guard_add",
+        "value": "固定減傷增加。"
+      },
+      {
+        "type": "max_hp_heal",
+        "value": "最大生命增加；可用 heal 指定立即治療量。"
+      },
+      {
+        "type": "potion_heal_add",
+        "value": "藥水治療量增加。"
+      },
+      {
+        "type": "speed_percent_add",
+        "value": "移動速度百分點增減。"
+      },
+      {
+        "type": "bleed_damage_add",
+        "value": "玩家施加流血的每秒傷害額外增加。"
+      },
+      {
+        "type": "staff_charge_reduction",
+        "value": "權杖蓄力毫秒數減少。"
+      },
+      {
+        "type": "low_hp_damage_percent_add",
+        "value": "生命低於 35% 時的傷害加成，小數表示。"
+      },
+      {
+        "type": "kill_heal_add",
+        "value": "擊殺後治療量增加。"
+      },
+      {
+        "type": "kill_shard_add",
+        "value": "擊殺後額外律質增加。"
+      },
+      {
+        "type": "bonus_shard_add",
+        "value": "每次擊殺額外律質加成。"
+      },
+      {
+        "type": "weapon_damage_percent_add",
+        "value": "特定武器造成的傷害百分比加成；需指定 weaponIds，例如 [\"bow\"]。"
+      },
+      {
+        "type": "weapon_attack_speed_percent_add",
+        "value": "特定武器攻擊速度百分比加成；0.2 代表攻擊間隔縮短為原本約 1/1.2。"
+      },
+      {
+        "type": "weapon_range_add",
+        "value": "特定武器額外射程，單位世界格數，可為小數。"
+      },
+      {
+        "type": "weapon_knockback_cells_add",
+        "value": "特定武器額外擊退距離，單位世界格數。"
+      }
+    ]
+  }
 }
