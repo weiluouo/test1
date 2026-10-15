@@ -32,7 +32,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
 
 </head><body><div class="wrap">
 <header class="top"><div><div class="eyebrow">THE SILVER SWORD CHRONICLES</div><div class="brand">銀劍的英雄<span class="gold">．夢幻境之旅</span></div><div class="sub">古老羊皮紙記載著旅程；每一次抉擇，都將改寫英雄的傳說。</div></div><div class="badge" id="headerMeta">✦ 0 律質</div></header>
-<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept=".ssv,.json,application/json,application/octet-stream" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">升級價格會隨等級逐步增加；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王分為近戰、遠程、騎兵三階段（70%／30% 生命切換）；召喚的支援怪會削弱隨機數值，擊敗後恢復。怪物戰利品會落地，必須走近拾取。</p></div></div></div></section>
+<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept=".ssv,.json,application/json,application/octet-stream" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">每種鍛造升級皆採固定價格，不會因等級上升而通膨；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王分為近戰、遠程、騎兵三階段（70%／30% 生命切換）；召喚的支援怪會削弱隨機數值，擊敗後恢復。怪物戰利品會落地，必須走近拾取。</p></div></div></div></section>
 <section id="gameScreen" class="hidden">
 <div class="layout"><div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2 id="roomTitle">第一層：銀霧入口</h2><div class="sub" id="roomDesc">探索道路、搜集戰利品，並尋找通往下一層的出口。</div></div><span class="badge" id="roomBadge">即時戰鬥</span></div><div class="map" id="map" aria-label="地城自由移動地圖"></div>
 <div id="bossInfo" class="boss-info hidden" aria-live="polite"></div>
@@ -124,7 +124,7 @@ let expeditionScenarioStatus='loading';
 let expeditionScenarioError='';
 let contentDataStatus='loading';
 let contentDataError='';
-function applyOneRelicEffect(effect,r){if(!effect||!effect.type)return;const v=Number(effect.value)||0;switch(effect.type){case'attack_add':r.atk=(Number(r.atk)||0)+v;break;case'armor_add':r.armor=(Number(r.armor)||0)+v;break;case'weapon_damage_percent_add':applyWeaponScopedBonus(r,effect,'damagePercentAdd');break;case'weapon_attack_speed_percent_add':applyWeaponScopedBonus(r,effect,'attackSpeedPercentAdd');break;case'weapon_range_add':applyWeaponScopedBonus(r,effect,'rangeAdd');break;case'weapon_knockback_cells_add':applyWeaponScopedBonus(r,effect,'knockbackCellsAdd');break;case'max_hp_heal':r.maxHp=(Number(r.maxHp)||0)+v;r.hp=Math.min(r.maxHp,(Number(r.hp)||0)+(Number(effect.heal)||0));break;case'bonus_shard_add':r.bonusShard=(Number(r.bonusShard)||0)+v;break;case'potion_heal_add':r.potHeal=(Number(r.potHeal)||0)+v;break;case'potion_heal_set':r.potHeal=v;break;case'guard_add':r.guardLayer=(Number(r.guardLayer)||0)+v;break;case'fixed_guard_add':r.guardBase=(Number(r.guardBase)||0)+v;break;case'guard_set':r.guardLayer=v;break;case'crit_add':r.crit=Math.max(0,Math.min(.75,(Number(r.crit)||0)+v));break;case'crit_set':r.crit=Math.max(r.crit||0,v);break;case'speed_percent_add':case'change_speed_percent':applySpeedPercent(r,v);break;case'crit_damage_add':r.critDamageBonus=(Number(r.critDamageBonus)||0)+v;break;case'bleed_damage_add':r.bleedDamageAdd=(Number(r.bleedDamageAdd)||0)+v;break;case'staff_charge_reduction':r.staffChargeReduction=Math.min(1500,(Number(r.staffChargeReduction)||0)+v);break;case'low_hp_damage_percent_add':r.lowHpDamagePercent=(Number(r.lowHpDamagePercent)||0)+v;break;case'kill_heal_add':r.killHealAdd=(Number(r.killHealAdd)||0)+v;break;case'kill_shard_add':r.killShardAdd=(Number(r.killShardAdd)||0)+v;break;case'attack_percent_add':r.attackPercentBonus=(Number(r.attackPercentBonus)||0)+v;break;default:console.warn('未知遺物效果：',effect.type)}}
+function applyOneRelicEffect(effect,r){if(!effect||!effect.type)return;const v=Number(effect.value)||0;switch(effect.type){case'attack_add':r.atk=(Number(r.atk)||0)+v;break;case'armor_add':r.armor=(Number(r.armor)||0)+v;break;case'weapon_damage_percent_add':applyWeaponScopedBonus(r,effect,'damagePercentAdd');break;case'weapon_attack_speed_percent_add':applyWeaponScopedBonus(r,effect,'attackSpeedPercentAdd');break;case'weapon_range_add':applyWeaponScopedBonus(r,effect,'rangeAdd');break;case'weapon_knockback_cells_add':applyWeaponScopedBonus(r,effect,'knockbackCellsAdd');break;case'max_hp_heal':r.maxHp=(Number(r.maxHp)||0)+v;r.hp=Math.min(r.maxHp,(Number(r.hp)||0)+(Number(effect.heal)||0));break;case'bonus_shard_add':r.bonusShard=(Number(r.bonusShard)||0)+v;break;case'potion_heal_add':r.potHeal=(Number(r.potHeal)||0)+v;break;case'potion_heal_set':r.potHeal=v;break;case'guard_add':r.guardLayer=(Number(r.guardLayer)||0)+v;break;case'fixed_guard_add':r.guardBase=(Number(r.guardBase)||0)+v;break;case'guard_set':r.guardLayer=v;break;case'crit_add':r.crit=Math.max(0,Math.min(.75,(Number(r.crit)||0)+v));break;case'crit_set':r.crit=Math.max(r.crit||0,v);break;case'speed_percent_add':case'change_speed_percent':applySpeedPercent(r,v);break;case'crit_damage_add':r.critDamageBonus=(Number(r.critDamageBonus)||0)+v;break;case'bleed_damage_add':r.bleedDamageAdd=(Number(r.bleedDamageAdd)||0)+v;break;case'staff_charge_reduction':r.staffChargeReduction=Math.min(1500,(Number(r.staffChargeReduction)||0)+v);break;case'low_hp_damage_percent_add':r.lowHpDamagePercent=(Number(r.lowHpDamagePercent)||0)+v;break;case'kill_heal_add':r.killHealAdd=(Number(r.killHealAdd)||0)+v;break;case'kill_shard_add':r.killShardAdd=(Number(r.killShardAdd)||0)+v;break;case'attack_percent_add':r.attackPercentBonus=(Number(r.attackPercentBonus)||0)+v;break;case'staff_splash_explosion':r.staffSplashExplosionMultiplier=Math.max(Number(r.staffSplashExplosionMultiplier)||0,v);r.staffSplashExplosionRadiusCells=Math.max(Number(r.staffSplashExplosionRadiusCells)||0,Number(effect.radiusCells)||1);break;default:console.warn('未知遺物效果：',effect.type)}}
 function applyRelicDefinition(def,r){const effects=Array.isArray(def.effects)?def.effects:(Array.isArray(def.effect)?def.effect:(def.effect?[def.effect]:[]));for(const effect of effects)applyOneRelicEffect(effect,r)}
 async function loadExternalGameData(){
  expeditionScenarioStatus='loading';contentDataStatus='loading';
@@ -738,8 +738,8 @@ renderMeta();
   const baseRenderMeta = renderMeta;
   const upgradeBaseCosts = new Map(SHOP.map(item=>[item.id, Number(item.cost)||100]));
   function currentUpgradeCost(item){
-    const level = Math.max(0, Number(meta.up?.[item.id])||0);
-    return Math.round((upgradeBaseCosts.get(item.id)||item.cost||100) * (1 + level * 0.2 + Math.max(0,level-10)*0.03));
+    // 鍛造費用固定，升級等級不再影響單次價格。
+    return Math.max(0, Number(upgradeBaseCosts.get(item.id) ?? item.cost) || 0);
   }
   function refreshStarterWeaponSelect(){
     const sel=$('startWeaponSelect'); if(!sel) return;
@@ -1028,6 +1028,7 @@ renderMeta();
     if(ids.has('wolf-fang-pendant')&&ids.has('blood-rune'))items.push({id:'fang-blood',name:'獵血共鳴',desc:'對流血中的敵人額外造成 1 點直接傷害。'});
     if(ids.has('copperwall-charm')&&ids.has('silver-oath'))items.push({id:'silver-wall',name:'銀誓壁壘',desc:'額外固定減傷 +1。'});
     if(ids.has('glass-prism')&&run.weapon==='staff')items.push({id:'prism-staff',name:'光稜聚焦',desc:'裝備權杖時，光束傷害 +15%。'});
+    if(ids.has('staff-splash-core')&&run.weapon==='staff')items.push({id:'staff-splash',name:'星爆擴散',desc:'權杖光束命中時爆炸；1 格內的其他敵人受到 1 倍自身攻擊傷害。'});
     if(ids.has('eagle-eye-bowstring')&&ids.has('hunter-eye')&&run.weapon==='bow')items.push({id:'bow-hunter',name:'鷹眼獵殺',desc:'裝備長弓時，額外傷害 +10%、射程 +0.25 格。'});
     if(ids.has('breaker-spear-tassel')&&ids.has("warrior's-knot")&&run.weapon==='spear')items.push({id:'spear-breaker',name:'破陣之勢',desc:'裝備長槍時，額外傷害 +12%、攻擊速度 +10%、擊退距離 +0.5 格。'});
     if(ids.has('gunlance-ignition-core')&&ids.has('ember-core')&&run.weapon==='gunlance')items.push({id:'gunlance-ignition',name:'赤芯連鎖',desc:'裝備銃槍時，額外傷害 +10%、攻擊速度 +15%。'});
@@ -1540,7 +1541,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
   const prevRenderLoot=renderGroundLoot;
   renderGroundLoot=function(){prevRenderLoot();if(!run)return;for(const item of (run.loot||[])){const id='arenaLoot-'+String(item.uid).replace(/[^a-zA-Z0-9_-]/g,'_'),el=$(id);if(!el)continue;let cap=el.querySelector('.loot-caption');if(!cap){cap=document.createElement('span');cap.className='loot-caption';el.appendChild(cap)}let name=item.kind==='shards'?'律質':item.kind==='potion'?'藥水':(item.relic?.name||'遺物');let amount=item.kind==='shards'?Number(item.amount)||1:1;cap.textContent=name+(amount>1?` ×${amount}`:'');}}
   // Staff lock marker reuses the exact visual language of the whiff indicator.
-  const style=document.createElement('style');style.textContent='.magic-charge-marker{width:34px!important;min-width:34px!important;height:34px!important;aspect-ratio:1!important;border-radius:50%!important;background:rgba(244,228,189,.88)!important;border:2px dashed #9a7743!important;color:#795725!important;text-shadow:0 1px #fff3d2!important;box-shadow:0 0 0 3px #b89b6a33!important;filter:none!important;animation:none!important;font-size:22px!important}';document.head.appendChild(style);
+  const style=document.createElement('style');style.textContent='.magic-charge-marker{width:auto!important;min-width:0!important;height:auto!important;aspect-ratio:auto!important;border-radius:0!important;background:transparent!important;border:0!important;color:#987129!important;text-shadow:0 0 8px #fff1b5!important;box-shadow:none!important;filter:drop-shadow(0 0 3px #e2c16e)!important;animation:magicChargePulse .52s ease-in-out infinite alternate!important;font-size:clamp(19px,2.4vw,27px)!important}';document.head.appendChild(style);
   // Remove attack warning and staff marker immediately when an enemy dies.
   const oldDefeat=handleEnemyDefeat;handleEnemyDefeat=function(e){if(e){e.warningEl?.remove();e.warningEl=null;const m=$('magicChargeMarker');if(m&&run?.magicCharge?.targetUid===e.uid){m.style.opacity='0';m.style.transform='translate(-50%,-50%) scale(.2)';}}return oldDefeat(e)};
   // Sprint: 4x movement for 300ms, then 3s cooldown; direction follows current input or facing.
@@ -1602,7 +1603,7 @@ body.merchant-open{overflow:hidden!important;overscroll-behavior:none}
 #modalContent.merchant-scroll .merchant-services{position:sticky;bottom:0;z-index:2;background:#efdfbc;padding:8px 0;box-shadow:0 -5px 10px #efdfbcaa}
 @media(max-width:560px){#modal{padding:6px!important}#modalContent.merchant-scroll{max-height:calc(100vh - 12px)!important;max-height:calc(100dvh - 12px)!important;padding:16px!important}#modalContent.merchant-scroll .merchant-offers{grid-template-columns:1fr!important}#modalContent.merchant-scroll .merchant-services{flex-direction:column}}
 #gameScreen .arena-actor.player .arena-sprite{position:relative!important;overflow:visible!important}
-.hero-held-weapon{position:absolute;z-index:4;right:-6%;bottom:15%;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(13px,2.2vw,23px);line-height:1;filter:drop-shadow(0 2px 1px #57391b) drop-shadow(0 0 2px #fff0bf);transform-origin:70% 80%;pointer-events:none;white-space:nowrap}
+.hero-held-weapon{position:absolute;z-index:4;right:-55%;bottom:15%;display:inline-flex;align-items:center;justify-content:center;font-size:clamp(13px,2.2vw,23px);line-height:1;filter:drop-shadow(0 2px 1px #57391b) drop-shadow(0 0 2px #fff0bf);transform-origin:70% 80%;pointer-events:none;white-space:nowrap}
 .hero-held-weapon.is-short{transform:rotate(-47deg) translate(1px,-1px)}.hero-held-weapon.is-long{transform:rotate(-40deg) translate(1px,-2px)}.hero-held-weapon.is-spear{transform:rotate(-48deg) scale(.95)}.hero-held-weapon.is-bow{transform:rotate(-15deg) scale(.9)}.hero-held-weapon.is-gunlance{transform:rotate(-33deg) scale(.93)}.hero-held-weapon.is-staff{transform:rotate(-38deg) scale(.95)}
 #gameScreen .arena-actor.player .arena-cooldown-bar{position:absolute;left:50%;top:calc(112% + 8px);transform:translateX(-50%);width:155%;height:4px;border-radius:99px;background:#b1b0aa;border:1px solid #77756f;overflow:hidden;pointer-events:none;box-shadow:0 1px 2px #513d2044;z-index:15}
 #gameScreen .arena-actor.player .arena-cooldown-bar span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#8e8e89,#cecdc7);transition:width .04s linear}
@@ -1617,11 +1618,11 @@ body.merchant-open{overflow:hidden!important;overscroll-behavior:none}
   applyEnemyDamageToPlayer=function(e,now,projectileHit=false){if(run&&Date.now()<(run.invulnerableUntil||0))return 0;return priorEnemyDamage(e,now,projectileHit)};
   const priorPlayerBleed=updatePlayerBleed;
   updatePlayerBleed=function(now){if(run&&Date.now()<(run.invulnerableUntil||0)&&run.playerBleedUntil&&run.playerBleedNextAt&&now>=run.playerBleedNextAt){run.playerBleedNextAt=now+1000;return}return priorPlayerBleed(now)};
-  // Mirror the exact fx-magic animation used by a staff's empty swing while charging, following the hero.
+  // 權杖蓄力動畫直接顯示在鎖定目標上，並隨怪物移動；不再跟隨玩家。
   const priorTriggerAttack=triggerAttack;
-  triggerAttack=function(...args){const out=priorTriggerAttack(...args);const c=run?.magicCharge;if(c&&!c.castFx){const t=run.enemies.find(e=>e.uid===c.targetUid&&!e.dead)||run.player;c.castFx=emitFx('fx-magic',run.player,t,'✦');}return out};
+  triggerAttack=function(...args){const out=priorTriggerAttack(...args);const c=run?.magicCharge;if(c&&!c.castFx){const t=run.enemies.find(e=>e.uid===c.targetUid&&!e.dead&&e.hp>0);if(t)c.castFx=emitFx('fx-magic',t,t,'✦');}return out};
   const priorChargeUpdate=updateWeaponCharge;
-  updateWeaponCharge=function(now){const c=run?.magicCharge;if(c?.castFx){const pos=elAtWorld('map',run.player);if(pos){c.castFx.style.left=pos.x+'px';c.castFx.style.top=pos.y+'px';}}const out=priorChargeUpdate(now);if(c?.castFx&&!run?.magicCharge)c.castFx.remove();return out};
+  updateWeaponCharge=function(now){const c=run?.magicCharge;const t=c&&run?.enemies?.find(e=>e.uid===c.targetUid&&!e.dead&&e.hp>0);if(c?.castFx&&t){const pos=elAtWorld('map',t);if(pos){c.castFx.style.left=pos.x+'px';c.castFx.style.top=pos.y+'px';}}else if(c?.castFx&&!t){c.castFx.remove();c.castFx=null;}const out=priorChargeUpdate(now);if(c?.castFx&&!run?.magicCharge)c.castFx.remove();return out};
   // Player-held weapon and cooldown meter are rendered as part of the actor, not as a separate HUD.
   const priorArenaRender=renderArena;
   renderArena=function(...args){const result=priorArenaRender(...args);if(!run)return result;const actor=$('arenaActor-player');if(!actor)return result;
@@ -1639,3 +1640,60 @@ body.merchant-open{overflow:hidden!important;overscroll-behavior:none}
 })();
 </script>
 </body></html>
+
+<style id="silver-sword-user-requested-polish">
+/* 還原最初使用的系統無襯線字體，取消後來追加的華康超明體強制覆寫。 */
+html,body,body *,button,input,select,textarea{
+  font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei","PingFang TC","Heiti TC",sans-serif!important;
+}
+/* 鍛造與武器圖示統一使用羊皮紙底色。 */
+#metaShop .forge-icon,.weapon-icon{
+  background:#f5e9ca!important;
+  color:#715126!important;
+  border:1px solid #b99d70!important;
+  border-radius:7px!important;
+  box-shadow:inset 0 1px #fff7dd!important;
+  overflow:hidden;
+}
+#metaShop .forge-icon .game-icon-image,.weapon-icon .game-icon-image{
+  display:block;width:100%;height:100%;object-fit:contain;
+}
+/* 武器符號移到放大角色插圖的最右緣，而不是擠在角色中央。 */
+#gameScreen .arena-actor.player .arena-sprite{position:relative!important;overflow:visible!important}
+#gameScreen .arena-actor.player .hero-held-weapon{
+  right:-55%!important;bottom:15%!important;z-index:18!important;
+  filter:drop-shadow(0 1px 2px #fff0c9) drop-shadow(0 1px 2px #6c4b22)!important;
+}
+/* 權杖蓄力標記只保留追蹤中的小型光芒，不使用虛線圓框、不鋪高不透明背景。 */
+#gameScreen .magic-charge-marker{
+  width:auto!important;min-width:0!important;height:auto!important;aspect-ratio:auto!important;
+  padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;color:#987129!important;text-shadow:0 0 8px #fff1b5!important;
+  filter:drop-shadow(0 0 3px #e2c16e)!important;font-size:clamp(19px,2.4vw,27px)!important;
+}
+.fx-staff-explosion{z-index:90!important;color:#ffe7a0!important;font-size:clamp(30px,4.5vw,54px)!important;text-shadow:0 0 7px #fff9d8,0 0 17px #e2a84d,0 0 28px #b17ae2!important;animation:staffExplosion .46s ease-out both!important}
+@keyframes staffExplosion{0%{opacity:0;transform:translate(-50%,-50%) scale(.18)}28%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}65%{opacity:.9;transform:translate(-50%,-50%) scale(1.42)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.85)}}
+</style>
+<script>
+(function silverSwordStaffSplash(){
+  if(typeof applyWeaponHit!=='function')return;
+  const previousApplyWeaponHit=applyWeaponHit;
+  applyWeaponHit=function(target,damage,weapon,now){
+    const landed=previousApplyWeaponHit(target,damage,weapon,now);
+    if(!landed||!run||!target||weapon?.attackFx!=='fx-magic')return landed;
+    const multiplier=Math.max(0,Number(run.staffSplashExplosionMultiplier)||0);
+    if(multiplier<=0)return landed;
+    const radiusCells=Math.max(0.1,Number(run.staffSplashExplosionRadiusCells)||1);
+    const radius=(Number(WORLD?.cell)||100)*radiusCells;
+    const splashDamage=Math.max(1,Math.round((Number(run.atk)||1)*(1+(Number(run.attackPercentBonus)||0))*multiplier));
+    const neighbors=(run.enemies||[]).filter(other=>other&&other!==target&&!other.dead&&Number(other.hp)>0&&Math.hypot((Number(other.x)||0)-(Number(target.x)||0),(Number(other.y)||0)-(Number(target.y)||0))<=radius);
+    emitFx('fx-staff-explosion',target,target,'✹');
+    for(const other of neighbors){
+      // Use the existing damage path without recursively triggering a second explosion.
+      previousApplyWeaponHit(other,splashDamage,{name:'星爆擴散',attackFx:'fx-magic'},now);
+    }
+    if(neighbors.length)addLog(`星爆晶核引發擴散爆炸：周遭 ${neighbors.length} 名敵人各受到 ${splashDamage} 點傷害。`);
+    return landed;
+  };
+})();
+</script>
