@@ -23,7 +23,7 @@
       "preferredRange": 54,
       "leashRange": 470,
       "decisionInterval": 150,
-      "windupMs": 520,
+      "windupMs": 280,
       "roleLabel": "近戰"
     },
     {
@@ -38,7 +38,7 @@
       "damageMultiplier": 0.7,
       "aggroRange": 220,
       "attackRange": 84,
-      "attackCooldown": 1050,
+      "attackCooldown": 750,
       "attackType": "charge",
       "description": "高速騎兵型敵人；快速追擊並以較長攻擊距離的衝撞打擊，風險在於容易被引離巡邏區。",
       "mapIconFile": "騎兵.png",
@@ -47,7 +47,7 @@
       "preferredRange": 60,
       "leashRange": 520,
       "decisionInterval": 110,
-      "windupMs": 390,
+      "windupMs": 220,
       "chargeDistance": 86,
       "roleLabel": "騎兵"
     },
@@ -72,7 +72,7 @@
       "preferredRange": 62,
       "leashRange": 470,
       "decisionInterval": 175,
-      "windupMs": 760,
+      "windupMs": 400,
       "roleLabel": "重裝"
     },
     {
@@ -87,14 +87,14 @@
       "damageMultiplier": 0.7,
       "aggroRange": 300,
       "attackRange": 270,
-      "attackCooldown": 2500,
+      "attackCooldown": 1500,
       "attackType": "projectile",
       "projectileIcon": "🔥",
       "keepDistance": 170,
       "description": "遠距離發射可閃避的怨火；優先維持距離，視線受牆阻擋時會尋路至可射擊位置。投射物速度較慢，攻擊前會短暫停留。",
       "mapIconFile": "遠程.png",
       "fallbackIcon": "👻",
-      "projectileSpeed": 112,
+      "projectileSpeed": 170,
       "behavior": "ranged-kiter",
       "preferredRange": 170,
       "leashRange": 560,
