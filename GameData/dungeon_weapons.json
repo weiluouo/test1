@@ -12,7 +12,7 @@
       "cooldown": 1500,
       "wall": false,
       "attackFx": "fx-short",
-      "description": "快速短距斬擊；命中後流血，每秒 -1 HP、持續 5 秒，再次命中刷新時間。",
+      "description": "快速短距斬擊；命中後施加流血，每秒傷害隨層數提升，最多 3 層、持續 5 秒；再次命中增加層數並刷新時間。",
       "role": "bleed"
     },
     {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "以舊版 dungeon_monsters.json 的四種怪物與基礎資料為核心；補入有清晰職能的 AI 參數、攻擊預告距離與王座專用支援怪。hp/atk 為基礎值；遊戲會依樓層與難度縮放。supportOnly=true 的支援怪不會出現在一般房間，只由 BOSS 召喚。",
+  "description": "怪物資料含近戰、騎兵、遠程與支援角色；嶙峋野狗以三隻為一群，祭司自第 5 層起有機會生成，祭司存活時提高敵方速度與傷害並週期治療。supportOnly=true 的支援怪只由王座召喚。",
   "monsters": [
     {
       "id": "ash-skeleton",
@@ -74,6 +74,37 @@
       "decisionInterval": 175,
       "windupMs": 760,
       "roleLabel": "重裝"
+    },
+    {
+      "id": "ragged-wild-dog",
+      "name": "嶙峋野狗",
+      "icon": "🐕",
+      "hp": 3,
+      "atk": 2,
+      "xp": 2,
+      "classType": "cavalry",
+      "speed": 210,
+      "damageMultiplier": 0.72,
+      "aggroRange": 245,
+      "attackRange": 78,
+      "attackCooldown": 1250,
+      "attackType": "melee",
+      "description": "高速騎兵型野獸；每次以三隻成群出現，生命較低，撕咬會附加可刷新、不可疊加的流血。",
+      "mapIconFile": "",
+      "fallbackIcon": "🐕",
+      "behavior": "fast-pursuer",
+      "preferredRange": 56,
+      "leashRange": 540,
+      "decisionInterval": 105,
+      "windupMs": 330,
+      "spawnCount": 3,
+      "attackBleed": {
+        "damage": 1,
+        "durationMs": 5000,
+        "refreshes": true,
+        "stacks": false
+      },
+      "roleLabel": "騎兵"
     },
     {
       "id": "resentful-wisp",
@@ -189,6 +220,37 @@
         "crit",
         "guard"
       ]
+    },
+    {
+      "id": "dream-priest",
+      "name": "祭司",
+      "icon": "🧙‍♂️",
+      "hp": 10,
+      "atk": 0,
+      "xp": 4,
+      "classType": "support",
+      "speed": 68,
+      "damageMultiplier": 0,
+      "aggroRange": 9999,
+      "attackRange": 0,
+      "attackCooldown": 999999,
+      "attackType": "support",
+      "description": "第五層起有機會出現的非召喚支援單位；在場時使全體敵方速度與傷害提高 40%，每 5 秒治療受傷最多的敵方單位。",
+      "mapIconFile": "",
+      "fallbackIcon": "🧙‍♂️",
+      "behavior": "priest-support",
+      "preferredRange": 190,
+      "leashRange": 9999,
+      "decisionInterval": 160,
+      "windupMs": 0,
+      "supportOnly": false,
+      "spawnFromFloor": 5,
+      "supportRole": "priest",
+      "supportAuraSpeedMultiplier": 1.4,
+      "supportAuraDamageMultiplier": 1.4,
+      "supportHealIntervalMs": 5000,
+      "supportHealBase": 5,
+      "roleLabel": "支援"
     }
   ],
   "config": {
