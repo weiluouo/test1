@@ -380,6 +380,29 @@
           ]
         }
       ]
+    },
+    {
+      "id": "staff-splash-core",
+      "name": "星爆晶核",
+      "desc": "裝備權杖時，光束命中會觸發擴散爆炸；半徑 1 格，對周遭其他敵人各造成相當於自身攻擊力 1 倍的傷害。",
+      "icon": "✴",
+      "fallbackIcon": "✴",
+      "weight": 0.65,
+      "tags": [
+        "weapon",
+        "staff",
+        "magic",
+        "area",
+        "offense"
+      ],
+      "effect": {
+        "type": "staff_splash_explosion",
+        "value": 1,
+        "radiusCells": 1,
+        "weaponIds": [
+          "staff"
+        ]
+      }
     }
   ],
   "fieldGuide": {
@@ -481,6 +504,7 @@
         "type": "weapon_knockback_cells_add",
         "value": "特定武器額外擊退距離，單位世界格數。"
       }
-    ]
+    ],
+    "staff_splash_explosion": "權杖專屬擴散效果；value 為自身攻擊倍率，radiusCells 為以 WORLD.cell 為單位的爆炸半徑。只有權杖光束命中時觸發，周遭其他敵人各承受一次傷害。"
   }
 }
