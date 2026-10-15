@@ -366,7 +366,7 @@
       ],
       "effects": [
         {
-          "type": "weapon_attack_range_percent_add",
+          "type": "weapon_range_add",
           "value": 0.5,
           "weaponIds": [
             "long"
