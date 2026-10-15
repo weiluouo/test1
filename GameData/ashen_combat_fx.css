@@ -31,3 +31,9 @@
 .fx-magic-beam{font-size:0;width:18px;height:230px;border-radius:50%;background:linear-gradient(to top,rgba(255,255,255,.98) 0%,rgba(130,239,255,.92) 28%,rgba(106,125,255,.62) 65%,rgba(120,100,255,0) 100%);box-shadow:0 0 12px #9bf4ff,0 0 25px #817aff,0 0 46px #88eaff;transform-origin:bottom center;animation:magicBeam .7s cubic-bezier(.15,.7,.25,1) both}
 @keyframes magicCharge{0%{opacity:.2;transform:translate(-50%,-50%) scale(.35) rotate(0)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.05) rotate(65deg)}50%{opacity:.8;transform:translate(-50%,-50%) scale(.78) rotate(150deg)}75%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(245deg)}100%{opacity:.95;transform:translate(-50%,-50%) scale(1.1) rotate(360deg)}}
 @keyframes magicBeam{0%{opacity:0;transform:translate(-50%,-100%) scaleY(.05)}15%{opacity:1;transform:translate(-50%,-100%) scaleY(1.08)}65%{opacity:.95;transform:translate(-50%,-100%) scaleY(1)}100%{opacity:0;transform:translate(-50%,-100%) scaleY(.02)}}
+
+/* Silver Sword parchment palette compatibility */
+.combat-fx{filter:drop-shadow(0 1px 1px #4e331966);text-shadow:0 1px 0 #fff0cf}
+.fx-magic,.fx-magic-beam{color:#92712f;text-shadow:0 0 10px #ffed9a,0 0 20px #d5ae55}
+.enemy-projectile-node{color:#8b382f;text-shadow:0 0 5px #fff2cb;will-change:left,top}
+.magic-charge-marker{color:#946c20}

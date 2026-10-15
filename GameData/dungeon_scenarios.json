@@ -1,13 +1,8 @@
 {
   "schemaVersion": "1.0.0",
-  "game": "灰燼地城：無盡輪迴",
+  "game": "銀劍的英雄．夢幻境之旅",
   "language": "zh-Hant",
-  "source": {
-    "filename": "情境列表.xlsx",
-    "worksheet": "工作表1",
-    "rowsUsed": 21,
-    "note": "依原表 21 條情境改編為單人遠征事件；保留天災、族群、邪靈、救援、秘寶與採集等主題，將原本的人口／信仰／政權等多人模擬後果轉譯為玩家本局生命、攻擊、藥水、遺物與律質。"
-  },
+  "source": "Silver Sword Dreamlands expedition scenario design",
   "config": {
     "triggerFloors": [
       1,
@@ -22,7 +17,11 @@
     "hideOutcomeUntilChoice": true,
     "writeResultToExpeditionLogOnly": true,
     "defaultEventWeight": 1,
-    "resultDisplaySeconds": 2
+    "resultDisplaySeconds": 2,
+    "designNotes": [
+      "情境在選擇前只顯示門檻、代價與判定成功率估計，不提前揭露結果。",
+      "情境結果在遠征中套用；危險選擇需保留可理解的風險與對應收益。"
+    ]
   },
   "effectTypes": [
     {
@@ -2978,5 +2977,6 @@
         }
       ]
     }
-  ]
+  ],
+  "description": "《銀劍的英雄．夢幻境之旅》遠征事件資料；採用羊皮紙中世紀冒險視覺主題。"
 }

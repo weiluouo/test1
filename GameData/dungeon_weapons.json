@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "武器由此檔管理。icon 可填文字／Emoji 或 GameData 內的 PNG 檔名；cooldown 單位毫秒，range 單位為地圖格距（每格 100 世界單位）。attackFx 可定義既有戰鬥行為：fx-short 流血、fx-long 雙目標橫斬、fx-spear 範圍震盪、fx-magic 三秒鎖定蓄力光束。長槍 splashRangeCells 可設定濺射半徑，未設定時預設 10 格。",
+  "description": "《銀劍的英雄．夢幻境之旅》武器資料。cooldown 單位毫秒、range 為地圖格距；武器各有不同節奏與特殊效果。",
   "weapons": [
     {
       "id": "short",
@@ -12,7 +12,8 @@
       "cooldown": 1500,
       "wall": false,
       "attackFx": "fx-short",
-      "description": "短距離快速斬擊。"
+      "description": "快速短距斬擊；命中後流血，每秒 -1 HP、持續 5 秒，再次命中刷新時間。",
+      "role": "bleed"
     },
     {
       "id": "long",
@@ -24,7 +25,8 @@
       "cooldown": 2000,
       "wall": false,
       "attackFx": "fx-long",
-      "description": "高傷害近戰斬擊。"
+      "description": "較慢但有力的橫斬；射程內至少兩個目標時，最多命中兩個敵人、各造成 1 倍攻擊力傷害。",
+      "role": "sweep"
     },
     {
       "id": "spear",
@@ -36,7 +38,8 @@
       "cooldown": 1800,
       "wall": false,
       "attackFx": "fx-spear",
-      "description": "可在較長距離突刺。"
+      "description": "單體長距離突刺；命中後擊退敵人約一格，不會造成全地圖或周遭群傷。",
+      "role": "knockback"
     },
     {
       "id": "bow",
@@ -48,7 +51,8 @@
       "cooldown": 2000,
       "wall": true,
       "attackFx": "fx-arrow",
-      "description": "遠距離射擊，可穿越障礙物。"
+      "description": "長距離單體射擊；可穿越牆壁與障礙，冷卻期間要以走位避開逼近的敵人。",
+      "role": "piercing"
     },
     {
       "id": "gunlance",
@@ -60,19 +64,21 @@
       "cooldown": 700,
       "wall": false,
       "attackFx": "fx-bullet",
-      "description": "低傷害、長射程、短冷卻的子彈射擊。"
+      "description": "高射速、低單發傷害的投射物；適合移動中持續輸出。",
+      "role": "rapid"
     },
     {
       "id": "staff",
       "name": "權杖",
       "icon": "權杖.png",
       "fallbackIcon": "🪄",
-      "mult": 2.5,
-      "range": 2,
+      "mult": 2,
+      "range": 3,
       "cooldown": 3500,
       "wall": false,
       "attackFx": "fx-magic",
-      "description": "鎖定射程內單一敵人，蓄力 3 秒後召下光束；鎖定後即使敵人離開射程仍會命中。"
+      "description": "鎖定射程內單一敵人，蓄力 3 秒後降下光束；蓄力標記持續追蹤，鎖定後即使目標離開射程也會命中。",
+      "role": "delayed-burst"
     }
   ]
 }
