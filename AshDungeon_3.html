@@ -18,9 +18,21 @@ button,select,input{font-family:inherit}button{color:#44331f;background:linear-g
 @media(max-width:760px){.wrap{padding:12px}.layout{grid-template-columns:minmax(0,1fr)}.starter-choice{align-items:stretch;flex-direction:column;gap:8px}.starter-choice select{width:100%}.codex-grid{grid-template-columns:1fr}.top{align-items:flex-start}.badge{white-space:normal}}
 </style>
 
+
+<style id="silver-final-theme-fixes">
+body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.enemy-attack-warning,.magic-charge-marker{font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei","PingFang TC","Heiti TC",sans-serif!important}
+#gameScreen #map.map{border:0!important;outline:0!important;box-shadow:none!important;background-color:#e7d3a9!important}
+.magic-charge-marker{color:#94713a!important;background:rgba(231,211,169,.88)!important;border:1px solid #c7ad80!important;border-radius:5px!important;box-shadow:0 0 0 2px rgba(199,173,128,.16)!important;text-shadow:0 1px #f8edcf!important;filter:none!important}
+.arena-chest{filter:drop-shadow(0 1px 2px #8b7657)!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.arena-loot{position:absolute;z-index:4;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);width:3.4%;min-width:21px;aspect-ratio:1;border:1px solid #c7ad80;border-radius:50%;background:rgba(231,211,169,.74);color:#8a642e;font-size:clamp(14px,2.2vw,22px);line-height:1;text-shadow:0 1px #f8edcf;box-shadow:0 1px 2px #947b4b22;pointer-events:none;animation:groundLootPulse 1.4s ease-in-out infinite alternate}
+.arena-loot[title^="夢境律質"]{color:#97702f;border-color:#bba071}.arena-loot[title^="遺物"]{color:#8e773d;border-color:#c1a77a}
+@keyframes groundLootPulse{from{opacity:.72;transform:translate(-50%,-50%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1.04)}}
+.enemy-attack-warning.boss-charge-warning{border-color:#9f5f2c;background:rgba(218,157,91,.38);color:#754321;box-shadow:0 0 0 4px rgba(159,95,44,.15)}
+</style>
+
 </head><body><div class="wrap">
 <header class="top"><div><div class="eyebrow">THE SILVER SWORD CHRONICLES</div><div class="brand">銀劍的英雄<span class="gold">．夢幻境之旅</span></div><div class="sub">古老羊皮紙記載著旅程；每一次抉擇，都將改寫英雄的傳說。</div></div><div class="badge" id="headerMeta">✦ 0 律質</div></header>
-<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="starter-choice"><label for="startWeaponSelect"><b>遠征初始武器</b><span class="sub">已發現的武器可永久解鎖為起始選項</span></label><select id="startWeaponSelect" aria-label="選擇遠征初始武器"></select></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept="application/json,.json" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">升級價格會隨等級逐步增加；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王每 3 秒嘗試施放技能，生命低於 70% 與 30% 時會改變戰鬥階段。觀察警戒線並在落擊前離開危險區。</p></div></div></div></section>
+<section id="startScreen" class="panel startscreen"><div class="eyebrow">A QUEST WRITTEN ON PARCHMENT</div><div class="hero">持銀劍踏上旅途，<br><span class="gold">在夢幻境寫下傳說。</span></div><p class="intro">穿越十層夢幻境，探索古堡、遺跡與被遺忘的聖所。收集武器與遺物、在事件中作出抉擇，並迎戰守護夢境核心的魔王。遠征失敗仍會保留局外律質與永久鍛造。</p><h3>選擇遠征難度</h3><div class="difficulty" id="difficultyList"></div><div class="stats meta-stats"><div class="stat"><label>最大生命加成</label><strong id="metaHp">+0.0</strong></div><div class="stat"><label>攻擊加成</label><strong id="metaAtk">+0.0</strong></div><div class="stat"><label>暴擊機率</label><strong id="metaCrit">0.0%</strong></div><div class="stat"><label>初始藥水</label><strong id="metaPot">2</strong></div><div class="stat"><label>傷害減免</label><strong id="metaDR">0</strong></div><div class="stat"><label>每層首次減傷</label><strong id="metaLayerDR">0</strong></div><div class="stat"><label>律質獲取加成</label><strong id="metaShard">+0</strong></div><div class="stat"><label>殺敵回血</label><strong id="metaKillHeal">+0</strong></div><div class="stat"><label>每 5 秒回血</label><strong id="metaRegen">+0.0</strong></div><div class="stat"><label>累積擊敗</label><strong id="metaKills">0</strong></div><div class="stat"><label>遠征次數</label><strong id="metaRuns">0</strong></div><div class="stat"><label>最深樓層</label><strong id="metaBest">0 / 10</strong></div></div><div class="actions" style="margin:10px 0"><button id="musicToggle">♫ 背景音樂：開啟／暫停</button><span class="sub">原創循環旋律 · Song Maker 風格</span></div><div class="actions"><button class="primary" id="startBtn">踏上旅程　→</button><button id="resetMeta">重置局外進度</button><button id="exportSaveBtn">匯出進度</button><button id="importSaveBtn">匯入進度</button><input id="importSaveFile" type="file" accept="application/json,.json" hidden></div><div class="section"><h3>英雄鍛造</h3><p class="sub">升級價格會隨等級逐步增加；鍛造可以永久強化能力。</p><div id="metaShop" class="skill-list"></div></div><div class="section codex"><h3>《夢幻境行旅手冊》</h3><div class="codex-grid"><div><b>⚔ 戰鬥</b><p>方向鍵／WASD 移動，E 或空白鍵攻擊，R 使用藥水，Q 切換目標鎖定。點擊地圖中的敵人也可鎖定目標。按 F3 可顯示效能診斷。</p></div><div><b>✧ 遠征房間</b><p>戰鬥室清除敵人後解鎖出口；寶藏室提供獎勵抉擇；休整室能恢復狀態；精英室的敵人更強，但獎勵更多。</p></div><div><b>♜ 構築</b><p>武器決定攻擊節奏，遺物可以同時具有多個效果。特定遺物組合會形成協同效果，適時查看局內遺物欄。</p></div><div><b>♔ 守關魔王</b><p>魔王分為近戰、遠程、騎兵三階段（70%／30% 生命切換）；召喚的支援怪會削弱隨機數值，擊敗後恢復。怪物戰利品會落地，必須走近拾取。</p></div></div></div></section>
 <section id="gameScreen" class="hidden">
 <div class="layout"><div class="panel"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h2 id="roomTitle">第一層：銀霧入口</h2><div class="sub" id="roomDesc">探索道路、搜集戰利品，並尋找通往下一層的出口。</div></div><span class="badge" id="roomBadge">即時戰鬥</span></div><div class="map" id="map" aria-label="地城自由移動地圖"></div>
 <div id="bossInfo" class="boss-info hidden" aria-live="polite"></div>
@@ -49,7 +61,7 @@ const names=['銀霧入口','斷裂長廊','失落祭室','沉眠兵營','腐朽
 function startRun(){const d=DIFFS[difficulty],maxHp=30+meta.up.life;run={floor:1,hp:maxHp,maxHp,baseMoveSpeed:200,speedPercent:0,moveSpeed:200,atk:5+meta.up.nature,pots:2+meta.up.civil,shards:0,kills:0,relics:[],bonusShard:meta.up.underworld,regen:meta.up.life*.2,potHeal:12,guard:0,guardBase:meta.up.nation,guardLayer:2*meta.up.nation,guardUsed:false,crit:meta.up.nature*.005,armor:0,weapon:'short',weapons:['short'],buffs:[],turn:0,explored:false,done:false,diff:d,map:[],player:{x:1,y:1},enemies:[],chests:[],exit:{x:7,y:5},roomSearched:false};$('startScreen').classList.add('hidden');$('gameScreen').classList.remove('hidden');$('runDifficulty').textContent=d.name;makeRoom();addLog('你踏入夢幻境。羊皮紙地圖邊緣寫著古老誓言，銀劍在鞘中微微鳴響。');render()}
 function makeRoom(){run.player={x:1,y:1};run.exit={x:7,y:5};run.map=[];for(let y=0;y<7;y++){let row=[];for(let x=0;x<9;x++)row.push((x===0||x===8||y===0||y===6)?'wall':'floor');run.map.push(row)}run.map[5][7]='exit';
 // 生成內部牆壁；每次加牆後檢查所有可走格仍彼此連通，確保不會封死道路。
-const connected=()=>{const seen=new Set(['1,1']),q=[[1,1]];for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx>0&&nx<8&&ny>0&&ny<6&&run.map[ny][nx]!=='wall'&&!seen.has(k)){seen.add(k);q.push([nx,ny])}}}for(let y=1;y<6;y++)for(let x=1;x<8;x++)if(run.map[y][x]!=='wall'&&!seen.has(x+','+y))return false;return seen.has('7,5')};let candidates=[];for(let y=2;y<5;y++)for(let x=2;x<7;x++)if(!(x===4&&y===3))candidates.push({x,y});candidates.sort(()=>Math.random()-.5);for(const p of candidates){if(Math.random()<.23){run.map[p.y][p.x]='wall';if(!connected())run.map[p.y][p.x]='floor'}}if(run.floor===10)run.map[3][4]='floor';run.enemies=[];run.chests=[];run.roomSearched=false;run.guardThisRoom=false;run.guardUsed=false;let n=run.floor===10?1:Math.min(4,1+Math.floor(run.floor/3));for(let i=0;i<n;i++){let p=randomFloor();if(run.floor===10){p={x:4,y:3};}let base=ENEMIES[Math.floor(Math.random()*ENEMIES.length)];const baseHp=run.floor===10?Math.max(1,Number(MONSTER_CONFIG.boss?.baseHp)||84):base.hp+run.floor*2;run.enemies.push({...base,x:p.x,y:p.y,name:run.floor===10?'夢境君王':base.name,icon:run.floor===10?'👹':base.icon,hp:Math.round(baseHp*run.diff.hp),maxHp:Math.round(baseHp*run.diff.hp),atk:Math.round((run.floor===10?7:base.atk+Math.floor(run.floor/3))*run.diff.atk),boss:run.floor===10})}for(let i=0;i<2;i++){let p=randomFloor();run.chests.push({...p,open:false})}run.searchPoint=randomFloor();run.searchUsed=false; $('roomTitle').textContent=`第 ${run.floor} 層：${names[run.floor-1]}`;$('roomDesc').textContent=run.floor===10?'夢境王座正在甦醒。擊敗夢境君王，結束這次遠征。':'找到出口，帶著戰利品繼續深入。';$('roomBadge').textContent=run.floor===10?'首領戰':'探索中'}function randomFloor(){for(let i=0;i<100;i++){let x=1+Math.floor(Math.random()*7),y=1+Math.floor(Math.random()*5);if(run.map[y][x]==='floor'&&!(x===1&&y===1)&&!(x===7&&y===5)&&!run.enemies?.some(e=>e.x===x&&e.y===y)&&!run.chests?.some(c=>c.x===x&&c.y===y))return{x,y}}return{x:4,y:4}}
+const connected=()=>{const seen=new Set(['1,1']),q=[[1,1]];for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx>0&&nx<8&&ny>0&&ny<6&&run.map[ny][nx]!=='wall'&&!seen.has(k)){seen.add(k);q.push([nx,ny])}}}for(let y=1;y<6;y++)for(let x=1;x<8;x++)if(run.map[y][x]!=='wall'&&!seen.has(x+','+y))return false;return seen.has('7,5')};let candidates=[];for(let y=2;y<5;y++)for(let x=2;x<7;x++)if(!(x===4&&y===3))candidates.push({x,y});candidates.sort(()=>Math.random()-.5);for(const p of candidates){if(Math.random()<.23){run.map[p.y][p.x]='wall';if(!connected())run.map[p.y][p.x]='floor'}}if(run.floor===10)run.map[3][4]='floor';run.enemies=[];run.chests=[];run.roomSearched=false;run.guardThisRoom=false;run.guardUsed=false;let n=run.floor===10?1:Math.min(4,1+Math.floor(run.floor/3));for(let i=0;i<n;i++){let p=randomFloor();if(run.floor===10){p={x:4,y:3};}const regularEnemies=ENEMIES.filter(m=>!m.supportOnly);const monsterPool=regularEnemies.length?regularEnemies:ENEMIES;let base=monsterPool[Math.floor(Math.random()*monsterPool.length)];const baseHp=run.floor===10?Math.max(1,Number(MONSTER_CONFIG.boss?.baseHp)||84):base.hp+run.floor*2;run.enemies.push({...base,x:p.x,y:p.y,name:run.floor===10?'夢境君王':base.name,icon:run.floor===10?'👹':base.icon,hp:Math.round(baseHp*run.diff.hp),maxHp:Math.round(baseHp*run.diff.hp),atk:Math.round((run.floor===10?7:base.atk+Math.floor(run.floor/3))*run.diff.atk),boss:run.floor===10})}for(let i=0;i<2;i++){let p=randomFloor();run.chests.push({...p,open:false})}run.searchPoint=randomFloor();run.searchUsed=false; $('roomTitle').textContent=`第 ${run.floor} 層：${names[run.floor-1]}`;$('roomDesc').textContent=run.floor===10?'夢境王座正在甦醒。擊敗夢境君王，結束這次遠征。':'找到出口，帶著戰利品繼續深入。';$('roomBadge').textContent=run.floor===10?'首領戰':'探索中'}function randomFloor(){for(let i=0;i<100;i++){let x=1+Math.floor(Math.random()*7),y=1+Math.floor(Math.random()*5);if(run.map[y][x]==='floor'&&!(x===1&&y===1)&&!(x===7&&y===5)&&!run.enemies?.some(e=>e.x===x&&e.y===y)&&!run.chests?.some(c=>c.x===x&&c.y===y))return{x,y}}return{x:4,y:4}}
 function addLog(t){let p=document.createElement('p');p.textContent=t;$('log').prepend(p);while($('log').children.length>45)$('log').lastChild.remove()}
 function render(){if(!run)return;$('hpText').textContent=`${Math.max(0,run.hp).toFixed(1)} / ${run.maxHp.toFixed(1)}`;$('hpBar').style.width=Math.max(0,run.hp/run.maxHp*100)+'%';$('atkText').textContent=run.atk.toFixed(1);$('potText').textContent=run.pots;$('floorText').textContent=`${run.floor} / 10`;$('floorBar').style.width=run.floor*10+'%';$('runShards').textContent=run.shards;$('runKills').textContent=run.kills;$('relicCount').textContent=run.relics.length+' 件';$('weaponList').innerHTML=WEAPONS.filter(w=>run.weapons.includes(w.id)).map(w=>`<div class="weapon-item ${run.weapon===w.id?'active':''}"><div><b>${w.icon} ${w.name}</b><div class="sub">傷害 ×${w.mult} · 距離 ${w.range}${w.wall?' · 可穿牆':''}</div></div><button data-equip="${w.id}" ${run.weapon===w.id?'disabled':''}>裝備</button></div>`).join('');const relicCounts={};run.relics.forEach(r=>{const k=r.name;relicCounts[k]=(relicCounts[k]||0)+1});$('relics').innerHTML=run.relics.length?Object.values(run.relics.reduce((a,r)=>{if(!a[r.name])a[r.name]={...r,count:0};a[r.name].count++;return a},{})).map(r=>`<div class="skill"><div><b>${r.icon} ${r.name} <span class="gold">×${r.count}</span></b><small>${r.desc}</small></div></div>`).join(''):'<div class="sub">尚未取得遺物。</div>';
 let m=$('map');m.innerHTML='';for(let y=0;y<7;y++)for(let x=0;x<9;x++){let b=document.createElement('div'),tile=run.map[y][x];b.className='tile '+tile;let enemy=run.enemies.find(e=>e.x===x&&e.y===y&&!e.dead),chest=run.chests.find(c=>c.x===x&&c.y===y&&!c.open);if(run.player.x===x&&run.player.y===y){b.className+=' player';b.textContent='🧙'}else if(enemy){b.className+=' '+(enemy.boss?'boss':'enemy');b.textContent=enemy.icon;b.title=`${enemy.name} ${enemy.hp}/${enemy.maxHp}`}else if(chest){b.className+=' chest';b.textContent='📦'}else if(tile==='wall')b.textContent='▪';else if(tile==='exit')b.textContent='🚪';else b.textContent='';m.appendChild(b)}$('attackBtn').textContent='⚔ 攻擊射程內敵人';$('attackBtn').disabled=!nearEnemy();$('potionBtn').disabled=run.pots<=0||run.hp===run.maxHp;if($('exploreBtn'))$('exploreBtn').disabled=run.roomSearched}
@@ -337,7 +349,7 @@ makeRoom=function(){
   gridMakeRoomOriginal();
   run.projectiles=[];
   run.player=toWorldEntity(run.player);run.exit=toWorldEntity(run.exit);if(run.floor===10){run.map[3][4]='floor';const bossCell=run.enemies.find(e=>e.boss);if(bossCell){bossCell.x=4;bossCell.y=3;}}
-  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=42;e.attackCooldown=1200;e.nextSkillAt=Date.now()+3000;e.shieldUntil=0;run.bossStatus='魔王尚未施放技能。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier||1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange||40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||template?.preferredRange||155;e.decisionInterval=Number(template?.decisionInterval)||140;e.windupMs=Number(template?.windupMs)||360;e.aggro=false;e.homeX=e.x;e.homeY=e.y;e.roamStyle=e.behavior==='fast-pursuer'?'restless':e.behavior==='patrol-pursuer'?'patrol':e.behavior==='ranged-kiter'?'wander':['wander','patrol','restless'][Math.floor(Math.random()*3)];e.roamRadius=e.roamStyle==='restless'?78+Math.random()*18:e.roamStyle==='patrol'?52+Math.random()*12:62+Math.random()*16;e.patrolAxis=Math.random()*Math.PI*2;e.patrolSide=Math.random()<.5?-1:1;e.wanderTarget=null;e.wanderPauseUntil=Date.now()+Math.random()*700;e.wanderExpiresAt=0;e.rangedMoveStyle=['strafe','circle','reposition'][Math.floor(Math.random()*3)];e.rangedMoveTarget=null;e.rangedMoveUntil=0;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
+  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=82;e.attackCooldown=1250;e.windupMs=620;e.mode='melee';e.nextSkillAt=Date.now()+3000;e.shieldUntil=0;run.bossStatus='夢境君王以近戰模式守護王座。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier||1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange||40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||template?.preferredRange||155;e.decisionInterval=Number(template?.decisionInterval)||140;e.windupMs=Number(template?.windupMs)||360;e.aggro=false;e.homeX=e.x;e.homeY=e.y;e.roamStyle=e.behavior==='fast-pursuer'?'restless':e.behavior==='patrol-pursuer'?'patrol':e.behavior==='ranged-kiter'?'wander':['wander','patrol','restless'][Math.floor(Math.random()*3)];e.roamRadius=e.roamStyle==='restless'?78+Math.random()*18:e.roamStyle==='patrol'?52+Math.random()*12:62+Math.random()*16;e.patrolAxis=Math.random()*Math.PI*2;e.patrolSide=Math.random()<.5?-1:1;e.wanderTarget=null;e.wanderPauseUntil=Date.now()+Math.random()*700;e.wanderExpiresAt=0;e.rangedMoveStyle=['strafe','circle','reposition'][Math.floor(Math.random()*3)];e.rangedMoveTarget=null;e.rangedMoveUntil=0;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
   run.chests.forEach((c,i)=>{toWorldEntity(c);c.uid=`f${run.floor}-c${i}`});if(run.searchPoint)run.searchPoint=toWorldEntity(run.searchPoint);
   run.exitHandled=false;run.bossTelegraph=null;run.floorTransitioning=false;arenaBuiltFloor=-1;
 };
@@ -608,7 +620,8 @@ function moveEnemies(dt,now){
   // 接近索敵距離才進入戰鬥；尚未警戒時，在出生點附近小幅漫遊。
   if(!e.aggro&&d<=(e.aggroRange||230)){e.aggro=true;e.wanderTarget=null;e.wanderPauseUntil=0;addLog(`${e.name}發現了你！`)}
   if(!e.aggro){e.aiState='wander';updateIdleWander(e,dt,now);continue;}
-  const ranged=e.classType==='ranged';const touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+7;
+  if(e.supporter){e.aiState='support-orbit';updateSupportMovement(e,dt,now);continue;}
+  const ranged=e.classType==='ranged'||(isBoss&&e.mode==='ranged');const touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+7;
   if(ranged){
    const keep=Math.max(e.keepDistance||155,touch+12);
    const attackRange=Math.max(touch+8,Number(e.attackRange)||260);
@@ -638,7 +651,9 @@ function moveEnemies(dt,now){
    const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
    const speed=Number(e.speed)||64;moveTowardPoint(e,waypoint,dt,speed);continue;
   }
-  if(d<=touch){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,false);continue;}
+  const attackRange=Math.max(touch,Number(e.attackRange)||touch);
+  if(e.attackWindupUntil){if(now>=e.attackWindupUntil){if(d<=attackRange+15)damagePlayerFromEnemy(e,now,false);else{e.attackWindupUntil=0;e.warningEl?.remove();e.warningEl=null;e.nextAttackAt=now+180;}}continue;}
+  if(d<=attackRange){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,false);continue;}
   e.aiState='pursue';const waypoint=getCachedPathWaypoint(e,now);if(!waypoint)continue;
   const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
   const speed=isBoss?Math.max(136,Number(e.speed)||Number(MONSTER_CONFIG.boss?.speed)||136):(e.speed||76);const step=Math.min(speed*dt,len);
@@ -648,7 +663,7 @@ function moveEnemies(dt,now){
 }
 function processRunInteractions(now){for(const c of run.chests){if(!c.open&&dist(run.player,c)<35)openChest(c)}if(run.searchPoint&&!run.roomSearched&&dist(run.player,run.searchPoint)<39){addLog('你接近地圖中的星芒印記，開始調查。');explore()}if(dist(run.player,run.exit)<39&&!run.exitHandled){if(aliveEnemies().length){if(!run.exitWarningAt||now-run.exitWarningAt>2500){addLog('出口仍被敵人封鎖，先擊敗剩餘怪物。');run.exitWarningAt=now}}else{run.exitHandled=true;if(run.floor===10){finish(true);return}if(run.floor%2===1){showExpeditionScenario(()=>advanceToNextFloor());return}advanceToNextFloor();return}}}
 realtimeUpdate=function(){if(!run||run.done||$('gameScreen').classList.contains('hidden'))return;const now=performance.now();if(!run.lastFrame)run.lastFrame=now;const dt=Math.min(.05,Math.max(0,(now-run.lastFrame)/1000));run.lastFrame=now;if(!$('modal').classList.contains('hidden'))return
- const held=[...heldDirections.values()];let vx=0,vy=0;for(const d of held){vx+=dirVectors[d]?.x||0;vy+=dirVectors[d]?.y||0}const vl=Math.hypot(vx,vy);if(vl){vx/=vl;vy/=vl;moveActor(run.player,vx*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,vy*(run.moveSpeed||PLAYER_BASE_SPEED)*dt,WORLD.playerRadius,'player');run.playerFacing={x:vx,y:vy}}
+ const held=[...heldDirections.values()];let vx=0,vy=0;for(const d of held){vx+=dirVectors[d]?.x||0;vy+=dirVectors[d]?.y||0}const vl=Math.hypot(vx,vy);if(vl){vx/=vl;vy/=vl;moveActor(run.player,vx*(run.moveSpeed||PLAYER_BASE_SPEED)*(run.supportSpeedMultiplier||1)*dt,vy*(run.moveSpeed||PLAYER_BASE_SPEED)*(run.supportSpeedMultiplier||1)*dt,WORLD.playerRadius,'player');run.playerFacing={x:vx,y:vy}}
  moveEnemies(dt,Date.now());updateEnemyBleeds(Date.now());if(!run||run.done)return;updateWeaponCharge(Date.now());if(!run||run.done)return;updateProjectiles(dt,Date.now());updateBoss(Date.now());if(run.hp<=0){finish(false);return}if(Date.now()>=(run.nextRegenAt||0)){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);const gain=run.hp-before;if(gain>0){floatDamage(run.player,gain,true);addLog(`自然恢復：生命 +${gain.toFixed(1)}（每 5 秒）。`)}}run.nextRegenAt=Date.now()+REGEN_INTERVAL}
  processRunInteractions(Date.now());if(!run||run.done)return;if(run.hp<=0){finish(false);return}render(true);};
 startRun=function(){if(frameLoop!==null){cancelAnimationFrame(frameLoop);frameLoop=null}clearHeldDirections();arenaBuiltFloor=-1;uidSequence=0;weaponListSignature='';relicListSignature='__reset__';$('log').innerHTML='';baseStartRun();if(!run||run.done)return;run.nextRegenAt=Date.now()+REGEN_INTERVAL;run.nextAttackAt=0;run.lastFrame=performance.now();run.lastHudRenderAt=0;const frame=()=>{if(!run||run.done){frameLoop=null;return}realtimeUpdate();if(run&&!run.done)frameLoop=requestAnimationFrame(frame);else frameLoop=null};frameLoop=requestAnimationFrame(frame);};
@@ -875,8 +890,8 @@ renderMeta();
     if(enemyStepAccumulator<ENEMY_AI_STEP)return;
     const stepDt=enemyStepAccumulator;enemyStepAccumulator=0;
     for(const e of aliveEnemies()){
-      if(e.boss||!Number.isFinite(e.homeX)||!Number.isFinite(e.homeY))continue;
-      if(e.attackWindupUntil&&dist(e,run.player)>(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+18){e.attackWindupUntil=0;e.nextAttackAt=Math.max(e.nextAttackAt||0,now+180);e.warningEl?.remove();e.warningEl=null;}
+      if(e.boss||e.supporter||!Number.isFinite(e.homeX)||!Number.isFinite(e.homeY))continue;
+      if(e.attackWindupUntil&&dist(e,run.player)>Math.max((e.radius||WORLD.enemyRadius)+WORLD.playerRadius+18,Number(e.attackRange)||0)+15){e.attackWindupUntil=0;e.nextAttackAt=Math.max(e.nextAttackAt||0,now+180);e.warningEl?.remove();e.warningEl=null;}
       const leash=Number(e.leashRange)||470;
       if(e.aggro&&dist(e,{x:e.homeX,y:e.homeY})>leash){e.aggro=false;e.rangedMoveTarget=null;e.pathCacheUntil=0;if(!e.leashResetLogged){addLog(`${e.name}失去追蹤，退回原本巡邏區域。`);e.leashResetLogged=true}}
       if(!e.aggro)e.leashResetLogged=false;
@@ -904,7 +919,8 @@ renderMeta();
   function updateTargetUi(force=false){
     const now=performance.now();if(!force&&now-lastTargetUiAt<100)return;lastTargetUiAt=now;
     const status=$('targetStatus'),btn=$('lockTargetBtn');if(!status)return;
-    const t=run?.enemies?.find(e=>e.uid===run.lockedTargetUid&&!e.dead&&e.hp>0);
+    let t=run?.enemies?.find(e=>e.uid===run.lockedTargetUid&&!e.dead&&e.hp>0);
+    if(run&&t&&!inRange(t)){const replacements=aliveEnemies().filter(e=>e.uid!==t.uid&&inRange(e)).sort((a,b)=>dist(a,run.player)-dist(b,run.player));if(replacements.length){t=replacements[0];run.lockedTargetUid=t.uid;}else{run.lockedTargetUid=null;t=null;}}
     if(!run||!t){const text='尚未鎖定目標；攻擊會優先選擇面向前方的敵人。';if(status.textContent!==text)status.textContent=text;if(btn&&btn.textContent!=='◎ 鎖定目標（Q）')btn.textContent='◎ 鎖定目標（Q）';return;}
     const d=dist(t,run.player)/WORLD.cell;const text=`鎖定：${t.name} · 距離 ${d.toFixed(1)} 格${inRange(t)?' · 位於武器射程內':' · 目前超出射程／視線受阻'}`;
     if(status.textContent!==text)status.textContent=text;if(btn&&btn.textContent!=='◎ 解除／切換目標（Q）')btn.textContent='◎ 解除／切換目標（Q）';
@@ -926,17 +942,17 @@ renderMeta();
   nearEnemy=function(){return nearestEnemyInRange()};
   function cycleTarget(){
     if(!run||run.done)return;
-    const foes=aliveEnemies().slice().sort((a,b)=>dist(a,run.player)-dist(b,run.player));
-    if(!foes.length){run.lockedTargetUid=null;updateTargetUi();return;}
-    const ix=foes.findIndex(e=>e.uid===run.lockedTargetUid);const next=foes[(ix+1)%foes.length];run.lockedTargetUid=next.uid;next.aggro=true;updateTargetUi(true);render();
-    addLog(`鎖定目標：${next.name}。`);
+    const foes=aliveEnemies().filter(e=>inRange(e)).sort((a,b)=>dist(a,run.player)-dist(b,run.player));
+    if(!foes.length){run.lockedTargetUid=null;updateTargetUi(true);render();addLog('目前攻擊範圍內沒有敵人，已取消鎖定。');return;}
+    const ix=foes.findIndex(e=>e.uid===run.lockedTargetUid);const next=ix<0?foes[0]:foes[(ix+1)%foes.length];run.lockedTargetUid=next.uid;next.aggro=true;updateTargetUi(true);render();
+    addLog(`鎖定範圍內目標：${next.name}。`);
   }
   const lockBtn=$('lockTargetBtn');if(lockBtn)lockBtn.addEventListener('click',()=>cycleTarget());
   $('map')?.addEventListener('click',ev=>{
     const el=ev.target.closest('#arenaActors .arena-actor.enemy, #arenaActors .arena-actor.boss');
     if(!el||!run||run.done)return;
-    const enemy=run.enemies.find(e=>e.uid===el.dataset.uid&&!e.dead&&e.hp>0);if(!enemy)return;
-    run.lockedTargetUid=enemy.uid;enemy.aggro=true;updateTargetUi(true);render();addLog(`已鎖定「${enemy.name}」。`);
+    const enemy=run.enemies.find(e=>e.uid===el.dataset.uid&&!e.dead&&e.hp>0);if(!enemy)return;if(!inRange(enemy)){addLog(`「${enemy.name}」不在目前武器射程或視線內，無法鎖定。`);return;}
+    run.lockedTargetUid=enemy.uid;enemy.aggro=true;updateTargetUi(true);render();addLog(`已鎖定射程內目標「${enemy.name}」。`);
   });
   document.addEventListener('keydown',ev=>{
     if((ev.code==='KeyQ')&&!$('gameScreen').classList.contains('hidden')&&run&&!run.done&&!ev.repeat&&$('modal').classList.contains('hidden')){ev.preventDefault();cycleTarget();}
@@ -951,7 +967,7 @@ renderMeta();
       if(actor){actor.classList.toggle('target-locked',e.uid===run.lockedTargetUid);actor.classList.toggle('elite',!!e.elite);actor.classList.toggle('bleeding',!!(e.bleedUntil&&e.bleedUntil>Date.now()));actor.title=`${e.elite?'精英守衛｜':''}${e.name} ${Math.ceil(e.hp)}/${e.maxHp}${e.bleedUntil>Date.now()?'｜流血中':''}`;}
       if(e.warningEl?.isConnected)positionNode(e.warningEl,e);
     }
-    const target=run.enemies.find(e=>e.uid===run.lockedTargetUid&&!e.dead&&e.hp>0);
+    const target=run.enemies.find(e=>e.uid===run.lockedTargetUid&&!e.dead&&e.hp>0&&inRange(e));
     const marker=$('targetLockMarker');
     if(target){if(!marker){const m=addArenaNode($('map'),'target-lock-marker','◆');m.id='targetLockMarker';}positionNode($('targetLockMarker'),target)}else marker?.remove();
   };
@@ -1118,6 +1134,238 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
  const priorUpdate=realtimeUpdate;realtimeUpdate=function(){const t=performance.now();const result=priorUpdate();const end=performance.now();perf.frames++;perf.lastMs=end-t;perf.workMs+=perf.lastMs;perf.maxMs=Math.max(perf.maxMs,perf.lastMs);if(end-perf.windowStart>=1000){const span=end-perf.windowStart;perf.fps=perf.frames*1000/span;perf.avgMs=perf.workMs/Math.max(1,perf.frames);perf.lastPathQueries=perf.pathQueries;perf.frames=0;perf.workMs=0;perf.maxMs=0;perf.pathQueries=0;perf.windowStart=end;if(!panel.classList.contains('hidden')){const count=run?aliveEnemies().length:0;const fx=document.querySelectorAll('.combat-fx,.combat-number').length;panel.textContent=`FPS ${perf.fps.toFixed(1)}｜平均更新 ${perf.avgMs.toFixed(2)} ms｜最近一秒尋路查詢 ${perf.lastPathQueries}｜存活敵人 ${count}｜畫面特效 ${fx}｜單次更新 ${perf.lastMs.toFixed(2)} ms`;}}return result;};
 })();
 
+
+
+/* ===== Monster-focused balance and interaction layer ===== */
+const ssPreviousMakeRoom = makeRoom;
+let ssLootSequence = 0;
+makeRoom = function(){
+  ssPreviousMakeRoom();
+  if(!run)return;
+  run.loot=[];
+  run.bossDefeated=false;
+  run.supportSpeedMultiplier=1;
+  run.lootExitWarned=false;
+  // Remove the one-cell stone rim. The real world edge is now the collision boundary.
+  for(let x=0;x<9;x++){if(run.map[0])run.map[0][x]='floor';if(run.map[6])run.map[6][x]='floor';}
+  for(let y=0;y<7;y++){if(run.map[y]){run.map[y][0]='floor';run.map[y][8]='floor';}}
+  const boss=run.enemies.find(e=>e.boss);
+  if(boss){boss.phase=1;boss.mode='melee';boss.classType='boss';boss.speed=Number(MONSTER_CONFIG.boss?.speed)||136;boss.attackRange=82;boss.attackCooldown=1250;boss.windupMs=620;boss.keepDistance=0;boss.projectileIcon='✦';boss.projectileSpeed=130;boss.nextSkillAt=Date.now()+(Number(MONSTER_CONFIG.boss?.skillIntervalMs)||3000);run.bossStatus='第一階段・近戰模式：王者正逼近你。'}
+};
+
+const ssPreviousCanOccupy = canOccupy;
+canOccupy = function(x,y,radius,who='player'){
+  if(!run||!Number.isFinite(x)||!Number.isFinite(y))return false;
+  if(x<radius+4||x>WORLD.width-radius-4||y<radius+4||y>WORLD.height-radius-4)return false;
+  const x0=Math.floor((x-radius)/WORLD.cell),x1=Math.floor((x+radius)/WORLD.cell),y0=Math.floor((y-radius)/WORLD.cell),y1=Math.floor((y+radius)/WORLD.cell);
+  for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++){
+    if(!run.map[cy]||run.map[cy][cx]==='wall'){
+      if(circleIntersectsRect(x,y,radius,cx*WORLD.cell,cy*WORLD.cell,(cx+1)*WORLD.cell,(cy+1)*WORLD.cell))return false;
+    }
+  }
+  if(who==='player')for(const e of run.enemies){if(!e.dead&&e.hp>0&&dist({x,y},e)<radius+(e.radius||WORLD.enemyRadius)-3)return false;}
+  else if(who==='enemy'&&dist({x,y},run.player)<radius+WORLD.playerRadius-2)return false;
+  return true;
+};
+
+// Pathfinding also uses the newly playable perimeter cells.
+const ssPreviousPathFn = getCachedPathWaypoint;
+let ssExpandedPath={key:'',next:new Map()};
+getCachedPathWaypoint=function(e,now){
+  if(!run||!e)return ssPreviousPathFn(e,now);
+  const px=Math.max(0,Math.min(8,Math.floor(run.player.x/WORLD.cell))),py=Math.max(0,Math.min(6,Math.floor(run.player.y/WORLD.cell)));
+  const key=`${run.floor}:${px},${py}`;
+  if(ssExpandedPath.key!==key){
+    const next=new Map(),seen=new Set([`${px},${py}`]),q=[[px,py]];
+    for(let i=0;i<q.length;i++){const [x,y]=q[i],k=`${x},${y}`;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,nk=`${nx},${ny}`;if(nx<0||nx>8||ny<0||ny>6||run.map?.[ny]?.[nx]==='wall'||seen.has(nk))continue;seen.add(nk);next.set(nk,{x:x*WORLD.cell+WORLD.cell/2,y:y*WORLD.cell+WORLD.cell/2});q.push([nx,ny]);}}
+    ssExpandedPath={key,next};
+  }
+  const ex=Math.max(0,Math.min(8,Math.floor(e.x/WORLD.cell))),ey=Math.max(0,Math.min(6,Math.floor(e.y/WORLD.cell)));
+  if(ex===px&&ey===py)return {x:run.player.x,y:run.player.y};
+  return ssExpandedPath.next.get(`${ex},${ey}`)||ssPreviousPathFn(e,now);
+};
+
+function ssCurseChoices(){
+  if(!run)return [];
+  const choices=[{stat:'attack',label:'攻擊力',valid:run.atk>1},{stat:'speed',label:'移動速度',valid:(run.moveSpeed||PLAYER_BASE_SPEED)>40},{stat:'crit',label:'暴擊率',valid:(run.crit||0)>.005},{stat:'guard',label:'傷害減免',valid:(run.guardBase||0)+(run.guardLayer||0)+(run.armor||0)>0},{stat:'potion',label:'藥水治療',valid:(run.potHeal||0)>4}];
+  return choices.filter(x=>x.valid);
+}
+function ssApplySupportCurse(e){
+  if(!run||!e||e.debuffApplied)return;
+  const allowed=Array.isArray(e.debuffStats)&&e.debuffStats.length?e.debuffStats:null;
+  let choices=ssCurseChoices();if(allowed)choices=choices.filter(x=>allowed.includes(x.stat));if(!choices.length)choices=ssCurseChoices();
+  if(!choices.length)return;
+  const curse=choices[Math.floor(Math.random()*choices.length)];e.debuffStat=curse.stat;e.debuffLabel=curse.label;e.debuffApplied=true;
+  if(curse.stat==='attack'){const before=run.atk;const after=Math.max(1,before-Math.max(1,Math.ceil(before*.2)));e.debuffAmount=before-after;run.atk=after;}
+  else if(curse.stat==='speed'){e.debuffAmount=.18;refreshSupportState();}
+  else if(curse.stat==='crit'){const before=run.crit;run.crit=Math.max(0,before-.08);e.debuffAmount=before-run.crit;}
+  else if(curse.stat==='guard'){
+    const target=run.guardBase>0?'guardBase':run.armor>0?'armor':'guardLayer';e.debuffTarget=target;const before=Number(run[target])||0;const after=Math.max(0,before-1);e.debuffAmount=before-after;run[target]=after;
+  }else if(curse.stat==='potion'){const before=run.potHeal;const after=Math.max(4,before-3);e.debuffAmount=before-after;run.potHeal=after;}
+  addLog(`支援詛咒：「${e.name}」使你的${curse.label}降低${curse.stat==='speed'?'18%':curse.stat==='crit'?(e.debuffAmount*100).toFixed(1)+'%':String(e.debuffAmount)}；擊敗它即可恢復。`);
+}
+function restoreSupportDebuff(e){
+  if(!run||!e||!e.supporter||!e.debuffApplied||e.debuffRestored)return;
+  const v=Number(e.debuffAmount)||0;
+  if(e.debuffStat==='attack')run.atk+=v;
+  else if(e.debuffStat==='crit')run.crit=Math.min(.85,run.crit+v);
+  else if(e.debuffStat==='guard'&&e.debuffTarget)run[e.debuffTarget]=(Number(run[e.debuffTarget])||0)+v;
+  else if(e.debuffStat==='potion')run.potHeal+=v;
+  e.debuffRestored=true;
+  refreshSupportState();
+  addLog(`支援怪「${e.name}」被擊倒，${e.debuffLabel}的數值削弱已解除。`);
+}
+function refreshSupportState(){
+  if(!run)return;
+  const speedCurses=aliveEnemies().filter(e=>e.supporter&&e.debuffApplied&&e.debuffStat==='speed').length;
+  run.supportSpeedMultiplier=Math.max(.52,Math.pow(.82,speedCurses));
+}
+function updateSupportMovement(e,dt,now){
+  const boss=aliveEnemies().find(x=>x.boss);
+  if(!boss){const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,Number(e.speed)||52);return;}
+  if(!Number.isFinite(e.orbitPhase))e.orbitPhase=Math.random()*Math.PI*2;
+  const angle=now*.00032+e.orbitPhase;
+  const r=132+Math.sin(now*.0012+e.orbitPhase)*18;
+  const target={x:Math.max(32,Math.min(WORLD.width-32,boss.x+Math.cos(angle)*r)),y:Math.max(32,Math.min(WORLD.height-32,boss.y+Math.sin(angle)*r*.78))};
+  if(!canOccupy(target.x,target.y,e.radius||WORLD.enemyRadius,'enemy')||segmentHitsWall(e,target)){
+    const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,Number(e.speed)||52);return;
+  }
+  moveTowardPoint(e,target,dt,Number(e.speed)||52);
+}
+
+const ssPreviousRealtimeUpdate=realtimeUpdate;
+realtimeUpdate=function(){refreshSupportState();const result=ssPreviousRealtimeUpdate();refreshSupportState();return result;};
+
+function ssLootIcon(item){if(item.kind==='shards')return '✦';if(item.kind==='potion')return '🧪';if(item.kind==='relic')return item.relic?.icon||'✧';return '◈';}
+function createGroundLoot(kind,x,y,details={}){
+  if(!run)return null;run.loot=run.loot||[];
+  const n=run.loot.length,angle=n*2.399963229728653,r=n%3===0?0:14+8*(n%3);
+  const item={uid:`loot-${run.floor}-${++ssLootSequence}`,kind,x:Math.max(24,Math.min(WORLD.width-24,x+Math.cos(angle)*r)),y:Math.max(24,Math.min(WORLD.height-24,y+Math.sin(angle)*r)),...details};
+  run.loot.push(item);return item;
+}
+function renderGroundLoot(){
+  const map=$('map');if(!map||!run)return;
+  const live=new Set();
+  for(const item of (run.loot||[])){const id='arenaLoot-'+String(item.uid).replace(/[^a-zA-Z0-9_-]/g,'_');live.add(id);let el=$(id);if(!el){el=addArenaNode(map,'arena-loot');el.id=id;el.setAttribute('aria-hidden','true');}el.textContent=ssLootIcon(item);el.title=item.kind==='shards'?`夢境律質 ×${item.amount}`:item.kind==='potion'?'藥水':`遺物：${item.relic?.name||'未知遺物'}`;positionNode(el,item);}
+  map.querySelectorAll('.arena-loot').forEach(el=>{if(!live.has(el.id))el.remove();});
+}
+function pickupGroundLoot(now){
+  if(!run||!Array.isArray(run.loot))return;
+  const left=[];
+  for(const item of run.loot){if(dist(run.player,item)>=31){left.push(item);continue;}
+    if(item.kind==='shards'){const n=Math.max(0,Number(item.amount)||0);run.shards+=n;addLog(`拾取夢境律質 ×${n}。`);}
+    else if(item.kind==='potion'){run.pots++;addLog('拾取地上的藥水 ×1。');}
+    else if(item.kind==='relic'&&item.relic){const relic=item.relic;relic.apply?.(run);run.relics.push(relic);addLog(`拾取遺物「${relic.name}」：${relic.desc||'古代力量與你締結契約。'}`);}
+  }
+  run.loot=left;
+}
+const ssPreviousProcessInteractions=processRunInteractions;
+processRunInteractions=function(now){
+  if(!run)return;
+  pickupGroundLoot(now);
+  if(run.loot?.length&&dist(run.player,run.exit)<39&&aliveEnemies().length===0&&!run.lootExitWarned){addLog('道路已經開啟；請先走近並拾取地上的所有戰利品。');run.lootExitWarned=true;}
+  if(dist(run.player,run.exit)<39&&aliveEnemies().length===0&&(run.loot||[]).length)return;
+  ssPreviousProcessInteractions(now);
+};
+
+// Defeated enemies create physical drops. Currency, relics and potions count only after pickup.
+handleEnemyDefeat=function(e){
+  if(!run||!e||e.dead||Number(e.hp)>0)return false;
+  e.hp=0;e.dead=true;run.kills++;
+  if(e.supporter)restoreSupportDebuff(e);
+  const baseReward=Math.max(1,Math.round((2+run.floor*.5)*(run.diff?.reward||1)))+(Number(run.bonusShard)||0)+(Number(run.killShardAdd)||0);
+  createGroundLoot('shards',e.x,e.y,{amount:baseReward});
+  const killHeal=(Number(run.killHealAdd)||0)+(Number(meta.up?.underworld)||0);if(killHeal>0){const gain=Math.min(run.maxHp-run.hp,killHeal);run.hp+=gain;if(gain>0)floatDamage(run.player,gain,true);}
+  if(e.elite){const bonus=Math.max(3,Math.round((4+run.floor)*((run.diff&&run.diff.reward)||1)));createGroundLoot('shards',e.x,e.y,{amount:bonus});addLog(`精英戰利品：另掉落 ${bonus} 枚律質。`);}
+  addLog(`${e.name}倒下了；戰利品落在地上，靠近拾取才會入袋。`);
+  if(Math.random()<.05&&RELICS.length){const relic=randomRelicByWeight();if(relic){createGroundLoot('relic',e.x,e.y,{relic});addLog(`掉落遺物：「${relic.name}」已落在地上。`);}}
+  if(Math.random()<.05){createGroundLoot('potion',e.x,e.y,{});addLog('怪物掉落一瓶藥水。');}
+  if(e.boss){run.bossDefeated=true;run.bossStatus='夢境君王已倒下；收集王座前的戰利品後，前往出口完成遠征。';run.bossTelegraph=null;addLog('夢境君王已被擊敗。戰利品仍留在地上，收集完畢後前往出口。');}
+  if(run.lockedTargetUid===e.uid)run.lockedTargetUid=null;
+  if(aliveEnemies().length===0&&!run.roomClearedLogged&&run.floor!==10){run.roomClearedLogged=true;addLog('本房間已清理完成，拾取戰利品後即可離開。');}
+  render();if(run.hp<=0)finish(false);return true;
+};
+
+// Only support-class creatures may answer the boss's summon. They debuff one random viable player stat.
+spawnBossSummon=function(boss){
+  if(!run||!boss)return;
+  const active=aliveEnemies().filter(e=>e.supporter);
+  if(active.length>=2){addLog('王座支援已達上限（2 體）；魔王本次無法再召喚。');return;}
+  const templates=ENEMIES.filter(m=>m.supportOnly===true&&m.classType==='support');
+  if(!templates.length){addLog('支援怪資料未載入，召喚失敗。');return;}
+  const candidates=[];
+  for(let y=0;y<7;y++)for(let x=0;x<9;x++){
+    if(run.map[y]?.[x]!=='floor')continue;
+    const p={x:x*WORLD.cell+50,y:y*WORLD.cell+50};
+    if(dist(p,boss)<90||dist(p,run.player)<55||aliveEnemies().some(e=>dist(p,e)<44))continue;
+    if(!canOccupy(p.x,p.y,WORLD.enemyRadius,'enemy'))continue;
+    candidates.push(p);
+  }
+  if(!candidates.length){addLog('王座支援無法找到落腳之處。');return;}
+  const p=candidates[Math.floor(Math.random()*candidates.length)],base=templates[Math.floor(Math.random()*templates.length)];
+  const hp=Math.max(1,Math.round((Number(base.hp)||8+run.floor)*run.diff.hp));
+  const mob={...base,x:p.x,y:p.y,name:`王座支援・${base.name}`,hp,maxHp:hp,atk:0,boss:false,dead:false,summoned:true,supporter:true,aggro:true,uid:`f${run.floor}-support-${++uidSequence}`,radius:WORLD.enemyRadius,speed:Number(base.speed)||58,aggroRange:9999,attackRange:0,attackCooldown:999999,attackType:'support',leashRange:9999,homeX:p.x,homeY:p.y,decisionInterval:150,windupMs:0,orbitPhase:Math.random()*Math.PI*2};
+  run.enemies.push(mob);ssApplySupportCurse(mob);refreshSupportState();addLog(`夢境君王召來支援怪「${mob.name}」；它不直接攻擊，只會削弱你的數值。`);render();
+};
+
+bossCandidates=function(boss){
+  const supportCount=aliveEnemies().filter(e=>e.supporter).length;
+  const modeSkill=boss?.mode==='ranged'?'volley':boss?.mode==='cavalry'?'charge':'heavy';
+  const choices=[modeSkill,'energy'];if(supportCount<2)choices.push('summon');return choices;
+};
+function ssFireBossVolley(boss,now){
+  const d=dist(boss,run.player)||1,baseAngle=Math.atan2(run.player.y-boss.y,run.player.x-boss.x),speed=Math.max(90,Number(boss.projectileSpeed)||130);
+  run.projectiles=run.projectiles||[];
+  for(const offset of [-.2,0,.2]){const a=baseAngle+offset,p={uid:`proj-${++uidSequence}`,x:boss.x,y:boss.y,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,speed,icon:'✦',owner:boss,radius:9,dead:false};p.el=addArenaNode($('map'),'enemy-projectile-node');setIconContent(p.el,'✦','✦');p.el.style.transform=`translate(-50%,-50%) rotate(${a*180/Math.PI}deg)`;positionNode(p.el,p);run.projectiles.push(p);}
+}
+castBossSkill=function(boss,now){
+  const choices=bossCandidates(boss);let options=choices.filter(s=>s!==boss.lastSkill);if(!options.length)options=choices;if(!options.length)return;
+  const skill=options[Math.floor(Math.random()*options.length)];boss.lastSkill=skill;boss.nextSkillAt=now+(Number(MONSTER_CONFIG.boss?.skillIntervalMs)||3000);
+  if(skill==='energy'){boss.shieldUntil=now+2100;run.bossStatus=`${boss.phase} 階段・轉能護盾：2.1 秒內受到的傷害將轉成恢復。`;addLog('夢境君王施放「轉能」：暫時不要攻擊它！');emitFx('fx-energy',boss,boss);}
+  else if(skill==='heavy'||skill==='charge'){
+    const dx=Math.abs(run.player.x-boss.x),dy=Math.abs(run.player.y-boss.y),orientation=dx>=dy?'horizontal':'vertical',center=orientation==='horizontal'?run.player.y:run.player.x;
+    run.bossTelegraph={kind:skill,orientation,center,resolveAt:now+(skill==='charge'?850:1050)};
+    run.bossStatus=skill==='charge'?'第三階段・騎兵衝鋒：紅線即將落下，迅速閃避！':'第一階段・近戰重斬：離開紅色警戒線！';
+    addLog(skill==='charge'?'夢境君王降低身姿準備衝鋒，警戒區將在 0.85 秒後結算。':'夢境君王蓄力重斬，警戒區將在 1.05 秒後結算。');
+  }else if(skill==='volley'){run.bossStatus='第二階段・遠程模式：三道夢焰正朝你飛來。';ssFireBossVolley(boss,now);addLog('夢境君王展開夢焰三連射；投射物可用走位閃避。');}
+  else if(skill==='summon'){run.bossStatus='王座呼喚：支援怪正在削弱你的能力。';spawnBossSummon(boss);}
+};
+
+function ssSetBossPhase(boss,phase,now){
+  boss.phase=phase;
+  if(phase===1){boss.mode='melee';boss.classType='boss';boss.speed=Number(MONSTER_CONFIG.boss?.speed)||136;boss.attackRange=82;boss.attackCooldown=1250;boss.windupMs=620;boss.keepDistance=0;boss.damageMultiplier=1;run.bossStatus='第一階段・近戰模式：高傷近身重斬。';}
+  else if(phase===2){boss.mode='ranged';boss.classType='boss';boss.speed=Number(MONSTER_CONFIG.boss?.phaseTwoSpeed)||150;boss.attackRange=Number(MONSTER_CONFIG.boss?.rangedRange)||300;boss.attackCooldown=Number(MONSTER_CONFIG.boss?.rangedCooldownMs)||2100;boss.projectileSpeed=Number(MONSTER_CONFIG.boss?.rangedProjectileSpeed)||128;boss.keepDistance=Number(MONSTER_CONFIG.boss?.rangedKeepDistance)||190;boss.damageMultiplier=1.08;run.bossStatus='第二階段・遠程模式：保持距離並以夢焰封鎖道路。';}
+  else{boss.mode='cavalry';boss.classType='boss';boss.speed=Number(MONSTER_CONFIG.boss?.phaseThreeSpeed)||218;boss.attackRange=Number(MONSTER_CONFIG.boss?.cavalryRange)||96;boss.attackCooldown=Number(MONSTER_CONFIG.boss?.cavalryCooldownMs)||1550;boss.windupMs=Number(MONSTER_CONFIG.boss?.cavalryWindupMs)||470;boss.keepDistance=0;boss.damageMultiplier=1.24;run.bossStatus='第三階段・騎兵模式：高速追擊與衝鋒。';}
+  boss.nextSkillAt=now+(Number(MONSTER_CONFIG.boss?.skillIntervalMs)||3000);boss.attackWindupUntil=0;boss.warningEl?.remove();boss.warningEl=null;
+}
+updateBoss=function(now){
+  const boss=aliveEnemies().find(e=>e.boss);if(!boss){if(run)run.bossTelegraph=null;return;}
+  const hpRatio=boss.hp/Math.max(1,boss.maxHp),thresholds=MONSTER_CONFIG.boss?.phaseThresholds||[.7,.3];
+  const phase=hpRatio<=Number(thresholds[1]??.3)?3:hpRatio<=Number(thresholds[0]??.7)?2:1;
+  if(!boss.phase||phase!==boss.phase){ssSetBossPhase(boss,phase,now);if(phase===2)addLog('夢境君王進入第二階段：切換為遠程夢焰模式。');if(phase===3)addLog('夢境君王進入第三階段：切換為高速騎兵衝鋒模式。');}
+  if(boss.shieldUntil&&now>=boss.shieldUntil){boss.shieldUntil=0;run.bossStatus='轉能護盾消散。';addLog('夢境君王的轉能護盾已消散。');}
+  if(run.bossTelegraph&&now>=run.bossTelegraph.resolveAt){
+    const t=run.bossTelegraph;const inside=t.orientation==='horizontal'?Math.abs(run.player.y-t.center)<=WORLD.cell*1.5&&run.player.x>=0&&run.player.x<=WORLD.width:Math.abs(run.player.x-t.center)<=WORLD.cell*1.5&&run.player.y>=0&&run.player.y<=WORLD.height;run.bossTelegraph=null;
+    if(t.kind==='charge'){
+      const dx=run.player.x-boss.x,dy=run.player.y-boss.y,len=Math.hypot(dx,dy)||1,step=Math.max(0,Math.min(170,len-48));if(step>0)moveActor(boss,dx/len*step,dy/len*step,boss.radius||24,'enemy');
+    }
+    if(inside){const layer=!run.guardUsed?(run.guardLayer||0):0;run.guardUsed=true;const mult=t.kind==='charge'?2.05:1.7;const dmg=Math.max(0,Math.round((boss.atk||1)*mult*(boss.damageMultiplier||1)-(run.guardBase||0)-layer-(run.guard||0)-(run.armor||0)));run.guard=0;run.hp-=dmg;emitFx('fx-slash',boss,run.player);floatDamage(run.player,dmg);run.bossStatus=`${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中：造成 ${dmg} 點傷害。`;addLog(`夢境君王的${t.kind==='charge'?'騎兵衝鋒':'重斬'}命中你，造成 ${dmg} 點傷害。`);}
+    else{run.bossStatus='魔王攻擊落空：你已離開警戒區。';addLog('你及時離開警戒區，躲過魔王攻擊。');}
+  }
+  if(now>=(boss.nextSkillAt||0)&&!run.bossTelegraph)castBossSkill(boss,now);
+};
+
+// Render loot as world objects and show support curse / boss mode state.
+const ssPreviousRenderArena=renderArena;
+renderArena=function(){ssPreviousRenderArena();if(!run)return;renderGroundLoot();for(const e of aliveEnemies()){if(!e.supporter)continue;const actor=$('arenaActor-'+String(e.uid||'').replace(/[^a-zA-Z0-9_-]/g,'_'));const nm=actor?.querySelector('.arena-name-text');if(nm)nm.textContent=`【支援】${e.name}`;if(actor)actor.title=`支援詛咒：${e.debuffLabel||'未知數值'}下降；擊敗後恢復。 ${Math.ceil(e.hp)}/${e.maxHp}`;}};
+const ssPreviousRender=render;
+render=function(throttleHud=false){ssPreviousRender(throttleHud);if(!run)return;const boss=aliveEnemies().find(e=>e.boss),info=$('bossInfo');if(boss&&info){const modeName=boss.mode==='ranged'?'遠程':boss.mode==='cavalry'?'騎兵':'近戰';const activeSupport=aliveEnemies().filter(e=>e.supporter);const curse=activeSupport.length?`｜支援詛咒 ${activeSupport.map(e=>e.debuffLabel).join('、')}`:'';info.textContent=`夢境君王・第 ${boss.phase||1} 階段（${modeName}模式）｜${run.bossStatus||'王者正在注視你。'}${curse}｜技能倒數 ${(Math.max(0,(boss.nextSkillAt||Date.now())-Date.now())/1000).toFixed(1)} 秒`;}const speedEl=$('liveMoveSpeed');if(speedEl&&run.supportSpeedMultiplier<.999)speedEl.textContent=`${Math.round((run.moveSpeed||PLAYER_BASE_SPEED)*run.supportSpeedMultiplier)}（支援詛咒 -${Math.round((1-run.supportSpeedMultiplier)*100)}%）`;};
+
+/* The expedition always begins with the short sword; old saved startWeapon preferences are ignored. */
+const ssStartRunWithoutChoice = startRun;
+startRun=function(){ssStartRunWithoutChoice();if(run&&!run.done){run.weapon='short';run.weapons=['short'];run.lockedTargetUid=null;render();}};
+
+/* ===== End monster-focused layer ===== */
 </script>
 
 <style id="silverParchmentCombatOverrides">
