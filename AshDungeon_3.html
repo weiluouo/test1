@@ -61,7 +61,7 @@ const names=['銀霧入口','斷裂長廊','失落祭室','沉眠兵營','腐朽
 function startRun(){const d=DIFFS[difficulty],maxHp=30+meta.up.life;run={floor:1,hp:maxHp,maxHp,baseMoveSpeed:200,speedPercent:0,moveSpeed:200,atk:5+meta.up.nature,pots:2+meta.up.civil,shards:0,kills:0,relics:[],bonusShard:meta.up.underworld,regen:meta.up.life*.2,potHeal:12,guard:0,guardBase:meta.up.nation,guardLayer:2*meta.up.nation,guardUsed:false,crit:meta.up.nature*.005,armor:0,weapon:'short',weapons:['short'],buffs:[],turn:0,explored:false,done:false,diff:d,map:[],player:{x:1,y:1},enemies:[],chests:[],exit:{x:7,y:5},roomSearched:false};$('startScreen').classList.add('hidden');$('gameScreen').classList.remove('hidden');$('runDifficulty').textContent=d.name;makeRoom();addLog('你踏入夢幻境。羊皮紙地圖邊緣寫著古老誓言，銀劍在鞘中微微鳴響。');render()}
 function makeRoom(){run.player={x:1,y:1};run.exit={x:7,y:5};run.map=[];for(let y=0;y<7;y++){let row=[];for(let x=0;x<9;x++)row.push((x===0||x===8||y===0||y===6)?'wall':'floor');run.map.push(row)}run.map[5][7]='exit';
 // 生成內部牆壁；每次加牆後檢查所有可走格仍彼此連通，確保不會封死道路。
-const connected=()=>{const seen=new Set(['1,1']),q=[[1,1]];for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx>0&&nx<8&&ny>0&&ny<6&&run.map[ny][nx]!=='wall'&&!seen.has(k)){seen.add(k);q.push([nx,ny])}}}for(let y=1;y<6;y++)for(let x=1;x<8;x++)if(run.map[y][x]!=='wall'&&!seen.has(x+','+y))return false;return seen.has('7,5')};let candidates=[];for(let y=2;y<5;y++)for(let x=2;x<7;x++)if(!(x===4&&y===3))candidates.push({x,y});candidates.sort(()=>Math.random()-.5);for(const p of candidates){if(Math.random()<.23){run.map[p.y][p.x]='wall';if(!connected())run.map[p.y][p.x]='floor'}}if(run.floor===10)run.map[3][4]='floor';run.enemies=[];run.chests=[];run.roomSearched=false;run.guardThisRoom=false;run.guardUsed=false;let n=run.floor===10?1:Math.min(4,1+Math.floor(run.floor/3));for(let i=0;i<n;i++){let p=randomFloor();if(run.floor===10){p={x:4,y:3};}const regularEnemies=ENEMIES.filter(m=>!m.supportOnly);const monsterPool=regularEnemies.length?regularEnemies:ENEMIES;let base=monsterPool[Math.floor(Math.random()*monsterPool.length)];const baseHp=run.floor===10?Math.max(1,Number(MONSTER_CONFIG.boss?.baseHp)||84):base.hp+run.floor*2;run.enemies.push({...base,x:p.x,y:p.y,name:run.floor===10?'夢境君王':base.name,icon:run.floor===10?'👹':base.icon,hp:Math.round(baseHp*run.diff.hp),maxHp:Math.round(baseHp*run.diff.hp),atk:Math.round((run.floor===10?7:base.atk+Math.floor(run.floor/3))*run.diff.atk),boss:run.floor===10})}for(let i=0;i<2;i++){let p=randomFloor();run.chests.push({...p,open:false})}run.searchPoint=randomFloor();run.searchUsed=false; $('roomTitle').textContent=`第 ${run.floor} 層：${names[run.floor-1]}`;$('roomDesc').textContent=run.floor===10?'夢境王座正在甦醒。擊敗夢境君王，結束這次遠征。':'找到出口，帶著戰利品繼續深入。';$('roomBadge').textContent=run.floor===10?'首領戰':'探索中'}function randomFloor(){for(let i=0;i<100;i++){let x=1+Math.floor(Math.random()*7),y=1+Math.floor(Math.random()*5);if(run.map[y][x]==='floor'&&!(x===1&&y===1)&&!(x===7&&y===5)&&!run.enemies?.some(e=>e.x===x&&e.y===y)&&!run.chests?.some(c=>c.x===x&&c.y===y))return{x,y}}return{x:4,y:4}}
+const connected=()=>{const seen=new Set(['1,1']),q=[[1,1]];for(let i=0;i<q.length;i++){const [x,y]=q[i];for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy,k=nx+','+ny;if(nx>0&&nx<8&&ny>0&&ny<6&&run.map[ny][nx]!=='wall'&&!seen.has(k)){seen.add(k);q.push([nx,ny])}}}for(let y=1;y<6;y++)for(let x=1;x<8;x++)if(run.map[y][x]!=='wall'&&!seen.has(x+','+y))return false;return seen.has('7,5')};let candidates=[];for(let y=2;y<5;y++)for(let x=2;x<7;x++)if(!(x===4&&y===3))candidates.push({x,y});candidates.sort(()=>Math.random()-.5);for(const p of candidates){if(Math.random()<.23){run.map[p.y][p.x]='wall';if(!connected())run.map[p.y][p.x]='floor'}}if(run.floor===10)run.map[3][4]='floor';run.enemies=[];run.chests=[];run.roomSearched=false;run.guardThisRoom=false;run.guardUsed=false;let n=run.floor===10?1:Math.min(4,1+Math.floor(run.floor/3));for(let i=0;i<n;i++){let p=randomFloor();if(run.floor===10){p={x:4,y:3};}const regularEnemies=ENEMIES.filter(m=>!m.supportOnly&&Number(m.spawnFromFloor||1)<=run.floor);const monsterPool=regularEnemies.length?regularEnemies:ENEMIES.filter(m=>!m.supportOnly);let base=monsterPool[Math.floor(Math.random()*monsterPool.length)];const packSize=run.floor===10?1:Math.max(1,Math.min(6,Math.floor(Number(base.spawnCount)||1)));for(let packIndex=0;packIndex<packSize;packIndex++){let spawnPoint=p;if(packIndex>0){const offsets=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]].sort(()=>Math.random()-.5);const nearby=offsets.map(([ox,oy])=>({x:p.x+ox,y:p.y+oy})).find(q=>q.x>0&&q.x<8&&q.y>0&&q.y<6&&run.map[q.y][q.x]==='floor'&&!(q.x===1&&q.y===1)&&!(q.x===7&&q.y===5)&&!run.enemies.some(e=>e.x===q.x&&e.y===q.y));spawnPoint=nearby||randomFloor();}const baseHp=run.floor===10?Math.max(1,Number(MONSTER_CONFIG.boss?.baseHp)||84):(Number(base.hp)||1)+run.floor*2;const scaledHp=Math.max(1,Math.round(baseHp*run.diff.hp));const baseAtk=Number(base.atk)||0;run.enemies.push({...base,x:spawnPoint.x,y:spawnPoint.y,name:run.floor===10?'夢境君王':base.name,icon:run.floor===10?'👹':base.icon,hp:scaledHp,maxHp:scaledHp,atk:Math.round((run.floor===10?7:(baseAtk===0?0:baseAtk+Math.floor(run.floor/3)))*run.diff.atk),boss:run.floor===10})}}for(let i=0;i<2;i++){let p=randomFloor();run.chests.push({...p,open:false})}run.searchPoint=randomFloor();run.searchUsed=false; $('roomTitle').textContent=`第 ${run.floor} 層：${names[run.floor-1]}`;$('roomDesc').textContent=run.floor===10?'夢境王座正在甦醒。擊敗夢境君王，結束這次遠征。':'找到出口，帶著戰利品繼續深入。';$('roomBadge').textContent=run.floor===10?'首領戰':'探索中'}function randomFloor(){for(let i=0;i<100;i++){let x=1+Math.floor(Math.random()*7),y=1+Math.floor(Math.random()*5);if(run.map[y][x]==='floor'&&!(x===1&&y===1)&&!(x===7&&y===5)&&!run.enemies?.some(e=>e.x===x&&e.y===y)&&!run.chests?.some(c=>c.x===x&&c.y===y))return{x,y}}return{x:4,y:4}}
 function addLog(t){let p=document.createElement('p');p.textContent=t;$('log').prepend(p);while($('log').children.length>45)$('log').lastChild.remove()}
 function render(){if(!run)return;$('hpText').textContent=`${Math.max(0,run.hp).toFixed(1)} / ${run.maxHp.toFixed(1)}`;$('hpBar').style.width=Math.max(0,run.hp/run.maxHp*100)+'%';$('atkText').textContent=run.atk.toFixed(1);$('potText').textContent=run.pots;$('floorText').textContent=`${run.floor} / 10`;$('floorBar').style.width=run.floor*10+'%';$('runShards').textContent=run.shards;$('runKills').textContent=run.kills;$('relicCount').textContent=run.relics.length+' 件';$('weaponList').innerHTML=WEAPONS.filter(w=>run.weapons.includes(w.id)).map(w=>`<div class="weapon-item ${run.weapon===w.id?'active':''}"><div><b>${w.icon} ${w.name}</b><div class="sub">傷害 ×${w.mult} · 距離 ${w.range}${w.wall?' · 可穿牆':''}</div></div><button data-equip="${w.id}" ${run.weapon===w.id?'disabled':''}>裝備</button></div>`).join('');const relicCounts={};run.relics.forEach(r=>{const k=r.name;relicCounts[k]=(relicCounts[k]||0)+1});$('relics').innerHTML=run.relics.length?Object.values(run.relics.reduce((a,r)=>{if(!a[r.name])a[r.name]={...r,count:0};a[r.name].count++;return a},{})).map(r=>`<div class="skill"><div><b>${r.icon} ${r.name} <span class="gold">×${r.count}</span></b><small>${r.desc}</small></div></div>`).join(''):'<div class="sub">尚未取得遺物。</div>';
 let m=$('map');m.innerHTML='';for(let y=0;y<7;y++)for(let x=0;x<9;x++){let b=document.createElement('div'),tile=run.map[y][x];b.className='tile '+tile;let enemy=run.enemies.find(e=>e.x===x&&e.y===y&&!e.dead),chest=run.chests.find(c=>c.x===x&&c.y===y&&!c.open);if(run.player.x===x&&run.player.y===y){b.className+=' player';b.textContent='🧙'}else if(enemy){b.className+=' '+(enemy.boss?'boss':'enemy');b.textContent=enemy.icon;b.title=`${enemy.name} ${enemy.hp}/${enemy.maxHp}`}else if(chest){b.className+=' chest';b.textContent='📦'}else if(tile==='wall')b.textContent='▪';else if(tile==='exit')b.textContent='🚪';else b.textContent='';m.appendChild(b)}$('attackBtn').textContent='⚔ 攻擊射程內敵人';$('attackBtn').disabled=!nearEnemy();$('potionBtn').disabled=run.pots<=0||run.hp===run.maxHp;if($('exploreBtn'))$('exploreBtn').disabled=run.roomSearched}
@@ -349,11 +349,46 @@ makeRoom=function(){
   gridMakeRoomOriginal();
   run.projectiles=[];
   run.player=toWorldEntity(run.player);run.exit=toWorldEntity(run.exit);if(run.floor===10){run.map[3][4]='floor';const bossCell=run.enemies.find(e=>e.boss);if(bossCell){bossCell.x=4;bossCell.y=3;}}
-  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=82;e.attackCooldown=1250;e.windupMs=620;e.mode='melee';e.nextSkillAt=Date.now()+3000;e.shieldUntil=0;run.bossStatus='夢境君王以近戰模式守護王座。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier||1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange||40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||template?.preferredRange||155;e.decisionInterval=Number(template?.decisionInterval)||140;e.windupMs=Number(template?.windupMs)||360;e.aggro=false;e.homeX=e.x;e.homeY=e.y;e.roamStyle=e.behavior==='fast-pursuer'?'restless':e.behavior==='patrol-pursuer'?'patrol':e.behavior==='ranged-kiter'?'wander':['wander','patrol','restless'][Math.floor(Math.random()*3)];e.roamRadius=e.roamStyle==='restless'?78+Math.random()*18:e.roamStyle==='patrol'?52+Math.random()*12:62+Math.random()*16;e.patrolAxis=Math.random()*Math.PI*2;e.patrolSide=Math.random()<.5?-1:1;e.wanderTarget=null;e.wanderPauseUntil=Date.now()+Math.random()*700;e.wanderExpiresAt=0;e.rangedMoveStyle=['strafe','circle','reposition'][Math.floor(Math.random()*3)];e.rangedMoveTarget=null;e.rangedMoveUntil=0;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
+  run.enemies.forEach((e,i)=>{toWorldEntity(e);e.uid=`f${run.floor}-e${i}-${++uidSequence}`;e.radius=e.boss?24:WORLD.enemyRadius;const template=ENEMIES.find(m=>m.id===e.id||m.name===e.name);if(e.boss){e.roleLabel='首領';e.classType='boss';e.mapIconFile='';e.fallbackIcon='👹';e.speed=Number(MONSTER_CONFIG.boss?.speed)||136;e.damageMultiplier=1;e.aggro=true;e.aggroRange=9999;e.attackRange=82;e.attackCooldown=1250;e.windupMs=620;e.mode='melee';e.nextSkillAt=Date.now()+3000;e.shieldUntil=0;run.bossStatus='夢境君王以近戰模式守護王座。'}else{delete e.roleLabel;e.classType=template?.classType||'melee';e.supportRole=template?.supportRole||e.supportRole||null;e.attackBleed=template?.attackBleed||e.attackBleed||null;e.supportHealBase=Number(template?.supportHealBase??e.supportHealBase)||5;e.supportHealIntervalMs=Number(template?.supportHealIntervalMs??e.supportHealIntervalMs)||5000;e.supportAuraSpeedMultiplier=Number(template?.supportAuraSpeedMultiplier??e.supportAuraSpeedMultiplier)||1.4;e.supportAuraDamageMultiplier=Number(template?.supportAuraDamageMultiplier??e.supportAuraDamageMultiplier)||1.4;e.speed=template?.speed||70;e.damageMultiplier=template?.damageMultiplier??1;e.aggroRange=template?.aggroRange||230;e.attackRange=template?.attackRange??40;e.attackCooldown=template?.attackCooldown||1400;e.projectileIcon=template?.projectileIcon||'●';e.projectileSpeed=template?.projectileSpeed||160;e.mapIconFile=template?.mapIconFile||'';e.fallbackIcon=template?.fallbackIcon||'';e.keepDistance=template?.keepDistance||template?.preferredRange||155;e.decisionInterval=Number(template?.decisionInterval)||140;e.windupMs=Number(template?.windupMs)||360;e.aggro=false;e.homeX=e.x;e.homeY=e.y;e.roamStyle=e.behavior==='fast-pursuer'?'restless':e.behavior==='patrol-pursuer'?'patrol':e.behavior==='ranged-kiter'?'wander':['wander','patrol','restless'][Math.floor(Math.random()*3)];e.roamRadius=e.roamStyle==='restless'?78+Math.random()*18:e.roamStyle==='patrol'?52+Math.random()*12:62+Math.random()*16;e.patrolAxis=Math.random()*Math.PI*2;e.patrolSide=Math.random()<.5?-1:1;e.wanderTarget=null;e.wanderPauseUntil=Date.now()+Math.random()*700;e.wanderExpiresAt=0;e.rangedMoveStyle=['strafe','circle','reposition'][Math.floor(Math.random()*3)];e.rangedMoveTarget=null;e.rangedMoveUntil=0;}e.nextAttackAt=Date.now()+600+Math.random()*700;});
   run.chests.forEach((c,i)=>{toWorldEntity(c);c.uid=`f${run.floor}-c${i}`});if(run.searchPoint)run.searchPoint=toWorldEntity(run.searchPoint);
   run.exitHandled=false;run.bossTelegraph=null;run.floorTransitioning=false;arenaBuiltFloor=-1;
 };
 function aliveEnemies(){return run?run.enemies.filter(e=>!e.dead&&e.hp>0):[]}
+function activePriest(){return aliveEnemies().find(e=>e.supportRole==='priest')||null;}
+function priestAuraActive(){return !!activePriest();}
+function priestSpeedMultiplier(){const p=activePriest();return p?Math.max(1,Number(p.supportAuraSpeedMultiplier)||1.4):1;}
+function priestDamageMultiplier(){const p=activePriest();return p?Math.max(1,Number(p.supportAuraDamageMultiplier)||1.4):1;}
+function effectiveEnemySpeed(e,scale=1){return (Number(e?.speed)||70)*priestSpeedMultiplier()*scale;}
+function updatePriestMovement(e,dt,now){
+ const d=dist(e,run.player),touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+20;
+ if(d<145){const len=Math.max(1,d),ux=(e.x-run.player.x)/len,uy=(e.y-run.player.y)/len,step=Math.min(effectiveEnemySpeed(e)*dt,Math.max(4,145-d));for(const [ax,ay] of [[ux,uy],[ux,0],[0,uy],[-uy,ux],[uy,-ux]]){const n=Math.hypot(ax,ay)||1;if(moveActor(e,ax/n*step,ay/n*step,e.radius||WORLD.enemyRadius,'enemy'))break;}return;}
+ if(d>270){const wp=getCachedPathWaypoint(e,now);if(wp)moveTowardPoint(e,wp,dt,effectiveEnemySpeed(e,.55));return;}
+ updateIdleWander(e,dt,now);
+}
+function updatePriestHealing(now){
+ if(!run||run.done)return;
+ const priests=aliveEnemies().filter(e=>e.supportRole==='priest');
+ for(const priest of priests){
+  const interval=Math.max(1000,Number(priest.supportHealIntervalMs)||5000);
+  if(!priest.nextHealAt)priest.nextHealAt=now+interval;
+  if(now<priest.nextHealAt)continue;
+  priest.nextHealAt=now+interval;
+  const target=aliveEnemies().filter(e=>e.hp<e.maxHp).sort((a,b)=>(b.maxHp-b.hp)-(a.maxHp-a.hp))[0];
+  if(!target)continue;
+  const amount=Math.max(1,Math.round((Number(priest.supportHealBase)||5)*(Number(run.diff?.hp)||1)));
+  const before=target.hp;target.hp=Math.min(target.maxHp,target.hp+amount);const healed=Math.max(0,target.hp-before);
+  if(healed>0){floatDamage(target,healed,true);emitFx('fx-heal',priest,target,'✚');addLog(`祭司「${priest.name}」施行治療：${target.name}恢復 ${healed} 點生命。`);}
+ }
+}
+function updatePlayerBleed(now){
+ if(!run||run.done||!run.playerBleedUntil||!run.playerBleedNextAt)return;
+ let safety=0;
+ while(run.hp>0&&now>=run.playerBleedNextAt&&run.playerBleedNextAt<=run.playerBleedUntil&&safety++<5){
+  const dmg=Math.max(1,Number(run.playerBleedDamage)||1);run.hp=Math.max(0,run.hp-dmg);run.playerBleedNextAt+=1000;floatDamage(run.player,dmg);addLog(`流血發作：你失去 ${dmg} 點生命。`);
+ }
+ if(now>=run.playerBleedUntil){run.playerBleedUntil=0;run.playerBleedNextAt=0;run.playerBleedDamage=0;addLog('你身上的流血效果已止住。');}
+ if(run.hp<=0)finish(false);
+}
 function weaponRangePx(w=getWeapon()){return w.range*WORLD.cell}
 function segmentHitsWall(a,b){const dx=b.x-a.x,dy=b.y-a.y,steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/8));for(let i=1;i<steps;i++){const t=i/steps,x=a.x+dx*t,y=a.y+dy*t,cx=Math.floor(x/WORLD.cell),cy=Math.floor(y/WORLD.cell);if(!run.map[cy]||run.map[cy][cx]==='wall')return true}return false}
 function inRange(e,w=getWeapon()) {if(!run||!e||e.dead)return false;const d=Math.hypot(e.x-run.player.x,e.y-run.player.y);if(d>weaponRangePx(w))return false;if(!w.wall&&segmentHitsWall(run.player,e))return false;return true}
@@ -397,7 +432,7 @@ function triggerAttack(){
 }
 function weaponBaseDamage(mult,critChance){return Math.max(1,Math.round((Number(run.atk)||1)*(Number(mult)||1))+(Math.random()<(Number(critChance)||0)?4:0))}
 function handleEnemyDefeat(e){if(!run||!e||e.dead||Number(e.hp)>0)return false;e.hp=0;e.dead=true;run.kills++;const kh=Number(meta.up.underworld)||0;if(kh){run.hp=Math.min(run.maxHp,run.hp+kh);if(kh>0)floatDamage(run.player,kh,true)}const reward=Math.max(1,Math.round((2+run.floor*.5)*run.diff.reward))+run.bonusShard;run.shards+=reward;addLog(`${e.name}倒下了，取得 ${reward} 枚律質。`);if(Math.random()<.05&&RELICS.length){const relic=randomRelicByWeight();if(relic){relic.apply(run);run.relics.push(relic);addLog(`稀有掉落：${relic.name}！`)}}if(Math.random()<.05){run.pots++;addLog('稀有掉落：怪物留下了一瓶藥水。')}if(e.boss){render();finish(true)}return true}
-function applyWeaponHit(e,dmg,w,now){if(!run||!e||e.dead)return false;const target={x:e.x,y:e.y};if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog(`魔王「轉能」將對${e.name}的 ${dmg} 點攻擊轉化為恢復，生命 +${healed}。`);return false}e.hp-=dmg;floatDamage(e,dmg);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`);if(w.attackFx==='fx-short'&&e.hp>0){e.bleedUntil=now+5000;e.nextBleedAt=now+1000;addLog(`${e.name}陷入流血：每秒損失 1 點生命，持續 5 秒；再次命中會刷新時間，不會疊加。`)}if(e.hp<=0)handleEnemyDefeat(e);return true}
+function applyWeaponHit(e,dmg,w,now){if(!run||!e||e.dead)return false;const target={x:e.x,y:e.y};if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog(`魔王「轉能」將對${e.name}的 ${dmg} 點攻擊轉化為恢復，生命 +${healed}。`);return false}e.hp-=dmg;floatDamage(e,dmg);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`);if(w.attackFx==='fx-short'&&e.hp>0){e.bleedStacks=e.bleedUntil>now?Math.min(3,(Number(e.bleedStacks)||1)+1):1;e.bleedUntil=now+5000;e.nextBleedAt=now+1000;addLog(`${e.name}陷入流血：${e.bleedStacks} 層（最多 3 層），每秒造成 ${e.bleedStacks+(Number(run.bleedDamageAdd)||0)} 點傷害，持續 5 秒；命中會增加層數並刷新時間。`)}if(e.hp<=0)handleEnemyDefeat(e);return true}
 fight=function(e){
  if(!run||run.done||!e||e.dead||Date.now()<(run.nextAttackAt||0))return;e.aggro=true;const w=getWeapon();if(!inRange(e,w)){addLog('目標超出武器攻擊半徑或被牆壁阻擋。');return}
  const now=Date.now(),from={x:run.player.x,y:run.player.y},fx=w.attackFx||currentWeaponFx();run.nextAttackAt=now+(Number(w.cooldown)||1500);
@@ -533,7 +568,7 @@ function getCachedPathWaypoint(e,now){
  if(e.pathCacheKey===key&&now<(e.pathCacheUntil||0))return e.pathCacheWaypoint||null;
  e.pathCacheKey=key;e.pathCacheWaypoint=findPathWaypoint(e);e.pathCacheUntil=now+180;return e.pathCacheWaypoint||null;
 }
-function applyEnemyDamageToPlayer(e,now,projectileHit=false){let layerGuard=0;if(!run.guardUsed){layerGuard=run.guardLayer||0;run.guardUsed=true}const raw=(e.atk||1)*(e.damageMultiplier||1),dmg=Math.max(0,Math.round(raw-(run.guardBase||0)-layerGuard-(run.guard||0)-(run.armor||0)));run.guard=0;run.hp-=dmg;if(!projectileHit)emitFx(e.classType==='cavalry'?'fx-bite':'fx-slash',e,run.player);emitFx('fx-hit',run.player,run.player);floatDamage(run.player,dmg);addLog(projectileHit?`${e.name}的遠程投射物命中你，造成 ${dmg} 點傷害。`:`${e.name}發動${e.classType==='cavalry'?'衝撞／啃咬':'斬擊'}，造成 ${dmg} 點傷害。`);return dmg}
+function applyEnemyDamageToPlayer(e,now,projectileHit=false){let layerGuard=0;if(!run.guardUsed){layerGuard=run.guardLayer||0;run.guardUsed=true}const aura=priestDamageMultiplier();const raw=(Number(e.atk)||0)*(Number(e.damageMultiplier??1))*aura,dmg=Math.max(0,Math.round(raw-(run.guardBase||0)-layerGuard-(run.guard||0)-(run.armor||0)));run.guard=0;run.hp-=dmg;if(!projectileHit)emitFx(e.classType==='cavalry'?'fx-bite':'fx-slash',e,run.player);emitFx('fx-hit',run.player,run.player);floatDamage(run.player,dmg);addLog(projectileHit?`${e.name}的遠程投射物命中你，造成 ${dmg} 點傷害。`:`${e.name}發動${e.classType==='cavalry'?'衝撞／啃咬':'斬擊'}，造成 ${dmg} 點傷害。`);if(e.attackBleed&&Number(e.attackBleed.damage)>0){const duration=Math.max(1000,Number(e.attackBleed.durationMs)||5000);run.playerBleedDamage=Math.max(1,Number(e.attackBleed.damage)||1);run.playerBleedUntil=now+duration;run.playerBleedNextAt=now+1000;addLog(`${e.name}的攻擊使你流血：每秒失去 ${run.playerBleedDamage} 點生命，持續 ${Math.round(duration/1000)} 秒；再次命中只會刷新時間。`);}return dmg}
 function damagePlayerFromEnemy(e,now,projectile=false){
  if(projectile){const d=dist(e,run.player)||1;const speed=Math.max(70,Number(e.projectileSpeed)||160);const p={uid:`proj-${++uidSequence}`,x:e.x,y:e.y,vx:(run.player.x-e.x)/d*speed,vy:(run.player.y-e.y)/d*speed,speed,icon:e.projectileIcon||'●',owner:e,radius:8,dead:false};run.projectiles=run.projectiles||[];const map=$('map');p.el=addArenaNode(map,'enemy-projectile-node');setIconContent(p.el,p.icon,'●');const angle=Math.atan2(p.vy,p.vx)*180/Math.PI;p.el.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;positionNode(p.el,p);run.projectiles.push(p);e.nextAttackAt=now+(e.attackCooldown||2400);addLog(`${e.name}發射投射物！彈道較慢，移動可以閃避。`);return 0}
  e.nextAttackAt=now+(e.attackCooldown||(e.boss?1200:1450));return applyEnemyDamageToPlayer(e,now,false)
@@ -580,7 +615,7 @@ function updateIdleWander(e,dt,now){
   chooseIdleWanderTarget(e,now);
  }
  if(!e.wanderTarget)return;
- const speed=(Number(e.speed)||70)*(e.roamStyle==='restless'?.46:e.roamStyle==='patrol'?.32:.37);
+ const speed=effectiveEnemySpeed(e,e.roamStyle==='restless'?.46:e.roamStyle==='patrol'?.32:.37);
  moveTowardPoint(e,e.wanderTarget,dt,speed);
 }
 function chooseRangedMoveTarget(e,keep,attackRange,now){
@@ -609,7 +644,7 @@ function updateRangedBandMovement(e,dt,now,keep,attackRange){
  if(!e.rangedMoveTarget||now>=e.rangedMoveUntil||dist(e,e.rangedMoveTarget)<8){
   if(!chooseRangedMoveTarget(e,keep,attackRange,now))return;
  }
- const speed=(Number(e.speed)||64)*(e.rangedMoveStyle==='reposition'?.82:.58);
+ const speed=effectiveEnemySpeed(e,e.rangedMoveStyle==='reposition'?.82:.58);
  moveTowardPoint(e,e.rangedMoveTarget,dt,speed);
 }
 function moveEnemies(dt,now){
@@ -621,17 +656,19 @@ function moveEnemies(dt,now){
   if(!e.aggro&&d<=(e.aggroRange||230)){e.aggro=true;e.wanderTarget=null;e.wanderPauseUntil=0;addLog(`${e.name}發現了你！`)}
   if(!e.aggro){e.aiState='wander';updateIdleWander(e,dt,now);continue;}
   if(e.supporter){e.aiState='support-orbit';updateSupportMovement(e,dt,now);continue;}
+  if(e.supportRole==='priest'){e.aiState='priest-support';updatePriestMovement(e,dt,now);continue;}
   const ranged=e.classType==='ranged'||(isBoss&&e.mode==='ranged');const touch=(e.radius||WORLD.enemyRadius)+WORLD.playerRadius+7;
   if(ranged){
    const keep=Math.max(e.keepDistance||155,touch+12);
    const attackRange=Math.max(touch+8,Number(e.attackRange)||260);
    // 遠程怪會在移動過程中照常攻擊：射擊判定放在本幀移動之前，不因退縮或走位而略過。
    const canShootNow=d<=attackRange&&lineClearForEnemy(e);
+   // 安全距離只影響走位，不會阻止射程內的攻擊；即使玩家貼近，仍先判定是否射擊。
    if(canShootNow&&now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,true);
    d=dist(e,run.player);
    if(d<keep){
     e.aiState='retreat';e.rangedMoveTarget=null;
-    const speed=Number(e.speed)||64,inv=Math.max(1,d),ux=(e.x-run.player.x)/inv,uy=(e.y-run.player.y)/inv;
+    const speed=effectiveEnemySpeed(e),inv=Math.max(1,d),ux=(e.x-run.player.x)/inv,uy=(e.y-run.player.y)/inv;
     const push=Math.min(speed*dt,Math.max(3,keep-d+3));
     const dirs=[[ux,uy],[ux,0],[0,uy],[-uy,ux],[uy,-ux],[-uy,-ux],[uy,ux]];
     let moved=false;
@@ -649,14 +686,14 @@ function moveEnemies(dt,now){
    e.aiState='seek-position';e.rangedMoveTarget=null;
    const waypoint=getCachedPathWaypoint(e,now);if(!waypoint)continue;
    const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
-   const speed=Number(e.speed)||64;moveTowardPoint(e,waypoint,dt,speed);continue;
+   const speed=effectiveEnemySpeed(e);moveTowardPoint(e,waypoint,dt,speed);continue;
   }
   const attackRange=Math.max(touch,Number(e.attackRange)||touch);
-  if(e.attackWindupUntil){if(now>=e.attackWindupUntil){if(d<=attackRange+15)damagePlayerFromEnemy(e,now,false);else{e.attackWindupUntil=0;e.warningEl?.remove();e.warningEl=null;e.nextAttackAt=now+180;}}continue;}
+  if(e.attackWindupUntil){if(now>=e.attackWindupUntil){if(d<=attackRange+15)damagePlayerFromEnemy(e,now,false);else{e.attackWindupUntil=0;e.warningEl?.remove();e.warningEl=null;e.nextAttackAt=now+180;}}else{e.aiState='windup-pursue';const wp=getCachedPathWaypoint(e,now);if(wp){const dx=wp.x-e.x,dy=wp.y-e.y,len=Math.hypot(dx,dy);if(len>3)moveTowardPoint(e,wp,dt,effectiveEnemySpeed(e));}}continue;}
   if(d<=attackRange){if(now>=(e.nextAttackAt||0))damagePlayerFromEnemy(e,now,false);continue;}
   e.aiState='pursue';const waypoint=getCachedPathWaypoint(e,now);if(!waypoint)continue;
   const dx=waypoint.x-e.x,dy=waypoint.y-e.y,len=Math.hypot(dx,dy);if(len<3)continue;
-  const speed=isBoss?Math.max(136,Number(e.speed)||Number(MONSTER_CONFIG.boss?.speed)||136):(e.speed||76);const step=Math.min(speed*dt,len);
+  const speed=(isBoss?Math.max(136,Number(e.speed)||Number(MONSTER_CONFIG.boss?.speed)||136):(e.speed||76))*priestSpeedMultiplier();const step=Math.min(speed*dt,len);
   const moved=moveActor(e,dx/len*step,dy/len*step,e.radius||WORLD.enemyRadius,'enemy');
   if(!moved){const alternatives=[[dx/len,0],[0,dy/len],[-dy/len,dx/len],[dy/len,-dx/len]];for(const [ax,ay] of alternatives){if(moveActor(e,ax*speed*dt,ay*speed*dt,e.radius||WORLD.enemyRadius,'enemy'))break}}
  }
@@ -664,7 +701,7 @@ function moveEnemies(dt,now){
 function processRunInteractions(now){for(const c of run.chests){if(!c.open&&dist(run.player,c)<35)openChest(c)}if(run.searchPoint&&!run.roomSearched&&dist(run.player,run.searchPoint)<39){addLog('你接近地圖中的星芒印記，開始調查。');explore()}if(dist(run.player,run.exit)<39&&!run.exitHandled){if(aliveEnemies().length){if(!run.exitWarningAt||now-run.exitWarningAt>2500){addLog('出口仍被敵人封鎖，先擊敗剩餘怪物。');run.exitWarningAt=now}}else{run.exitHandled=true;if(run.floor===10){finish(true);return}if(run.floor%2===1){showExpeditionScenario(()=>advanceToNextFloor());return}advanceToNextFloor();return}}}
 realtimeUpdate=function(){if(!run||run.done||$('gameScreen').classList.contains('hidden'))return;const now=performance.now();if(!run.lastFrame)run.lastFrame=now;const dt=Math.min(.05,Math.max(0,(now-run.lastFrame)/1000));run.lastFrame=now;if(!$('modal').classList.contains('hidden'))return
  const held=[...heldDirections.values()];let vx=0,vy=0;for(const d of held){vx+=dirVectors[d]?.x||0;vy+=dirVectors[d]?.y||0}const vl=Math.hypot(vx,vy);if(vl){vx/=vl;vy/=vl;moveActor(run.player,vx*(run.moveSpeed||PLAYER_BASE_SPEED)*(run.supportSpeedMultiplier||1)*dt,vy*(run.moveSpeed||PLAYER_BASE_SPEED)*(run.supportSpeedMultiplier||1)*dt,WORLD.playerRadius,'player');run.playerFacing={x:vx,y:vy}}
- moveEnemies(dt,Date.now());updateEnemyBleeds(Date.now());if(!run||run.done)return;updateWeaponCharge(Date.now());if(!run||run.done)return;updateProjectiles(dt,Date.now());updateBoss(Date.now());if(run.hp<=0){finish(false);return}if(Date.now()>=(run.nextRegenAt||0)){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);const gain=run.hp-before;if(gain>0){floatDamage(run.player,gain,true);addLog(`自然恢復：生命 +${gain.toFixed(1)}（每 5 秒）。`)}}run.nextRegenAt=Date.now()+REGEN_INTERVAL}
+ moveEnemies(dt,Date.now());updatePlayerBleed(Date.now());if(!run||run.done)return;updatePriestHealing(Date.now());if(!run||run.done)return;updateEnemyBleeds(Date.now());if(!run||run.done)return;updateWeaponCharge(Date.now());if(!run||run.done)return;updateProjectiles(dt,Date.now());updateBoss(Date.now());if(run.hp<=0){finish(false);return}if(Date.now()>=(run.nextRegenAt||0)){if(run.regen>0&&run.hp<run.maxHp){const before=run.hp;run.hp=Math.min(run.maxHp,run.hp+run.regen);const gain=run.hp-before;if(gain>0){floatDamage(run.player,gain,true);addLog(`自然恢復：生命 +${gain.toFixed(1)}（每 5 秒）。`)}}run.nextRegenAt=Date.now()+REGEN_INTERVAL}
  processRunInteractions(Date.now());if(!run||run.done)return;if(run.hp<=0){finish(false);return}render(true);};
 startRun=function(){if(frameLoop!==null){cancelAnimationFrame(frameLoop);frameLoop=null}clearHeldDirections();arenaBuiltFloor=-1;uidSequence=0;weaponListSignature='';relicListSignature='__reset__';$('log').innerHTML='';baseStartRun();if(!run||run.done)return;run.nextRegenAt=Date.now()+REGEN_INTERVAL;run.nextAttackAt=0;run.lastFrame=performance.now();run.lastHudRenderAt=0;const frame=()=>{if(!run||run.done){frameLoop=null;return}realtimeUpdate();if(run&&!run.done)frameLoop=requestAnimationFrame(frame);else frameLoop=null};frameLoop=requestAnimationFrame(frame);};
 // Keyboard controls: hold for continuous movement; E attacks. Direction sets allow two simultaneous keys.
@@ -891,7 +928,7 @@ renderMeta();
     const stepDt=enemyStepAccumulator;enemyStepAccumulator=0;
     for(const e of aliveEnemies()){
       if(e.boss||e.supporter||!Number.isFinite(e.homeX)||!Number.isFinite(e.homeY))continue;
-      if(e.attackWindupUntil&&dist(e,run.player)>Math.max((e.radius||WORLD.enemyRadius)+WORLD.playerRadius+18,Number(e.attackRange)||0)+15){e.attackWindupUntil=0;e.nextAttackAt=Math.max(e.nextAttackAt||0,now+180);e.warningEl?.remove();e.warningEl=null;}
+      
       const leash=Number(e.leashRange)||470;
       if(e.aggro&&dist(e,{x:e.homeX,y:e.homeY})>leash){e.aggro=false;e.rangedMoveTarget=null;e.pathCacheUntil=0;if(!e.leashResetLogged){addLog(`${e.name}失去追蹤，退回原本巡邏區域。`);e.leashResetLogged=true}}
       if(!e.aggro)e.leashResetLogged=false;
@@ -1055,10 +1092,10 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
       if(!e.bleedUntil||!e.nextBleedAt)continue;
       let safety=0;
       while(!e.dead&&now>=e.nextBleedAt&&e.nextBleedAt<=e.bleedUntil&&safety++<5){
-        const bleedDmg=Math.max(1,1+(Number(run.bleedDamageAdd)||0));e.hp-=bleedDmg;e.nextBleedAt+=1000;floatDamage(e,bleedDmg);
+        const bleedDmg=Math.max(1,(Math.min(3,Number(e.bleedStacks)||1))+(Number(run.bleedDamageAdd)||0));e.hp-=bleedDmg;e.nextBleedAt+=1000;floatDamage(e,bleedDmg);
         if(e.hp<=0){addLog(`${e.name}因流血失去最後 ${bleedDmg} 點生命。`);handleEnemyDefeat(e);if(run.done)return;}
       }
-      if(now>=e.bleedUntil){e.bleedUntil=0;e.nextBleedAt=0;}
+      if(now>=e.bleedUntil){e.bleedUntil=0;e.nextBleedAt=0;e.bleedStacks=0;}
     }
   };
 
@@ -1222,15 +1259,15 @@ function refreshSupportState(){
 }
 function updateSupportMovement(e,dt,now){
   const boss=aliveEnemies().find(x=>x.boss);
-  if(!boss){const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,Number(e.speed)||52);return;}
+  if(!boss){const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,effectiveEnemySpeed(e));return;}
   if(!Number.isFinite(e.orbitPhase))e.orbitPhase=Math.random()*Math.PI*2;
   const angle=now*.00032+e.orbitPhase;
   const r=132+Math.sin(now*.0012+e.orbitPhase)*18;
   const target={x:Math.max(32,Math.min(WORLD.width-32,boss.x+Math.cos(angle)*r)),y:Math.max(32,Math.min(WORLD.height-32,boss.y+Math.sin(angle)*r*.78))};
   if(!canOccupy(target.x,target.y,e.radius||WORLD.enemyRadius,'enemy')||segmentHitsWall(e,target)){
-    const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,Number(e.speed)||52);return;
+    const waypoint=getCachedPathWaypoint(e,now);if(waypoint)moveTowardPoint(e,waypoint,dt,effectiveEnemySpeed(e));return;
   }
-  moveTowardPoint(e,target,dt,Number(e.speed)||52);
+  moveTowardPoint(e,target,dt,effectiveEnemySpeed(e));
 }
 
 const ssPreviousRealtimeUpdate=realtimeUpdate;
@@ -1357,7 +1394,7 @@ updateBoss=function(now){
 
 // Render loot as world objects and show support curse / boss mode state.
 const ssPreviousRenderArena=renderArena;
-renderArena=function(){ssPreviousRenderArena();if(!run)return;renderGroundLoot();for(const e of aliveEnemies()){if(!e.supporter)continue;const actor=$('arenaActor-'+String(e.uid||'').replace(/[^a-zA-Z0-9_-]/g,'_'));const nm=actor?.querySelector('.arena-name-text');if(nm)nm.textContent=`【支援】${e.name}`;if(actor)actor.title=`支援詛咒：${e.debuffLabel||'未知數值'}下降；擊敗後恢復。 ${Math.ceil(e.hp)}/${e.maxHp}`;}};
+renderArena=function(){ssPreviousRenderArena();if(!run)return;renderGroundLoot();for(const e of aliveEnemies()){if(!e.supporter&&e.supportRole!=='priest')continue;const actor=$('arenaActor-'+String(e.uid||'').replace(/[^a-zA-Z0-9_-]/g,'_'));const nm=actor?.querySelector('.arena-name-text');if(nm)nm.textContent=`【支援】${e.name}`;if(actor)actor.title=e.supportRole==='priest'?`祭司效果：全體敵方速度、傷害 +40%；每 5 秒治療受傷最多的敵方單位。 ${Math.ceil(e.hp)}/${e.maxHp}`:`支援詛咒：${e.debuffLabel||'未知數值'}下降；擊敗後恢復。 ${Math.ceil(e.hp)}/${e.maxHp}`;}};
 const ssPreviousRender=render;
 render=function(throttleHud=false){ssPreviousRender(throttleHud);if(!run)return;const boss=aliveEnemies().find(e=>e.boss),info=$('bossInfo');if(boss&&info){const modeName=boss.mode==='ranged'?'遠程':boss.mode==='cavalry'?'騎兵':'近戰';const activeSupport=aliveEnemies().filter(e=>e.supporter);const curse=activeSupport.length?`｜支援詛咒 ${activeSupport.map(e=>e.debuffLabel).join('、')}`:'';info.textContent=`夢境君王・第 ${boss.phase||1} 階段（${modeName}模式）｜${run.bossStatus||'王者正在注視你。'}${curse}｜技能倒數 ${(Math.max(0,(boss.nextSkillAt||Date.now())-Date.now())/1000).toFixed(1)} 秒`;}const speedEl=$('liveMoveSpeed');if(speedEl&&run.supportSpeedMultiplier<.999)speedEl.textContent=`${Math.round((run.moveSpeed||PLAYER_BASE_SPEED)*run.supportSpeedMultiplier)}（支援詛咒 -${Math.round((1-run.supportSpeedMultiplier)*100)}%）`;};
 
@@ -1452,7 +1489,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
   const style=document.createElement('style');style.textContent='.magic-charge-marker{width:34px!important;min-width:34px!important;height:34px!important;aspect-ratio:1!important;border-radius:50%!important;background:rgba(244,228,189,.88)!important;border:2px dashed #9a7743!important;color:#795725!important;text-shadow:0 1px #fff3d2!important;box-shadow:0 0 0 3px #b89b6a33!important;filter:none!important;animation:none!important;font-size:22px!important}';document.head.appendChild(style);
   // Remove attack warning and staff marker immediately when an enemy dies.
   const oldDefeat=handleEnemyDefeat;handleEnemyDefeat=function(e){if(e){e.warningEl?.remove();e.warningEl=null;const m=$('magicChargeMarker');if(m&&run?.magicCharge?.targetUid===e.uid){m.style.opacity='0';m.style.transform='translate(-50%,-50%) scale(.2)';}}return oldDefeat(e)};
-  // Sprint: 4x movement for 300ms, then 5s cooldown; direction follows current input or facing.
+  // Sprint: 4x movement for 300ms, then 3s cooldown; direction follows current input or facing.
   const originalUpdate=realtimeUpdate;
   // Multiply the existing continuous movement vector only during the sprint window.
   const oldRealtimeText=originalUpdate.toString();
@@ -1460,7 +1497,7 @@ body,button,select,input,textarea,.hero,h1,h2,h3,h4,.arena-actor .arena-name,.en
   // Patch the movement scalar in the function's source isn't possible at runtime, so use a temporary moveActor multiplier.
   const baseMoveActor=moveActor;
   moveActor=function(actor,dx,dy,radius,kind){if(run&&actor===run.player&&run._sprintingNow){dx*=4;dy*=4}return baseMoveActor(actor,dx,dy,radius,kind)};
-  function sprint(){if(!run||run.done||!$('modal').classList.contains('hidden'))return;const now=performance.now();if(now<(run.sprintReadyAt||0))return;let dir={x:0,y:0};for(const d of heldDirections.values()){dir.x+=dirVectors[d]?.x||0;dir.y+=dirVectors[d]?.y||0}let len=Math.hypot(dir.x,dir.y);if(len<.01){dir=run.playerFacing||{x:1,y:0};len=Math.hypot(dir.x,dir.y)||1}dir={x:dir.x/len,y:dir.y/len};run.playerFacing=dir;run.sprintVector=dir;run.sprintUntil=now+300;run.sprintReadyAt=now+5000;const sprintDir=dir;const sprintKey='sprint:'+now;heldDirections.set(sprintKey,sprintDir.x===0?(sprintDir.y<0?'up':'down'):sprintDir.y===0?(sprintDir.x<0?'left':'right'):(sprintDir.x<0?'left':'right'));setTimeout(()=>heldDirections.delete(sprintKey),300);const b=$('sprintBtn');if(b){b.disabled=true;b.classList.remove('sprint-ready');b.textContent='💨 衝刺（冷卻）';setTimeout(()=>{if(b){b.disabled=false;b.classList.add('sprint-ready');b.textContent='💨 衝刺'}},5000)}addLog('你向當前方向衝刺：速度提升 4 倍，持續 0.3 秒。');}
+  function sprint(){if(!run||run.done||!$('modal').classList.contains('hidden'))return;const now=performance.now();if(now<(run.sprintReadyAt||0))return;let dir={x:0,y:0};for(const d of heldDirections.values()){dir.x+=dirVectors[d]?.x||0;dir.y+=dirVectors[d]?.y||0}let len=Math.hypot(dir.x,dir.y);if(len<.01){dir=run.playerFacing||{x:1,y:0};len=Math.hypot(dir.x,dir.y)||1}dir={x:dir.x/len,y:dir.y/len};run.playerFacing=dir;run.sprintVector=dir;run.sprintUntil=now+300;run.sprintReadyAt=now+3000;const sprintDir=dir;const sprintKey='sprint:'+now;heldDirections.set(sprintKey,sprintDir.x===0?(sprintDir.y<0?'up':'down'):sprintDir.y===0?(sprintDir.x<0?'left':'right'):(sprintDir.x<0?'left':'right'));setTimeout(()=>heldDirections.delete(sprintKey),300);const b=$('sprintBtn');if(b){b.disabled=true;b.classList.remove('sprint-ready');b.textContent='💨 衝刺（冷卻）';setTimeout(()=>{if(b){b.disabled=false;b.classList.add('sprint-ready');b.textContent='💨 衝刺'}},3000)}addLog('你向當前方向衝刺：速度提升 4 倍，持續 0.3 秒。');}
   // Sprint vector is applied even when the player is not holding a direction during the burst.
   const sprintTicker=setInterval(()=>{if(!run||!run._sprintingNow||!run.sprintVector)return;},100); // state-only; movement is still handled by the main frame loop
   document.addEventListener('keydown',ev=>{if(ev.code==='ShiftLeft'||ev.code==='ShiftRight'){if(!ev.repeat){ev.preventDefault();sprint()}}});
