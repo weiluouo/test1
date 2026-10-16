@@ -6,9 +6,9 @@
     "description": "檔案用途簡述。",
     "chest": "普通寶箱掉落規則。",
     "killDrops": "擊殺時地面掉落規則。",
-    "treasure": "寶藏室三選一與武器研究的預設數值。",
+    "treasure": "寶藏室律質選項的獎勵數值。",
     "sanctuary": "旅人聖所搜索、爆炸與休整規則。",
-    "merchant": "商人報價、出售公式、藥水與精英召喚價格設定。",
+    "merchant": "商人遺物報價、出售公式與藥水價格設定。",
     "treasureChoices": "寶藏室可選項目的 ID、圖示、標籤與說明；行為 ID 必須為 HTML 支援的 weapon/relic/shards。",
     "chest.weaponChance": "寶箱提供未持有武器的機率，0 到 1。",
     "chest.shards.min": "寶箱律質隨機下限。",
@@ -21,8 +21,6 @@
     "killDrops.potionChance": "怪物掉落藥水機率。",
     "killDrops.eliteBonus": "精英額外律質公式。",
     "treasure.shards": "寶藏室律質選項獲得的隨機量。",
-    "treasure.weaponFallbackAttack": "所有武器都解鎖後，武器研究轉化為的攻擊力。",
-    "treasure.weaponFallbackShards": "所有武器都解鎖後額外獲得的律質。",
     "sanctuary.explosionChance": "聖所補給爆炸機率。",
     "sanctuary.explosionDamageMin": "爆炸最少傷害。",
     "sanctuary.explosionDamageMaxHpRatio": "爆炸傷害與最大生命的比例；實際傷害取此值與下限比較。",
@@ -35,7 +33,6 @@
     "merchant.relicCostRandomMax": "遺物基礎價格可增加的隨機量上限（含 0）。",
     "merchant.perFloorCost": "遺物價格每深入一層增加的律質。",
     "merchant.potionCost": "藥水價格。",
-    "merchant.eliteCost": "召喚精英怪價格。",
     "merchant.sellMin": "出售遺物時保證至少獲得的律質。",
     "merchant.sellBase": "出售遺物價格計算的固定部分。",
     "merchant.sellWeightMultiplier": "出售遺物價格的權重乘數。",
@@ -76,9 +73,7 @@
       "min": 14,
       "max": 22,
       "useDifficultyReward": true
-    },
-    "weaponFallbackAttack": 2,
-    "weaponFallbackShards": 10
+    }
   },
   "sanctuary": {
     "explosionChance": 0.12,
@@ -97,7 +92,6 @@
     "relicCostRandomMax": 17,
     "perFloorCost": 2,
     "potionCost": 12,
-    "eliteCost": 8,
     "sellMin": 5,
     "sellBase": 8,
     "sellWeightMultiplier": 3
@@ -107,7 +101,7 @@
       "id": "weapon",
       "label": "武器研究",
       "icon": "⚔",
-      "description": "獲得一件尚未永久解鎖的武器；全部解鎖後改為攻擊力與律質。"
+      "description": "本局獲得一把尚未持有的隨機武器；本局已取得全部武器時，此選項不可選擇。"
     },
     {
       "id": "relic",
