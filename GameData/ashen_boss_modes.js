@@ -73,6 +73,7 @@
   };
   const createBoss = floor => {
     const spec = pickBoss(floor), p = bossLocation();
+    run.endlessBossChoiceShown = false;
     if (spec.id === 'dreamKing') {
       const cfg = BOSS_DATA.dreamKing, hp = Math.round((Number(cfg.baseHp) || 84) * (1 + floor * .035) * (Number(run.diff.hp) || 1));
       const boss = { id: 'dream-king', name: cfg.name || '夢境君王', icon: cfg.icon || '👹', x: p.x, y: p.y, hp, maxHp: hp,
@@ -170,6 +171,15 @@
       if (!run.exitWarningAt || now - run.exitWarningAt > 2500) { addLog('出口仍被敵人封鎖，先擊敗剩餘怪物。'); run.exitWarningAt = now; }
       return;
     }
+    if (run.isEndless && bossFloor(run.floor)) {
+      if (!run.endlessBossChoiceShown) {
+        run.endlessBossChoiceShown = true;
+        showModal(`<div class="eyebrow">ENDLESS FLOOR ${run.floor}</div><h2>首領戰利品已收集</h2><p class="intro">你已走到出口。要繼續深入，還是結束本次遠征？</p><div class="actions"><button class="primary" id="endlessContinue">繼續深入</button><button id="endlessExit">結束遠征</button></div>`);
+        $('endlessContinue').onclick = () => { closeModal(); advanceToNextFloor(); };
+        $('endlessExit').onclick = () => finish(true);
+      }
+      return;
+    }
     run.exitHandled = true;
     if (!run.isEndless && run.floor >= run.maxFloors) { finish(true); return; }
     if (run.floor % 2 === 1) showExpeditionScenario(() => advanceToNextFloor());
@@ -185,10 +195,10 @@
     const horizontal = Math.abs(dx) >= Math.abs(dy);
     const center = horizontal ? run.player.y : run.player.x;
     const lane = $('bossWarningLane');
-    lane.style.display = 'block';
-    if (horizontal) { lane.style.left = '0'; lane.style.top = `${center / WORLD.height * 100}%`; lane.style.width = '100%'; lane.style.height = `${halfWidth * 2 / WORLD.height * 100}%`; lane.style.transform = 'translateY(-50%)'; }
-    else { lane.style.left = `${center / WORLD.width * 100}%`; lane.style.top = '0'; lane.style.width = `${halfWidth * 2 / WORLD.width * 100}%`; lane.style.height = '100%'; lane.style.transform = 'translateX(-50%)'; }
-    run.bossEffects.push({ type: 'line', el: lane, horizontal, center, direction: horizontal ? Math.sign(dx) || 1 : Math.sign(dy) || 1, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
+    const frame = addBossMarker('boss-range-frame', WORLD.width / 2, WORLD.height / 2);
+    if (horizontal) { frame.style.left = '11.111%'; frame.style.top = `${(center - halfWidth) / WORLD.height * 100}%`; frame.style.width = '77.778%'; frame.style.height = `${halfWidth * 2 / WORLD.height * 100}%`; }
+    else { frame.style.left = `${(center - halfWidth) / WORLD.width * 100}%`; frame.style.top = '14.286%'; frame.style.width = `${halfWidth * 2 / WORLD.width * 100}%`; frame.style.height = '71.428%'; }
+    run.bossEffects.push({ type: 'line', el: frame, horizontal, center, direction: horizontal ? Math.sign(dx) || 1 : Math.sign(dy) || 1, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
   };
   const summonMud = (boss, count = 2) => {
     const cfg = MONSTER_CONFIG.summons?.zarianBlackMud || {};
@@ -220,7 +230,7 @@
       }
       return false;
     });
-    if (!(run.bossEffects || []).some(x => x.type === 'line')) $('bossWarningLane').style.display = 'none';
+    if (!(run.bossEffects || []).some(x => x.type === 'line')) { const lane = $('bossWarningLane'); if (lane) lane.style.display = 'none'; }
   };
   const castCustomSkill = (boss, now) => {
     const id = boss.bossId, step = boss.skillStep++;
@@ -267,7 +277,7 @@
         addLog(`「${skillName('prince', 'stackingMight')}」：攻擊加成累積至 ${Math.round((boss.damageMultiplier - 1) * 100)}%，防禦 +${boss.armorStack}。`);
       } else {
         boss.shieldMaxHp = boss.shieldHp = Math.round(boss.maxHp * (Number(skillSpec('prince', 'serpentShield').shieldRatio) || .75)); boss.shieldUntil = now + (Number(skillSpec('prince', 'serpentShield').durationMs) || 5000); boss.bossFrozen = true;
-        addLog(`「${skillName('prince', 'serpentShield')}」：王子靜止並獲得護盾；時間內未打破將直接擊殺玩家！`);
+        addLog(`「${skillName('prince', 'serpentShield')}」：王子靜止並獲得護盾；時間內未打破將使你的生命降至 1 點！`);
       }
     } else if (id === 'trefasha') {
       const second = boss.phase === 2;
@@ -311,7 +321,7 @@
     if (boss.enrageUntil && now >= boss.enrageUntil) { boss.enrageUntil = 0; boss.damageMultiplier = 1; boss.damageTakenMultiplier = 1; }
     if (boss.bossId === 'prince' && boss.bossFrozen && boss.shieldUntil && now >= boss.shieldUntil) {
       boss.bossFrozen = false; boss.shieldUntil = 0;
-      if (boss.shieldHp > 0) { boss.hp = 0; addLog('「那伽那伽密」護盾未能及時打破，玩家被神足王子的力量擊殺！'); finish(false); return; }
+      if (boss.shieldHp > 0) { run.hp = 1; addLog('「那伽那伽密」護盾未能及時打破，玩家生命被削減至 1 點！'); render(); }
       addLog('神足王子的護盾被擊破，禁錮解除！');
     }
     if (boss.shieldHp > 0 && boss.nextHealAt <= now) {
@@ -366,7 +376,7 @@
       clearBossEffects();
       if (run && !run.done) {
         if (!run.isEndless && run.floor >= run.maxFloors) finish(true);
-        else if (run.isEndless) showModal(`<div class="eyebrow">ENDLESS FLOOR ${run.floor}</div><h2>${escapeHtmlText(e.name)}已被擊敗</h2><p class="intro">你已通過第 ${run.floor} 層的無盡首領戰。要繼續深入，還是結束本次遠征？</p><div class="actions"><button class="primary" id="endlessContinue">繼續深入</button><button id="endlessExit">結束遠征</button></div>`), $('endlessContinue').onclick = () => { closeModal(); advanceToNextFloor(); }, $('endlessExit').onclick = () => finish(true);
+        // Endless mode now presents the continue/exit choice only after the player reaches the boss room exit.
       }
       return result;
     }
@@ -454,6 +464,7 @@
   style.textContent = `
     .difficulty{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
     .boss-fire-warning{position:absolute;z-index:9;transform:translate(-50%,-50%);border:2px solid #d33b2e;border-radius:50%;background:#ed503b38;box-shadow:0 0 0 5px #d5423030;pointer-events:none;animation:bossFirePulse .25s infinite alternate}
+    .boss-range-frame{position:absolute;z-index:8;box-sizing:border-box;border:3px solid #ff4d42;background:#f0443833;box-shadow:0 0 0 1px #ffd0ca88,inset 0 0 16px #ff3b2f55;pointer-events:none;animation:bossRangePulse .35s infinite alternate}
     .boss-flame-cone{position:absolute;z-index:9;transform:translate(-50%,-50%);font-size:34px;pointer-events:none;filter:drop-shadow(0 0 9px #e45a25)}
     .boss-charge-bull{font-size:52px!important;width:8%!important;min-width:42px;filter:drop-shadow(0 0 8px #a52b22)!important}
     .boss-red-stage .arena-sprite{filter:sepia(1) saturate(6) hue-rotate(320deg) brightness(.82)!important}
@@ -462,6 +473,7 @@
     .boss-shielded .arena-sprite{filter:drop-shadow(0 0 12px #5d9de8)!important}
     .boss-gold-scene #gameScreen{filter:sepia(.65) saturate(1.45)}
     @keyframes bossFirePulse{from{opacity:.48;transform:translate(-50%,-50%) scale(.88)}to{opacity:1;transform:translate(-50%,-50%) scale(1.06)}}
+    @keyframes bossRangePulse{from{opacity:.58}to{opacity:1}}
   `;
   document.head.appendChild(style);
   renderMeta();
