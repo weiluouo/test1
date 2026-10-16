@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "夢境君王與自訂首領平衡及技能設定。編輯此 JSON 即可調整遊戲實際讀取的首領名稱、圖示、基礎數值及技能參數。",
+  "dreamKing": {
+    "baseHp": 84,
+    "speed": 136,
+    "note": "三階段：生命高於 70% 為近戰、70% 以下為遠程、30% 以下為騎兵；每 3000 毫秒嘗試一次技能。王座只召喚支援類小怪。",
+    "skillIntervalMs": 3000,
+    "phaseThresholds": [
+      0.7,
+      0.3
+    ],
+    "phaseTwoSpeed": 150,
+    "phaseThreeSpeed": 218,
+    "rangedRange": 300,
+    "rangedCooldownMs": 2100,
+    "rangedProjectileSpeed": 128,
+    "rangedKeepDistance": 190,
+    "cavalryRange": 96,
+    "cavalryCooldownMs": 1550,
+    "cavalryWindupMs": 470,
+    "supportMax": 2,
+    "projectileLifetimeMs": 4500
+  },
+  "bosses": [
+    {
+      "id": "zarian",
+      "name": "漆黑的札里安",
+      "icon": "🦖",
+      "baseHp": 60,
+      "baseAtk": 8,
+      "speed": 104,
+      "attackRange": 77,
+      "attackCooldownMs": 1400,
+      "windupMs": 560,
+      "phase1": {
+        "speed": 70,
+        "rangedAttackIntervalMs": 800,
+        "projectileSpeed": 390,
+        "projectileIcon": "◆",
+        "projectileLifetimeMs": 4000
+      },
+      "phase2": {
+        "speed": 205,
+        "attackRange": 82,
+        "attackCooldownMs": 1350,
+        "windupMs": 440,
+        "attackMultiplier": 0.8
+      },
+      "skills": [
+        {
+          "id": "fireRain",
+          "name": "淵火成雨",
+          "phase": 1,
+          "circleCount": 25,
+          "warningMs": 1000,
+          "radius": 34,
+          "damageMultiplier": 1.05
+        },
+        {
+          "id": "dragonMight",
+          "name": "龍威似海",
+          "phase": 1,
+          "durationMs": 2000,
+          "slowMultiplier": 0.25
+        },
+        {
+          "id": "alienCrystal",
+          "name": "異星水晶",
+          "phase": 1,
+          "hpRatio": 0.3,
+          "healPerSecondRatio": 0.006
+        },
+        {
+          "id": "voidMire",
+          "name": "亞空污穢",
+          "phase": 2,
+          "summonCount": 2
+        },
+        {
+          "id": "flameBreath",
+          "name": "淵火灼地",
+          "phase": 2,
+          "damageMultiplier": 0.48,
+          "reach": 110,
+          "radius": 63
+        },
+        {
+          "id": "outerTech",
+          "name": "外域科技",
+          "phase": 2,
+          "shieldRatio": 0.2,
+          "healPerSecondRatio": 0.004
+        }
+      ]
+    },
+    {
+      "id": "prince",
+      "name": "大褐黃神足王子",
+      "icon": "🐉",
+      "baseHp": 120,
+      "baseAtk": 7,
+      "speed": 104,
+      "attackRange": 77,
+      "attackCooldownMs": 1400,
+      "windupMs": 560,
+      "skills": [
+        {
+          "id": "goldenGrace",
+          "name": "南摩三滿多",
+          "durationMs": 2000
+        },
+        {
+          "id": "stackingMight",
+          "name": "毋陀南．婆日拉",
+          "attackMultiplierAdd": 0.1,
+          "armorAdd": 3
+        },
+        {
+          "id": "serpentShield",
+          "name": "那伽那伽密",
+          "shieldRatio": 0.5,
+          "durationMs": 5000
+        }
+      ]
+    },
+    {
+      "id": "trefasha",
+      "name": "末代特雷法沙王",
+      "icon": "🐂",
+      "baseHp": 100,
+      "baseAtk": 8,
+      "speed": 104,
+      "attackRange": 77,
+      "attackCooldownMs": 1400,
+      "windupMs": 560,
+      "phaseThreshold": 0.5,
+      "phase2SpeedMultiplier": 1.5,
+      "skills": [
+        {
+          "id": "axeCleave",
+          "name": "斧劈",
+          "phase": 1,
+          "chargeMs": 2000,
+          "widthCells": 2,
+          "damageMultiplier": 1.55
+        },
+        {
+          "id": "bullCall",
+          "name": "公牛喚來",
+          "phase": 1,
+          "summonCount": 1
+        },
+        {
+          "id": "wrathKing",
+          "name": "暴怒之王",
+          "phase": 1,
+          "attackMultiplier": 1.3,
+          "durationMs": 3000
+        },
+        {
+          "id": "thunderCleave",
+          "name": "雷霆的拉布列斯",
+          "phase": 2,
+          "chargeMs": 1000,
+          "widthCells": 2.5,
+          "damageMultiplier": 2.25
+        },
+        {
+          "id": "heavenBull",
+          "name": "天星的金牛",
+          "phase": 2,
+          "summonCount": 2
+        },
+        {
+          "id": "fallenKingdom",
+          "name": "亡國之恨",
+          "phase": 2,
+          "attackMultiplier": 1.5,
+          "damageTakenMultiplier": 1.2,
+          "durationMs": 3000
+        }
+      ]
+    }
+  ]
+}

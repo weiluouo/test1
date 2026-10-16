@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "怪物基礎數值、行為、狀態效果與生成規則。投射物存活時間可由各怪物 projectileLifetimeMs 調整。",
+  "description": "一般怪物資料；所有首領設定請編輯 GameData/dungeon_boss.json。",
   "monsters": [
     {
       "id": "ash-skeleton",
@@ -254,29 +254,7 @@
       "roleLabel": "支援"
     }
   ],
-  "config": {
-    "boss": {
-      "baseHp": 84,
-      "speed": 136,
-      "note": "三階段：生命高於 70% 為近戰、70% 以下為遠程、30% 以下為騎兵；每 3000 毫秒嘗試一次技能。王座只召喚支援類小怪。",
-      "skillIntervalMs": 3000,
-      "phaseThresholds": [
-        0.7,
-        0.3
-      ],
-      "phaseTwoSpeed": 150,
-      "phaseThreeSpeed": 218,
-      "rangedRange": 300,
-      "rangedCooldownMs": 2100,
-      "rangedProjectileSpeed": 128,
-      "rangedKeepDistance": 190,
-      "cavalryRange": 96,
-      "cavalryCooldownMs": 1550,
-      "cavalryWindupMs": 470,
-      "supportMax": 2,
-      "projectileLifetimeMs": 4500
-    }
-  },
+  "config": {},
   "fieldGuide": {
     "schemaVersion": "資料格式版本，現行為 1.0.0。",
     "description": "此檔用途簡述。",
@@ -321,24 +299,34 @@
       "chargeDistance": "衝鋒類怪物發動衝鋒時的距離，世界單位。",
       "debuffStats": "召喚支援怪可能削弱的玩家數值 ID 陣列，例如 attack、crit、speed、potion、guard。"
     },
-    "configFields": {
-      "boss": "魔王共用參數物件。",
-      "boss.baseHp": "魔王基礎生命。",
-      "boss.speed": "魔王初始速度。",
-      "boss.skillIntervalMs": "魔王技能嘗試間隔毫秒。",
-      "boss.phaseThresholds": "魔王階段切換生命比例門檻。",
-      "boss.phaseTwoSpeed": "第二階段速度。",
-      "boss.phaseThreeSpeed": "第三階段速度。",
-      "boss.rangedRange": "遠程階段射程。",
-      "boss.rangedCooldownMs": "遠程階段攻擊間隔毫秒。",
-      "boss.rangedProjectileSpeed": "遠程階段投射物速度。",
-      "boss.rangedKeepDistance": "遠程階段偏好距離。",
-      "boss.cavalryRange": "騎兵階段攻擊距離。",
-      "boss.cavalryCooldownMs": "騎兵階段攻擊間隔。",
-      "boss.cavalryWindupMs": "騎兵階段攻擊前搖。",
-      "boss.supportMax": "王座召喚支援怪數量上限。",
-      "boss.projectileLifetimeMs": "魔王遠程階段投射物最長存在時間，毫秒；大於 0 時到期消失，0 或 null 代表不受時間限制（仍會在命中玩家、撞牆或離開地圖時消失）。",
-      "boss.note": "魔王階段與技能的文字備註，不直接改變數值。"
+    "summons": "首領召喚物設定；bossSummonPool 使用 monsters 中 supportOnly=true 的怪物。"
+  },
+  "summons": {
+    "zarianBlackMud": {
+      "id": "zarian-black-mud",
+      "name": "亞空黑泥",
+      "icon": "🖤",
+      "hpRatio": 0.12,
+      "attackRatio": 0.38,
+      "classType": "ranged",
+      "speed": 0,
+      "attackRange": 620,
+      "keepDistance": 220,
+      "attackCooldownMs": 1800,
+      "projectileSpeed": 225,
+      "projectileIcon": "●",
+      "projectileLifetimeMs": 5000,
+      "radius": 20
+    },
+    "zarianCrystal": {
+      "id": "zarian-crystal",
+      "name": "異星水晶",
+      "icon": "💎",
+      "hpRatio": 0.12,
+      "healPerSecondRatio": 0.006,
+      "radius": 21,
+      "classType": "support",
+      "speed": 0
     }
   }
 }

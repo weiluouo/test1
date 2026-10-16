@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "遺物資料。effects/effect 中可定義多種能力；weaponIds 可將加成限定給指定武器。",
+  "description": "遺物資料。effects/effect 中可定義多種能力；weaponIds 可將加成限定給指定武器。 bossRelicFor 為首領專屬一次性掉落，不會出現在一般寶箱、隨機遺物或商人商品。",
   "relics": [
     {
       "id": "wolf-fang-pendant",
@@ -403,6 +403,106 @@
           "staff"
         ]
       }
+    },
+    {
+      "id": "zarian-void-ward",
+      "name": "亞空護盾",
+      "desc": "常駐減傷 +2；受攻擊時，攻擊者速度減半，持續 3 秒。",
+      "icon": "🛡️",
+      "fallbackIcon": "🛡️",
+      "weight": 0,
+      "bossRelicFor": "zarian",
+      "uniqueBossRelic": true,
+      "tags": [
+        "boss",
+        "defense"
+      ],
+      "effects": [
+        {
+          "type": "fixed_guard_add",
+          "value": 2
+        },
+        {
+          "type": "boss_attacker_slow",
+          "multiplier": 0.5,
+          "durationMs": 3000
+        }
+      ]
+    },
+    {
+      "id": "prince-naga-mantra",
+      "name": "娜迦真言",
+      "desc": "攻擊 +2；造成傷害時汲取 10% 傷害恢復生命。",
+      "icon": "🐉",
+      "fallbackIcon": "🐉",
+      "weight": 0,
+      "bossRelicFor": "prince",
+      "uniqueBossRelic": true,
+      "tags": [
+        "boss",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "attack_add",
+          "value": 2
+        },
+        {
+          "type": "boss_lifesteal_percent_add",
+          "value": 0.1
+        }
+      ]
+    },
+    {
+      "id": "trefasha-labrys-shard",
+      "name": "拉布列斯殘片",
+      "desc": "常駐減傷 -4；攻擊時對目標周圍敵人造成自身攻擊力 50% 傷害。",
+      "icon": "🪓",
+      "fallbackIcon": "🪓",
+      "weight": 0,
+      "bossRelicFor": "trefasha",
+      "uniqueBossRelic": true,
+      "tags": [
+        "boss",
+        "offense"
+      ],
+      "effects": [
+        {
+          "type": "fixed_guard_add",
+          "value": -4
+        },
+        {
+          "type": "boss_cleave_percent_add",
+          "value": 0.5,
+          "radiusCells": 1.5
+        }
+      ]
+    },
+    {
+      "id": "dream-bubble-phantom",
+      "name": "泡沫幻影",
+      "desc": "移動速度 +30%；生命降至 50% 以下並受到攻擊時，額外移動速度 +100%，持續 2 秒。",
+      "icon": "🫧",
+      "fallbackIcon": "🫧",
+      "weight": 0,
+      "bossRelicFor": "dreamKing",
+      "uniqueBossRelic": true,
+      "tags": [
+        "boss",
+        "speed"
+      ],
+      "effects": [
+        {
+          "type": "speed_percent_add",
+          "value": 30
+        },
+        {
+          "type": "dream_bubble_speed_multiplier",
+          "value": 2,
+          "threshold": 0.5,
+          "durationMs": 2000
+        }
+      ]
     }
   ],
   "fieldGuide": {

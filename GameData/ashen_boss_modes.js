@@ -2,18 +2,23 @@
 (() => {
   const modes = [
     { name: '旅人', desc: '標準敵人強度 ×1.0 · 10 層', hp: 1, atk: 1, reward: 1, floors: 10 },
-    { name: '冒險者', desc: '敵人生命與攻擊 ×1.5 · 20 層', hp: 1.5, atk: 1.5, reward: 1.7, floors: 20 },
-    { name: '苦行者', desc: '敵人生命與攻擊 ×2.0 · 30 層', hp: 2, atk: 2, reward: 2.2, floors: 30 },
-    { name: '夢魘', desc: '敵人生命與攻擊 ×4.0 · 40 層', hp: 4, atk: 4, reward: 3, floors: 40 },
+    { name: '冒險者', desc: '敵人生命與攻擊 ×1.5 · 15 層', hp: 1.5, atk: 1.5, reward: 1.7, floors: 15 },
+    { name: '苦行者', desc: '敵人生命與攻擊 ×2.0 · 20 層', hp: 2, atk: 2, reward: 2.2, floors: 20 },
+    { name: '夢魘', desc: '敵人生命與攻擊 ×4.0 · 30 層', hp: 4, atk: 4, reward: 3, floors: 30 },
     { name: '無盡', desc: '敵人隨樓層持續變強 · 每 10 層迎戰隨機 BOSS', hp: 2.2, atk: 1.7, reward: 1.8, floors: Infinity, endless: true }
   ];
   DIFFS.splice(0, DIFFS.length, ...modes);
   const roman = ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ'];
-  const roster = [
-    { id: 'zarian', name: '漆黑的札里安', icon: '🦖' },
-    { id: 'prince', name: '大褐黃神足王子', icon: '🐉' },
-    { id: 'trefasha', name: '末代特雷法沙王', icon: '🐂' }
-  ];
+  const roster = () => [...BOSS_DATA.bosses, { id: 'dreamKing', ...BOSS_DATA.dreamKing }];
+  const bossSpec = id => roster().find(spec => spec.id === id);
+  const skillSpec = (id, skillId) => bossSpec(id)?.skills?.find(skill => skill.id === skillId) || {};
+  const skillName = (id, skillId) => bossSpec(id)?.skills?.find(skill => skill.id === skillId)?.name || skillId;
+  const roomCatalog = {
+    combat: { name: '交鋒之室', desc: '道路被夢境魔物封鎖。清除敵人後可繼續前進。' },
+    treasure: { name: '遺寶之室', desc: '古代行旅者留下了補給與寶藏。' },
+    rest: { name: '旅人聖所', desc: '調查星芒火盆可恢復狀態。' },
+    elite: { name: '精英守衛室', desc: '精英守衛更強，但會提供額外律質。' }
+  };
   const oldRenderMeta = renderMeta;
   renderMeta = function () {
     oldRenderMeta();
@@ -24,9 +29,7 @@
 
   const bossFloor = floor => floor > 0 && floor % 10 === 0;
   const modeFloorCount = () => DIFFS[difficulty]?.floors || 10;
-  const pickBoss = floor => DIFFS[difficulty]?.endless
-    ? roster[Math.floor(Math.random() * roster.length)]
-    : roster[(Math.floor(floor / 10) - 1) % roster.length];
+  const pickBoss = floor => roster()[Math.floor(Math.random() * roster().length)];
   const worldPoint = (x, y) => ({ x: x * WORLD.cell + WORLD.cell / 2, y: y * WORLD.cell + WORLD.cell / 2 });
   const isCustomBoss = e => !!e?.customBoss;
   const addBossMarker = (cls, x, y, radius, text = '') => {
@@ -70,17 +73,30 @@
   };
   const createBoss = floor => {
     const spec = pickBoss(floor), p = bossLocation();
+    if (spec.id === 'dreamKing') {
+      const cfg = BOSS_DATA.dreamKing, hp = Math.round((Number(cfg.baseHp) || 84) * (1 + floor * .035) * (Number(run.diff.hp) || 1));
+      const boss = { id: 'dream-king', name: cfg.name || '夢境君王', icon: cfg.icon || '👹', x: p.x, y: p.y, hp, maxHp: hp,
+        atk: Math.round((Number(cfg.baseAtk) || 7) * (Number(run.diff.atk) || 1) * (1 + floor * .025)), boss: true, dead: false,
+        phase: 0, radius: 31, classType: 'boss', mode: 'melee', speed: Number(cfg.speed) || 136, damageMultiplier: 1,
+        attackRange: 82, attackCooldown: 1250, windupMs: 620, aggro: true, aggroRange: 9999,
+        nextAttackAt: Date.now() + 1300, nextSkillAt: Date.now() + (Number(cfg.skillIntervalMs) || 3000), shieldHp: 0,
+        uid: `f${floor}-boss-dreamKing-${++uidSequence}` };
+      run.enemies = [boss]; run.chests = []; run.searchPoint = null; run.roomSearched = true; run.roomType = 'boss';
+      run.bossEffects = []; run.activeBossSpec = spec; run.bossStatus = `${boss.name}現身。`;
+      $('roomTitle').textContent = `第 ${floor} 層：${boss.name}`; $('roomDesc').textContent = '擊敗首領後，出口才會開啟。留意技能警示並把握迴避時機。'; $('roomBadge').textContent = '首領戰';
+      addLog(`第 ${floor} 層首領戰：「${boss.name}」！`); return;
+    }
     const scale = Number(run.diff.hp) || 1;
-    const hp = Math.round((spec.id === 'zarian' ? 220 : spec.id === 'prince' ? 300 : 260) * (1 + floor * .035) * scale);
+    const hp = Math.round(Number(spec.baseHp || 220) * (1 + floor * .035) * scale);
     const boss = { customBoss: true, bossId: spec.id, name: spec.name, icon: spec.icon, x: p.x, y: p.y,
-      hp, maxHp: hp, atk: Math.round((spec.id === 'prince' ? 7 : 8) * (Number(run.diff.atk) || 1) * (1 + floor * .025)),
-      boss: true, dead: false, phase: 1, radius: 31, classType: 'boss', mode: 'melee', speed: 104,
-      damageMultiplier: 1, attackRange: 77, attackCooldown: 1400, windupMs: 560,
+      hp, maxHp: hp, atk: Math.round(Number(spec.baseAtk || 8) * (Number(run.diff.atk) || 1) * (1 + floor * .025)),
+      boss: true, dead: false, phase: 1, radius: 31, classType: 'boss', mode: 'melee', speed: Number(spec.speed) || 104,
+      damageMultiplier: 1, attackRange: Number(spec.attackRange) || 77, attackCooldown: Number(spec.attackCooldownMs) || 1400, windupMs: Number(spec.windupMs) || 560,
       aggro: true, aggroRange: 9999, keepDistance: 190, nextAttackAt: Date.now() + 1300,
       nextSkillAt: Date.now() + 3500, nextScaleAt: Date.now() + 800,
       nextHealAt: Date.now() + 1000, skillStep: 0, shieldHp: 0, goldUntil: 0,
       uid: `f${floor}-boss-${spec.id}-${++uidSequence}` };
-    if (spec.id === 'zarian') { boss.mode = 'ranged'; boss.classType = 'ranged'; boss.speed = 70; boss.attackRange = 0; boss.nextAttackAt = Infinity; }
+    if (spec.id === 'zarian') { boss.mode = 'ranged'; boss.classType = 'ranged'; boss.speed = Number(spec.phase1.speed) || 70; boss.attackRange = 0; boss.nextAttackAt = Infinity; }
     run.enemies = [boss];
     run.chests = [];
     run.searchPoint = null;
@@ -114,7 +130,7 @@
     if (run.floor > 10 && run.roomType === 'boss') {
       const roomRoll = Math.random();
       run.roomType = roomRoll < .48 ? 'combat' : roomRoll < .72 ? 'treasure' : roomRoll < .86 ? 'rest' : 'elite';
-      const info = roomInfo[run.roomType] || roomInfo.combat;
+      const info = roomCatalog[run.roomType] || roomCatalog.combat;
       $('roomTitle').textContent = `第 ${run.floor} 層：${names[run.floor - 1] || '夢境深處'}`;
       $('roomDesc').textContent = info.desc;
       $('roomBadge').textContent = info.name;
@@ -144,6 +160,9 @@
   const oldInteractions = processRunInteractions;
   processRunInteractions = function (now) {
     if (!run || run.done) return;
+    pickupGroundLoot(now);
+    if (run.loot?.length && dist(run.player, run.exit) < 39 && aliveEnemies().length === 0 && !run.lootExitWarned) { addLog('道路已經開啟；請先走近並拾取地上的所有戰利品。'); run.lootExitWarned = true; }
+    if (dist(run.player, run.exit) < 39 && aliveEnemies().length === 0 && (run.loot || []).length) return;
     for (const c of run.chests || []) if (!c.open && dist(c, run.player) < 39) openChest(c);
     if (run.searchPoint && !run.roomSearched && dist(run.searchPoint, run.player) < 39) explore();
     if (dist(run.player, run.exit) >= 39 || run.exitHandled) return;
@@ -157,11 +176,6 @@
     else advanceToNextFloor();
   };
 
-  const bossNames = {
-    zarian: ['淵火成雨', '龍威似海', '異星水晶', '亞空污穢', '淵火灼地', '外域科技'],
-    prince: ['南摩三滿多', '毋陀南．婆日拉', '那伽那伽密'],
-    trefasha: ['斧劈', '公牛喚來', '暴怒之王', '雷霆的拉布列斯', '天星的金牛', '亡國之恨']
-  };
   const createFireCircle = (boss, x, y, radius, label, landsAt, multiplier) => {
     const el = addBossMarker('boss-fire-warning', x, y, radius, '');
     run.bossEffects.push({ type: 'fire', el, x, y, radius, landsAt, multiplier, label, boss });
@@ -176,16 +190,17 @@
     else { lane.style.left = `${center / WORLD.width * 100}%`; lane.style.top = '0'; lane.style.width = `${halfWidth * 2 / WORLD.width * 100}%`; lane.style.height = '100%'; lane.style.transform = 'translateX(-50%)'; }
     run.bossEffects.push({ type: 'line', el: lane, horizontal, center, direction: horizontal ? Math.sign(dx) || 1 : Math.sign(dy) || 1, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
   };
-  const summonMud = boss => {
-    for (let i = 0; i < 2; i++) {
-      const p = worldPoint(i ? 6 : 2, i ? 2 : 4), hp = Math.max(1, Math.round(boss.maxHp * .12));
-      run.enemies.push({ id: 'boss-mud', name: '亞空黑泥', icon: '🖤', x: p.x, y: p.y, hp, maxHp: hp,
-        atk: Math.max(1, Math.round(boss.atk * .38)), boss: false, dead: false, summoned: true, aggro: true,
-        classType: 'ranged', speed: 0, attackRange: 620, keepDistance: 220, attackCooldown: 1800,
-        projectileSpeed: 225, projectileIcon: '●', projectileLifetimeMs: 5000, radius: 20,
+  const summonMud = (boss, count = 2) => {
+    const cfg = MONSTER_CONFIG.summons?.zarianBlackMud || {};
+    for (let i = 0; i < count; i++) {
+      const p = worldPoint(i ? 6 : 2, i ? 2 : 4), hp = Math.max(1, Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12)));
+      run.enemies.push({ ...cfg, id: cfg.id || 'zarian-black-mud', name: cfg.name || '亞空黑泥', icon: cfg.icon || '🖤', x: p.x, y: p.y, hp, maxHp: hp,
+        atk: Math.max(1, Math.round(boss.atk * (Number(cfg.attackRatio) || .38))), boss: false, dead: false, summoned: true, aggro: true,
+        classType: cfg.classType || 'ranged', speed: Number(cfg.speed) || 0, attackRange: Number(cfg.attackRange) || 620, keepDistance: Number(cfg.keepDistance) || 220, attackCooldown: Number(cfg.attackCooldownMs) || 1800,
+        projectileSpeed: Number(cfg.projectileSpeed) || 225, projectileIcon: cfg.projectileIcon || '●', projectileLifetimeMs: Number(cfg.projectileLifetimeMs) || 5000, radius: Number(cfg.radius) || 20,
         homeX: p.x, homeY: p.y, leashRange: 9999, uid: `mud-${++uidSequence}`, nextAttackAt: Date.now() + 900 });
     }
-    addLog('「亞空污穢」：兩隻黑泥現身，正向你射出黑色液滴。');
+    addLog(`「${skillName('zarian', 'voidMire')}」：兩隻黑泥現身，正向你射出黑色液滴。`);
   };
   const summonBull = (boss, angle) => newProjectile(boss, angle, 320, '🐂', { radius: 30, lifetimeMs: 5000, bullCharge: true });
   const updateBossEffectTimers = now => {
@@ -211,62 +226,68 @@
     const id = boss.bossId, step = boss.skillStep++;
     if (id === 'zarian' && boss.phase === 1) {
       if (step % 3 === 0) {
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < (Number(skillSpec('zarian', 'fireRain').circleCount) || 25); i++) {
           const x = WORLD.cell + Math.random() * (WORLD.width - 2 * WORLD.cell), y = WORLD.cell + Math.random() * (WORLD.height - 2 * WORLD.cell);
-          if (run.map[Math.floor(y / WORLD.cell)]?.[Math.floor(x / WORLD.cell)] !== 'wall') createFireCircle(boss, x, y, 34, bossNames.zarian[0], now + 1000, 1.05);
+          const cfg = skillSpec('zarian', 'fireRain');
+          if (run.map[Math.floor(y / WORLD.cell)]?.[Math.floor(x / WORLD.cell)] !== 'wall') createFireCircle(boss, x, y, Number(cfg.radius) || 34, skillName('zarian', 'fireRain'), now + (Number(cfg.warningMs) || 1000), Number(cfg.damageMultiplier) || 1.05);
         }
-        addLog('「淵火成雨」：地面出現火圈，1 秒後火球落下！');
+        addLog(`「${skillName('zarian', 'fireRain')}」：地面出現火圈，1 秒後火球落下！`);
       } else if (step % 3 === 1) {
-        run.playerSnaredUntil = now + 2000; run.bossStatus = '龍威禁錮：移動速度降低 75%，持續 2 秒。';
-        addLog('「龍威似海」：沉重龍威禁錮你的步伐，持續 2 秒。');
+        const cfg = skillSpec('zarian', 'dragonMight');
+        run.playerSnaredUntil = now + (Number(cfg.durationMs) || 2000); run.playerSnaredMultiplier = Number(cfg.slowMultiplier) || .25; run.bossStatus = '龍威禁錮：移動速度降低 75%，持續 2 秒。';
+        addLog(`「${skillName('zarian', 'dragonMight')}」：沉重龍威禁錮你的步伐。`);
       } else {
-        const p = worldPoint(2 + Math.floor(Math.random() * 5), 1 + Math.floor(Math.random() * 5)), hp = Math.round(boss.maxHp * .12);
-        const crystal = { name: '異星水晶', icon: '💎', x: p.x, y: p.y, hp, maxHp: hp, atk: 0, boss: false,
-          bossCrystal: true, dead: false, radius: 21, classType: 'support', speed: 0, uid: `crystal-${++uidSequence}` };
-        run.enemies.push(crystal); addLog('「異星水晶」：水晶開始為札里安緩慢治療；摧毀水晶可阻止回血。');
+        const cfg = MONSTER_CONFIG.summons?.zarianCrystal || skillSpec('zarian', 'alienCrystal');
+        const p = worldPoint(2 + Math.floor(Math.random() * 5), 1 + Math.floor(Math.random() * 5)), hp = Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12));
+        const crystal = { ...cfg, name: cfg.name || '異星水晶', icon: cfg.icon || '💎', x: p.x, y: p.y, hp, maxHp: hp, atk: 0, boss: false, summoned: true,
+          bossCrystal: true, dead: false, radius: Number(cfg.radius) || 21, classType: cfg.classType || 'support', speed: Number(cfg.speed) || 0, uid: `crystal-${++uidSequence}` };
+        run.enemies.push(crystal); addLog(`「${skillName('zarian', 'alienCrystal')}」：水晶開始為札里安緩慢治療；摧毀水晶可阻止回血。`);
       }
     } else if (id === 'zarian') {
-      if (step % 3 === 0) summonMud(boss);
+      if (step % 3 === 0) summonMud(boss, Number(skillSpec('zarian', 'voidMire').summonCount) || 2);
       else if (step % 3 === 1) {
         const angle = Math.atan2(run.player.y - boss.y, run.player.x - boss.x), spread = Math.PI / 3;
         for (let i = -2; i <= 2; i++) {
           const a = angle + spread * i / 4;
-          const p = addBossMarker('boss-flame-cone', boss.x + Math.cos(a) * 110, boss.y + Math.sin(a) * 110, 40, '🔥');
-          run.bossEffects.push({ type: 'fire', el: p, x: boss.x + Math.cos(a) * 110, y: boss.y + Math.sin(a) * 110, radius: 63, landsAt: now + 350, multiplier: .48, label: bossNames.zarian[4], boss });
+          const cfg = skillSpec('zarian', 'flameBreath'), reach = Number(cfg.reach) || 110, radius = Number(cfg.radius) || 63;
+          const p = addBossMarker('boss-flame-cone', boss.x + Math.cos(a) * reach, boss.y + Math.sin(a) * reach, 40, '🔥');
+          run.bossEffects.push({ type: 'fire', el: p, x: boss.x + Math.cos(a) * reach, y: boss.y + Math.sin(a) * reach, radius, landsAt: now + 350, multiplier: Number(cfg.damageMultiplier) || .48, label: skillName('zarian', 'flameBreath'), boss });
         }
-        addLog('「淵火灼地」：札里安朝前方扇形吐火！');
+        addLog(`「${skillName('zarian', 'flameBreath')}」：札里安朝前方扇形吐火！`);
       } else {
-        boss.shieldHp = Math.round(boss.maxHp * .2); boss.nextHealAt = now + 1000;
-        addLog('「外域科技」：札里安啟動護盾；護盾未被擊破時會持續恢復生命。');
+        boss.shieldMaxHp = boss.shieldHp = Math.round(boss.maxHp * (Number(skillSpec('zarian', 'outerTech').shieldRatio) || .2)); boss.nextHealAt = now + 1000;
+        addLog(`「${skillName('zarian', 'outerTech')}」：札里安啟動護盾；護盾未被擊破時會持續恢復生命。`);
       }
     } else if (id === 'prince') {
       if (step % 3 === 0) {
-        boss.goldUntil = now + 2000; document.body.classList.add('boss-gold-scene');
-        addLog('「南摩三滿多」：黃金神光降臨 2 秒；王子造成的傷害會等量轉為生命。');
+        boss.goldUntil = now + (Number(skillSpec('prince', 'goldenGrace').durationMs) || 2000); document.body.classList.add('boss-gold-scene');
+        addLog(`「${skillName('prince', 'goldenGrace')}」：黃金神光降臨；王子造成的傷害會等量轉為生命。`);
       } else if (step % 3 === 1) {
-        boss.damageMultiplier += .1; boss.armorStack = (boss.armorStack || 0) + 3;
-        addLog(`「毋陀南．婆日拉」：攻擊加成累積至 ${Math.round((boss.damageMultiplier - 1) * 100)}%，防禦 +${boss.armorStack}。`);
+        boss.damageMultiplier += Number(skillSpec('prince', 'stackingMight').attackMultiplierAdd) || .1; boss.armorStack = (boss.armorStack || 0) + (Number(skillSpec('prince', 'stackingMight').armorAdd) || 3);
+        addLog(`「${skillName('prince', 'stackingMight')}」：攻擊加成累積至 ${Math.round((boss.damageMultiplier - 1) * 100)}%，防禦 +${boss.armorStack}。`);
       } else {
-        boss.shieldHp = Math.round(boss.maxHp * .75); boss.shieldUntil = now + 5000; boss.bossFrozen = true;
-        addLog('「那伽那伽密」：王子靜止並獲得 75% 最大生命值護盾；5 秒內未打破將直接擊殺玩家！');
+        boss.shieldMaxHp = boss.shieldHp = Math.round(boss.maxHp * (Number(skillSpec('prince', 'serpentShield').shieldRatio) || .75)); boss.shieldUntil = now + (Number(skillSpec('prince', 'serpentShield').durationMs) || 5000); boss.bossFrozen = true;
+        addLog(`「${skillName('prince', 'serpentShield')}」：王子靜止並獲得護盾；時間內未打破將直接擊殺玩家！`);
       }
     } else if (id === 'trefasha') {
       const second = boss.phase === 2;
       if ((!second && step % 3 === 0) || (second && step % 3 === 0)) {
-        castLineTelegraph(boss, second ? 1000 : 2000, WORLD.cell * (second ? 2.5 : 2), second ? 2.25 : 1.55, second ? bossNames.trefasha[3] : bossNames.trefasha[0]);
-        addLog(second ? '「雷霆的拉布列斯」：雷霆重擊蓄力 1 秒，立即離開寬闊紅線！' : '「斧劈」：斧刃蓄力 2 秒；紅線範圍內威力會隨距離衰減。');
+        const cfg = skillSpec('trefasha', second ? 'thunderCleave' : 'axeCleave');
+        castLineTelegraph(boss, Number(cfg.chargeMs) || (second ? 1000 : 2000), WORLD.cell * (Number(cfg.widthCells) || (second ? 2.5 : 2)), Number(cfg.damageMultiplier) || (second ? 2.25 : 1.55), skillName('trefasha', second ? 'thunderCleave' : 'axeCleave'));
+        addLog(`「${skillName('trefasha', second ? 'thunderCleave' : 'axeCleave')}」：首領開始蓄力，紅線範圍內威力會隨距離衰減。`);
       } else if (step % 3 === 1) {
         const a = Math.atan2(run.player.y - boss.y, run.player.x - boss.x);
-        summonBull(boss, a);
-        if (second) summonBull(boss, a + (Math.random() < .5 ? -.13 : .13));
-        addLog(second ? '「天星的金牛」：兩頭巨牛接連衝向你！撞上牆壁後會消失。' : '「公牛喚來」：巨牛沿直線衝鋒，撞上牆壁後消失。');
+        const count = Number(skillSpec('trefasha', second ? 'heavenBull' : 'bullCall').summonCount) || (second ? 2 : 1);
+        for (let i = 0; i < count; i++) summonBull(boss, a + (i ? (Math.random() < .5 ? -.13 : .13) : 0));
+        addLog(`「${skillName('trefasha', second ? 'heavenBull' : 'bullCall')}」：巨牛沿直線衝鋒，撞上牆壁後消失。`);
       } else {
-        boss.damageMultiplier = second ? 1.5 : 1.3; boss.enrageUntil = now + 3000;
-        if (second) boss.damageTakenMultiplier = 1.2;
-        addLog(second ? '「亡國之恨」：攻擊 +50%、受傷 +20%，持續 3 秒。' : '「暴怒之王」：攻擊提升 30%，持續 3 秒。');
+        const cfg = skillSpec('trefasha', second ? 'fallenKingdom' : 'wrathKing');
+        boss.damageMultiplier = Number(cfg.attackMultiplier) || (second ? 1.5 : 1.3); boss.enrageUntil = now + (Number(cfg.durationMs) || 3000);
+        if (second) boss.damageTakenMultiplier = Number(cfg.damageTakenMultiplier) || 1.2;
+        addLog(`「${skillName('trefasha', second ? 'fallenKingdom' : 'wrathKing')}」：首領進入短暫狂暴狀態。`);
       }
     }
-    boss.nextSkillAt = now + 5500;
+    boss.nextSkillAt = now + (Number(bossSpec(id)?.skillIntervalMs) || 5500);
   };
 
   const oldUpdateBoss = updateBoss;
@@ -276,13 +297,14 @@
     updateBossEffectTimers(now);
     if (boss.phaseTransitionAt) {
       if (now < boss.phaseTransitionAt) { boss.frameGrey = true; run.bossStatus = '札里安第一階段已擊敗；第二階段將在 3 秒後復甦。'; return; }
+      const second = bossSpec('zarian').phase2;
       boss.phaseTransitionAt = 0; boss.frameGrey = false; boss.phase = 2; boss.hp = boss.maxHp;
-      boss.icon = '🦖'; boss.mode = 'melee'; boss.classType = 'boss'; boss.speed = 205; boss.attackRange = 82; boss.attackCooldown = 1350; boss.windupMs = 440; boss.keepDistance = 0;
-      boss.atk = Math.max(1, Math.round(boss.atk * .8)); boss.nextSkillAt = now + 3000; boss.skillStep = 0;
+      boss.icon = bossSpec('zarian').icon; boss.mode = 'melee'; boss.classType = 'boss'; boss.speed = Number(second.speed) || 205; boss.attackRange = Number(second.attackRange) || 82; boss.attackCooldown = Number(second.attackCooldownMs) || 1350; boss.windupMs = Number(second.windupMs) || 440; boss.keepDistance = 0;
+      boss.atk = Math.max(1, Math.round(boss.atk * (Number(second.attackMultiplier) || .8))); boss.nextSkillAt = now + (Number(bossSpec('zarian').skillIntervalMs) || 3000); boss.skillStep = 0;
       addLog('漆黑的札里安復甦並轉為赤紅！第二階段：高速近戰。');
     }
-    if (boss.bossId === 'trefasha' && boss.phase === 1 && boss.hp <= boss.maxHp * .5) {
-      boss.phase = 2; boss.speed *= 1.5; boss.skillStep = 0; boss.nextSkillAt = now + 1800;
+    if (boss.bossId === 'trefasha' && boss.phase === 1 && boss.hp <= boss.maxHp * (Number(bossSpec('trefasha').phaseThreshold) || .5)) {
+      boss.phase = 2; boss.speed *= Number(bossSpec('trefasha').phase2SpeedMultiplier) || 1.5; boss.skillStep = 0; boss.nextSkillAt = now + 1800;
       addLog('末代特雷法沙王跨越半數生命：第二階段速度提升 50%，攻勢更猛烈！');
     }
     if (boss.goldUntil && now >= boss.goldUntil) { boss.goldUntil = 0; document.body.classList.remove('boss-gold-scene'); }
@@ -295,19 +317,22 @@
     if (boss.shieldHp > 0 && boss.nextHealAt <= now) {
       boss.nextHealAt = now + 1000;
       const crystals = aliveEnemies().filter(e => e.bossCrystal);
-      const heal = boss.bossId === 'zarian' && boss.phase === 1 ? crystals.length * Math.max(1, Math.round(boss.maxHp * .006)) : boss.bossId === 'zarian' ? Math.max(1, Math.round(boss.maxHp * .004)) : 0;
+      const healRatio = boss.bossId === 'zarian' && boss.phase === 1 ? Number(skillSpec('zarian', 'alienCrystal').healPerSecondRatio) || .006 : Number(skillSpec('zarian', 'outerTech').healPerSecondRatio) || .004;
+      const heal = boss.bossId === 'zarian' && boss.phase === 1 ? crystals.length * Math.max(1, Math.round(boss.maxHp * healRatio)) : boss.bossId === 'zarian' ? Math.max(1, Math.round(boss.maxHp * healRatio)) : 0;
       if (heal > 0) { boss.hp = Math.min(boss.maxHp, boss.hp + heal); floatDamage(boss, heal, true); }
     } else if (boss.bossId === 'zarian' && boss.phase === 1 && boss.nextHealAt <= now) {
       const n = aliveEnemies().filter(e => e.bossCrystal).length;
-      if (n) boss.hp = Math.min(boss.maxHp, boss.hp + n * Math.max(1, Math.round(boss.maxHp * .006)));
+      if (n) boss.hp = Math.min(boss.maxHp, boss.hp + n * Math.max(1, Math.round(boss.maxHp * (Number(skillSpec('zarian', 'alienCrystal').healPerSecondRatio) || .006))));
       boss.nextHealAt = now + 1000;
     }
     if (boss.bossId === 'zarian' && boss.phase === 1 && now >= boss.nextScaleAt) {
-      boss.nextScaleAt = now + 800;
-      newProjectile(boss, Math.atan2(run.player.y - boss.y, run.player.x - boss.x), 390, '◆', { radius: 8, lifetimeMs: 4000 });
+      const ranged = bossSpec('zarian').phase1;
+      boss.nextScaleAt = now + (Number(ranged.rangedAttackIntervalMs) || 800);
+      newProjectile(boss, Math.atan2(run.player.y - boss.y, run.player.x - boss.x), Number(ranged.projectileSpeed) || 390, ranged.projectileIcon || '◆', { radius: 8, lifetimeMs: Number(ranged.projectileLifetimeMs) || 4000 });
     }
     if (now >= boss.nextSkillAt && !boss.phaseTransitionAt) castCustomSkill(boss, now);
-    run.bossStatus = boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${bossNames[boss.bossId]?.[Math.max(0, (boss.skillStep - 1) % bossNames[boss.bossId].length)] || '蓄勢'}」準備中。`;
+    const activeSkills = bossSpec(boss.bossId)?.skills || [];
+    run.bossStatus = boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${activeSkills[Math.max(0, (boss.skillStep - 1) % activeSkills.length)]?.name || '蓄勢'}」準備中。`;
   };
 
   const oldApplyWeaponHit = applyWeaponHit;
@@ -325,12 +350,16 @@
   };
   const oldHandleDefeat = handleEnemyDefeat;
   handleEnemyDefeat = function (e) {
+    if (e?.summoned) { e.hp = 0; e.dead = true; if (e.supporter) restoreSupportDebuff(e); render(); return true; }
     if (isCustomBoss(e) && e.bossId === 'zarian' && e.phase === 1 && !e.phaseTransitionAt) {
       e.hp = 1; e.frameGrey = true; e.phaseTransitionAt = Date.now() + 3000; e.shieldHp = 0;
       e.attackWindupUntil = 0; e.warningEl?.remove(); clearBossEffects();
       addLog('漆黑的札里安第一階段倒下，圖框灰化；3 秒後將以赤紅姿態復甦。'); render(); return true;
     }
     if (isCustomBoss(e)) {
+      const relic = RELICS.find(item => item.bossRelicFor === e.bossId);
+      run.bossRelicsClaimed ||= [];
+      if (relic && !run.bossRelicsClaimed.includes(relic.id) && !(run.relics || []).some(item => item.id === relic.id) && Math.random() < .75) { run.bossRelicsClaimed.push(relic.id); createGroundLoot('relic', e.x, e.y, { relic }); addLog(`首領專屬遺物「${relic.name}」落在地上。`); }
       e.boss = false;
       const result = oldHandleDefeat(e);
       e.boss = true;
@@ -340,6 +369,11 @@
         else if (run.isEndless) showModal(`<div class="eyebrow">ENDLESS FLOOR ${run.floor}</div><h2>${escapeHtmlText(e.name)}已被擊敗</h2><p class="intro">你已通過第 ${run.floor} 層的無盡首領戰。要繼續深入，還是結束本次遠征？</p><div class="actions"><button class="primary" id="endlessContinue">繼續深入</button><button id="endlessExit">結束遠征</button></div>`), $('endlessContinue').onclick = () => { closeModal(); advanceToNextFloor(); }, $('endlessExit').onclick = () => finish(true);
       }
       return result;
+    }
+    if (e?.boss && run?.activeBossSpec?.id === 'dreamKing') {
+      const relic = RELICS.find(item => item.bossRelicFor === 'dreamKing');
+      run.bossRelicsClaimed ||= [];
+      if (relic && !run.bossRelicsClaimed.includes(relic.id) && !(run.relics || []).some(item => item.id === relic.id) && Math.random() < .75) { run.bossRelicsClaimed.push(relic.id); createGroundLoot('relic', e.x, e.y, { relic }); addLog(`首領專屬遺物「${relic.name}」落在地上。`); }
     }
     return oldHandleDefeat(e);
   };
@@ -365,7 +399,7 @@
   realtimeUpdate = function (...args) {
     if (run && run.playerSnaredUntil > Date.now()) {
       const previous = run.supportSpeedMultiplier;
-      run.supportSpeedMultiplier = Math.min(Number(previous) || 1, .25);
+      run.supportSpeedMultiplier = Math.min(Number(previous) || 1, Number(run.playerSnaredMultiplier) || .25);
       try { return oldRealtimeUpdate(...args); }
       finally { run.supportSpeedMultiplier = previous || 1; }
     }
@@ -383,6 +417,9 @@
       actor.classList.toggle('boss-red-stage', e.bossId === 'zarian' && e.phase === 2 || e.bossId === 'trefasha' && e.enrageUntil > Date.now());
       actor.classList.toggle('boss-grey', !!e.frameGrey);
       actor.classList.toggle('boss-shielded', e.shieldHp > 0);
+      let shield = actor.querySelector('.arena-shield-bar');
+      if (e.shieldHp > 0) { if (!shield) { shield = document.createElement('div'); shield.className = 'arena-shield-bar'; shield.innerHTML = '<span></span>'; actor.querySelector('.arena-hp')?.insertAdjacentElement('afterend', shield); } shield.firstElementChild.style.width = `${Math.max(0, Math.min(100, e.shieldHp / Math.max(1, e.shieldMaxHp || e.maxHp) * 100))}%`; }
+      else shield?.remove();
       actor.title = `${e.name}｜${e.phase} 階段｜HP ${Math.ceil(e.hp)}/${e.maxHp}${e.shieldHp ? `｜護盾 ${Math.ceil(e.shieldHp)}` : ''}`;
     }
     return value;
@@ -396,7 +433,7 @@
     if ($('floorBar')) $('floorBar').style.width = run.isEndless ? `${Math.min(100, run.floor % 10 * 10)}%` : `${Math.min(100, run.floor / run.maxFloors * 100)}%`;
     if ($('roomBadge')) $('roomBadge').textContent = bossFloor(run.floor)
       ? `第 ${run.floor} 層 · BOSS`
-      : `${run.floor} / ${total} 層 · ${(roomInfo[run.roomType] || roomInfo.combat).name}`;
+      : `${run.floor} / ${total} 層 · ${(roomCatalog[run.roomType] || roomCatalog.combat).name}`;
     const boss = getBoss(), info = $('bossInfo');
     if (boss && info) { info.classList.remove('hidden'); info.textContent = `${boss.name}・第 ${boss.phase} 階段｜${run.bossStatus || '首領正在蓄勢。'}${boss.shieldHp ? `｜護盾 ${Math.ceil(boss.shieldHp)}` : ''}`; }
     document.body.classList.toggle('boss-gold-scene', !!boss && boss.goldUntil > Date.now());
