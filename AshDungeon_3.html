@@ -1706,6 +1706,7 @@ html,body,body *,button,input,select,textarea{
 .mobile-joystick:before{left:50%;top:10%;bottom:10%;width:1px}.mobile-joystick:after{top:50%;left:10%;right:10%;height:1px}
 .mobile-joystick-thumb{position:absolute;width:47%;height:47%;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:2px solid #927747;background:radial-gradient(circle at 36% 28%,#fff0c9,#c5a66d 72%);box-shadow:0 3px 7px #6a4a242e,inset 0 0 0 3px #f1dfb7;pointer-events:none}
 .mobile-actions{flex:1 1 auto;min-width:0;max-width:168px;display:grid;grid-template-columns:1fr;gap:8px;align-content:center;touch-action:manipulation}
+.mobile-combat-controls,.mobile-combat-controls *{touch-action:none!important;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .mobile-actions button{min-height:42px;width:100%;padding:9px 7px;border-radius:10px;font-size:clamp(12px,3.3vw,15px);line-height:1.15;white-space:nowrap;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .mobile-actions #attackLeftBtn{background:linear-gradient(#a84c46,#75302d);border-color:#d18a70;color:#fff7e9}
 .mobile-actions #potionLeftBtn{background:linear-gradient(#fff0cc,#e6c890);border-color:#aa8549;color:#523920}
@@ -1742,34 +1743,79 @@ body.mobile-control-mode .mobile-combat-controls{display:flex!important}
       if(bossInfo&&bossInfo.parentNode)bossInfo.insertAdjacentElement('afterend',controls);else if(map&&map.parentNode)map.insertAdjacentElement('afterend',controls);else $('gameScreen')?.appendChild(controls);
     }
     const attack=$('attackLeftBtn'),potion=$('potionLeftBtn'),sprint=$('sprintBtn');
-    if(attack)attack.onclick=()=>{if(typeof triggerAttack==='function')triggerAttack()};
-    if(potion)potion.onclick=()=>{if(typeof usePotion==='function')usePotion()};
-    if(sprint)sprint.onclick=()=>{if(typeof window.__silverSwordSprint==='function')window.__silverSwordSprint()};
+    // Mobile browsers can cancel or redirect Pointer Events when a second finger lands.
+    // Bind touch controls with independent touch identifiers; keep click as mouse/keyboard fallback.
+    function bindMobileAction(button, action){
+      if(!button||button.dataset.multiTouchBound)return;
+      button.dataset.multiTouchBound='1';
+      let lastTouchAt=-10000;
+      button.addEventListener('touchstart',ev=>{
+        if(!document.body.classList.contains('mobile-control-mode'))return;
+        if(ev.cancelable)ev.preventDefault();
+        ev.stopPropagation();lastTouchAt=performance.now();
+        if(!button.disabled)action();
+      },{passive:false});
+      button.addEventListener('click',ev=>{
+        // Prevent a delayed synthetic click from firing the same action twice after touchstart.
+        if(performance.now()-lastTouchAt<800){ev.preventDefault();ev.stopImmediatePropagation();return;}
+        if(!button.disabled)action();
+      },true);
+    }
+    bindMobileAction(attack,()=>{if(typeof triggerAttack==='function')triggerAttack()});
+    bindMobileAction(potion,()=>{if(typeof usePotion==='function')usePotion()});
+    bindMobileAction(sprint,()=>{if(typeof window.__silverSwordSprint==='function')window.__silverSwordSprint()});
+
     const joy=$('joystick'),thumb=$('joystickThumb');
     if(joy&&thumb&&!joy.dataset.inputBound){
       joy.dataset.inputBound='1';
-      let activePointer=null;
+      let activeTouchId=null,activePointerId=null;
       const xKey='mobile-joystick-x',yKey='mobile-joystick-y';
       const releaseAxis=(key)=>{if(typeof heldDirections!=='undefined'&&heldDirections)heldDirections.delete(key)};
       const reset=()=>{
-        releaseAxis(xKey);releaseAxis(yKey);activePointer=null;
+        releaseAxis(xKey);releaseAxis(yKey);activeTouchId=null;activePointerId=null;
         thumb.style.left='50%';thumb.style.top='50%';
         if(typeof joystickPointer!=='undefined')joystickPointer=null;
         if(typeof joystickVector!=='undefined')joystickVector={x:0,y:0};
       };
-      const update=(ev)=>{
+      const update=(clientX,clientY)=>{
         const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
-        let dx=ev.clientX-cx,dy=ev.clientY-cy;const lim=r.width*.30,len=Math.hypot(dx,dy);
+        let dx=clientX-cx,dy=clientY-cy;const lim=r.width*.30,len=Math.hypot(dx,dy);
         if(len>lim){dx=dx/len*lim;dy=dy/len*lim}
         thumb.style.left=`calc(50% + ${dx}px)`;thumb.style.top=`calc(50% + ${dy}px)`;
         const dead=r.width*.10,dirX=Math.abs(dx)<dead?null:(dx<0?'left':'right'),dirY=Math.abs(dy)<dead?null:(dy<0?'up':'down');
         if(typeof heldDirections!=='undefined'&&heldDirections){releaseAxis(xKey);releaseAxis(yKey);if(dirX)heldDirections.set(xKey,dirX);if(dirY)heldDirections.set(yKey,dirY)}
         if(typeof joystickVector!=='undefined')joystickVector={x:dirX==='left'?-1:dirX==='right'?1:0,y:dirY==='up'?-1:dirY==='down'?1:0};
       };
-      joy.addEventListener('pointerdown',ev=>{if(!document.body.classList.contains('mobile-control-mode'))return;ev.preventDefault();activePointer=ev.pointerId;if(typeof joystickPointer!=='undefined')joystickPointer=ev.pointerId;try{joy.setPointerCapture(ev.pointerId)}catch(_){}update(ev)},{passive:false});
-      joy.addEventListener('pointermove',ev=>{if(activePointer===ev.pointerId){ev.preventDefault();update(ev)}},{passive:false});
-      for(const type of ['pointerup','pointercancel','lostpointercapture'])joy.addEventListener(type,ev=>{if(activePointer===ev.pointerId)reset()});
+      if('ontouchstart' in window){
+        // Track only the finger that began on the joystick. Touches on right-side buttons
+        // remain independent and never reset or steal the joystick's active touch.
+        joy.addEventListener('touchstart',ev=>{
+          if(!document.body.classList.contains('mobile-control-mode')||activeTouchId!==null)return;
+          const t=ev.changedTouches&&ev.changedTouches[0];if(!t)return;
+          if(ev.cancelable)ev.preventDefault();activeTouchId=t.identifier;
+          if(typeof joystickPointer!=='undefined')joystickPointer=t.identifier;
+          update(t.clientX,t.clientY);
+        },{passive:false});
+        joy.addEventListener('touchmove',ev=>{
+          if(activeTouchId===null)return;
+          const t=Array.from(ev.touches||[]).find(t=>t.identifier===activeTouchId);if(!t)return;
+          if(ev.cancelable)ev.preventDefault();update(t.clientX,t.clientY);
+        },{passive:false});
+        const endTouch=ev=>{
+          if(activeTouchId===null)return;
+          const ended=Array.from(ev.changedTouches||[]).some(t=>t.identifier===activeTouchId);
+          if(ended){if(ev.cancelable)ev.preventDefault();reset();}
+        };
+        joy.addEventListener('touchend',endTouch,{passive:false});
+        joy.addEventListener('touchcancel',endTouch,{passive:false});
+      }else{
+        // Pointer fallback for non-touch devices used during responsive testing.
+        joy.addEventListener('pointerdown',ev=>{if(!document.body.classList.contains('mobile-control-mode'))return;ev.preventDefault();activePointerId=ev.pointerId;if(typeof joystickPointer!=='undefined')joystickPointer=ev.pointerId;try{joy.setPointerCapture(ev.pointerId)}catch(_){}update(ev.clientX,ev.clientY)},{passive:false});
+        joy.addEventListener('pointermove',ev=>{if(activePointerId===ev.pointerId){ev.preventDefault();update(ev.clientX,ev.clientY)}},{passive:false});
+        for(const type of ['pointerup','pointercancel','lostpointercapture'])joy.addEventListener(type,ev=>{if(activePointerId===ev.pointerId)reset()});
+      }
       window.addEventListener('blur',reset);
+      document.addEventListener('visibilitychange',()=>{if(document.hidden)reset()});
     }
     updateDeviceMode();
   }
