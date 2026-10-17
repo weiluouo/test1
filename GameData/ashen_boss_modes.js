@@ -59,8 +59,8 @@
     const p = { uid: `proj-${++uidSequence}`, x: owner.x, y: owner.y,
       vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, speed, icon, owner,
       radius: options.radius || 9, createdAt: Date.now(), lifetimeMs: options.lifetimeMs || 5000,
-      dead: false, bullCharge: !!options.bullCharge };
-    p.el = addArenaNode($('map'), `enemy-projectile-node${options.bullCharge ? ' boss-charge-bull' : ''}`, icon);
+      dead: false, bullCharge: !!options.bullCharge, goldenCharge: !!options.goldenCharge };
+    p.el = addArenaNode($('map'), `enemy-projectile-node${options.bullCharge ? ` boss-charge-bull${options.goldenCharge ? ' boss-charge-gold' : ''}` : ''}`, icon);
     positionNode(p.el, p);
     run.projectiles.push(p);
     return p;
@@ -190,43 +190,81 @@
     const el = addBossMarker('boss-fire-warning', x, y, radius, '');
     run.bossEffects.push({ type: 'fire', el, x, y, radius, landsAt, multiplier, label, boss });
   };
+  const findOpenSummonPoint = (preferred, radius = WORLD.enemyRadius, minBossDistance = 72) => {
+    const candidates = [];
+    for (let y = 1; y < 6; y++) for (let x = 1; x < 8; x++) {
+      if (run.map[y]?.[x] !== 'floor') continue;
+      const p = worldPoint(x, y);
+      if (!canOccupy(p.x, p.y, radius, 'enemy')) continue;
+      if (dist(p, getBoss() || preferred) < minBossDistance) continue;
+      if (run.enemies.some(e => !e.dead && e.hp > 0 && dist(p, e) < radius + (Number(e.radius) || WORLD.enemyRadius) + 8)) continue;
+      candidates.push(p);
+    }
+    candidates.sort((a, b) => dist(a, preferred) - dist(b, preferred));
+    if (!candidates.length) return null;
+    const near = candidates.filter(p => dist(p, preferred) <= dist(candidates[0], preferred) + WORLD.cell * 1.1);
+    return near[Math.floor(Math.random() * near.length)] || candidates[0];
+  };
   const castLineTelegraph = (boss, duration, halfWidth, multiplier, label) => {
     const dx = run.player.x - boss.x, dy = run.player.y - boss.y;
-    const horizontal = Math.abs(dx) >= Math.abs(dy);
-    const center = horizontal ? run.player.y : run.player.x;
-    const lane = $('bossWarningLane');
-    const frame = addBossMarker('boss-range-frame', WORLD.width / 2, WORLD.height / 2);
-    if (horizontal) { frame.style.left = '11.111%'; frame.style.top = `${(center - halfWidth) / WORLD.height * 100}%`; frame.style.width = '77.778%'; frame.style.height = `${halfWidth * 2 / WORLD.height * 100}%`; }
-    else { frame.style.left = `${(center - halfWidth) / WORLD.width * 100}%`; frame.style.top = '14.286%'; frame.style.width = `${halfWidth * 2 / WORLD.width * 100}%`; frame.style.height = '71.428%'; }
-    run.bossEffects.push({ type: 'line', el: frame, horizontal, center, direction: horizontal ? Math.sign(dx) || 1 : Math.sign(dy) || 1, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
+    const lengthToPlayer = Math.hypot(dx, dy) || 1, ux = dx / lengthToPlayer, uy = dy / lengthToPlayer;
+    const minX = WORLD.cell, maxX = WORLD.width - WORLD.cell, minY = WORLD.cell, maxY = WORLD.height - WORLD.cell;
+    const tx = ux > 0 ? (maxX - boss.x) / ux : ux < 0 ? (minX - boss.x) / ux : Infinity;
+    const ty = uy > 0 ? (maxY - boss.y) / uy : uy < 0 ? (minY - boss.y) / uy : Infinity;
+    const length = Math.max(0, Math.min(tx, ty));
+    const angle = Math.atan2(uy, ux);
+    const frame = addArenaNode($('map'), 'boss-range-frame boss-line-any', '');
+    frame.style.left = `${boss.x / WORLD.width * 100}%`; frame.style.top = `${(boss.y - halfWidth) / WORLD.height * 100}%`;
+    frame.style.width = `${length / WORLD.width * 100}%`; frame.style.height = `${halfWidth * 2 / WORLD.height * 100}%`;
+    frame.style.transformOrigin = '0 50%'; frame.style.transform = `rotate(${angle}rad)`;
+    run.bossEffects.push({ type: 'line', el: frame, ux, uy, length, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
+  };
+  const createLineAftermath = (effect, cls, durationMs) => {
+    const el = addArenaNode($('map'), cls, '');
+    el.style.left = `${effect.boss.x / WORLD.width * 100}%`;
+    const halfHeight = cls === 'boss-ground-crack' ? 7 : effect.halfWidth;
+    el.style.top = `${(effect.boss.y - halfHeight) / WORLD.height * 100}%`;
+    el.style.width = `${effect.length / WORLD.width * 100}%`;
+    el.style.height = `${halfHeight * 2 / WORLD.height * 100}%`;
+    el.style.transformOrigin = '0 50%'; el.style.transform = `rotate(${Math.atan2(effect.uy, effect.ux)}rad)`;
+    setTimeout(() => el.remove(), durationMs);
   };
   const summonMud = (boss, count = 2) => {
     const cfg = MONSTER_CONFIG.summons?.zarianBlackMud || {};
     for (let i = 0; i < count; i++) {
-      const p = worldPoint(i ? 6 : 2, i ? 2 : 4), hp = Math.max(1, Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12)));
+      const preferred = worldPoint(i ? 6 : 2, i ? 2 : 4), p = findOpenSummonPoint(preferred, Number(cfg.radius) || 20);
+      if (!p) { addLog('亞空黑泥召喚失敗：周圍沒有可用的空地。'); continue; }
+      const hp = Math.max(1, Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12)));
       run.enemies.push({ ...cfg, id: cfg.id || 'zarian-black-mud', name: cfg.name || '亞空黑泥', icon: cfg.icon || '🖤', x: p.x, y: p.y, hp, maxHp: hp,
         atk: Math.max(1, Math.round(boss.atk * (Number(cfg.attackRatio) || .38))), boss: false, dead: false, summoned: true, aggro: true,
         classType: cfg.classType || 'ranged', speed: Number(cfg.speed) || 0, attackRange: Number(cfg.attackRange) || 620, keepDistance: Number(cfg.keepDistance) || 220, attackCooldown: Number(cfg.attackCooldownMs) || 1800,
         projectileSpeed: Number(cfg.projectileSpeed) || 225, projectileIcon: cfg.projectileIcon || '●', projectileLifetimeMs: Number(cfg.projectileLifetimeMs) || 5000, radius: Number(cfg.radius) || 20,
         homeX: p.x, homeY: p.y, leashRange: 9999, uid: `mud-${++uidSequence}`, nextAttackAt: Date.now() + 900 });
     }
-    addLog(`「${skillName('zarian', 'voidMire')}」：兩隻黑泥現身，正向你射出黑色液滴。`);
+    addLog(`「${skillName('zarian', 'voidMire')}」：黑泥現身，正向你射出黑色液滴。`);
   };
-  const summonBull = (boss, angle) => newProjectile(boss, angle, 320, '🐂', { radius: 30, lifetimeMs: 5000, bullCharge: true });
+  const summonBull = (boss, angle, golden = false) => newProjectile(boss, angle, 707.2, '🐂', { radius: 63, lifetimeMs: 5000, bullCharge: true, goldenCharge: golden });
   const updateBossEffectTimers = now => {
     const effects = run.bossEffects || [];
     run.bossEffects = effects.filter(effect => {
       if (now < effect.landsAt) return true;
       effect.el?.remove();
       if (effect.type === 'fire') {
+        if (effect.label.includes('淵火如雨')) {
+          const pillar = addBossMarker('boss-fire-pillar', effect.x, effect.y, effect.radius * .78, '🔥');
+          setTimeout(() => pillar.remove(), 760);
+        }
         if (dist({ x: effect.x, y: effect.y }, run.player) <= effect.radius + WORLD.playerRadius) damagePlayer(effect.boss, effect.multiplier, effect.label);
       } else if (effect.type === 'line') {
-        const along = effect.horizontal ? Math.abs(run.player.y - effect.center) : Math.abs(run.player.x - effect.center);
-        const within = effect.horizontal ? (run.player.x - effect.boss.x) * effect.direction >= 0 : (run.player.y - effect.boss.y) * effect.direction >= 0;
-        if (along <= effect.halfWidth && within) {
+        const dx = run.player.x - effect.boss.x, dy = run.player.y - effect.boss.y;
+        const along = dx * effect.ux + dy * effect.uy;
+        const across = Math.abs(dx * effect.uy - dy * effect.ux);
+        if (along >= 0 && along <= effect.length && across <= effect.halfWidth) {
           const d = dist(effect.boss, run.player), falloff = Math.max(.25, 1 - d / (WORLD.width * 1.35));
           damagePlayer(effect.boss, effect.multiplier * falloff, effect.label);
         }
+        if (effect.label.includes('雷霆')) createLineAftermath(effect, 'boss-thunder-strike', 480);
+        else createLineAftermath(effect, 'boss-ground-crack', 2000);
       }
       return false;
     });
@@ -248,7 +286,10 @@
         addLog(`「${skillName('zarian', 'dragonMight')}」：沉重龍威禁錮你的步伐。`);
       } else {
         const cfg = MONSTER_CONFIG.summons?.zarianCrystal || skillSpec('zarian', 'alienCrystal');
-        const p = worldPoint(2 + Math.floor(Math.random() * 5), 1 + Math.floor(Math.random() * 5)), hp = Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12));
+        const preferred = worldPoint(2 + Math.floor(Math.random() * 5), 1 + Math.floor(Math.random() * 5));
+        const p = findOpenSummonPoint(preferred, Number(cfg.radius) || 21);
+        if (!p) { addLog('異星水晶召喚失敗：周圍沒有可用的空地。'); boss.nextSkillAt = now + (Number(bossSpec(id)?.skillIntervalMs) || 5500); return; }
+        const hp = Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12));
         const crystal = { ...cfg, name: cfg.name || '異星水晶', icon: cfg.icon || '💎', x: p.x, y: p.y, hp, maxHp: hp, atk: 0, boss: false, summoned: true,
           bossCrystal: true, dead: false, radius: Number(cfg.radius) || 21, classType: cfg.classType || 'support', speed: Number(cfg.speed) || 0, uid: `crystal-${++uidSequence}` };
         run.enemies.push(crystal); addLog(`「${skillName('zarian', 'alienCrystal')}」：水晶開始為札里安緩慢治療；摧毀水晶可阻止回血。`);
@@ -288,8 +329,9 @@
       } else if (step % 3 === 1) {
         const a = Math.atan2(run.player.y - boss.y, run.player.x - boss.x);
         const count = Number(skillSpec('trefasha', second ? 'heavenBull' : 'bullCall').summonCount) || (second ? 2 : 1);
-        for (let i = 0; i < count; i++) summonBull(boss, a + (i ? (Math.random() < .5 ? -.13 : .13) : 0));
-        addLog(`「${skillName('trefasha', second ? 'heavenBull' : 'bullCall')}」：巨牛沿直線衝鋒，撞上牆壁後消失。`);
+        summonBull(boss, a, second);
+        boss.bullChargeQueue = count > 1 ? { remaining: count - 1, angle: a + (Math.random() < .5 ? -.13 : .13), golden: second } : null;
+        addLog(`「${skillName('trefasha', second ? 'heavenBull' : 'bullCall')}」：巨牛沿直線衝破障礙，衝至地圖邊界後消失。`);
       } else {
         const cfg = skillSpec('trefasha', second ? 'fallenKingdom' : 'wrathKing');
         boss.damageMultiplier = Number(cfg.attackMultiplier) || (second ? 1.5 : 1.3); boss.enrageUntil = now + (Number(cfg.durationMs) || 3000);
@@ -309,7 +351,7 @@
       if (now < boss.phaseTransitionAt) { boss.frameGrey = true; run.bossStatus = '札里安第一階段已擊敗；第二階段將在 3 秒後復甦。'; return; }
       const second = bossSpec('zarian').phase2;
       boss.phaseTransitionAt = 0; boss.frameGrey = false; boss.phase = 2; boss.hp = boss.maxHp;
-      boss.icon = bossSpec('zarian').icon; boss.mode = 'melee'; boss.classType = 'boss'; boss.speed = Number(second.speed) || 205; boss.attackRange = Number(second.attackRange) || 82; boss.attackCooldown = Number(second.attackCooldownMs) || 1350; boss.windupMs = Number(second.windupMs) || 440; boss.keepDistance = 0;
+      boss.icon = bossSpec('zarian').icon; boss.mode = 'melee'; boss.classType = 'boss'; boss.attackType = 'melee'; boss.projectileSpeed = 0; boss.keepDistance = 0; boss.rangedMoveTarget = null; boss.attackRange = Number(second.attackRange) || 82; boss.speed = Number(second.speed) || 205; boss.attackCooldown = Number(second.attackCooldownMs) || 1350; boss.windupMs = Number(second.windupMs) || 440; boss.nextAttackAt = now + 250; boss.attackWindupUntil = 0;
       boss.atk = Math.max(1, Math.round(boss.atk * (Number(second.attackMultiplier) || .8))); boss.nextSkillAt = now + (Number(bossSpec('zarian').skillIntervalMs) || 3000); boss.skillStep = 0;
       addLog('漆黑的札里安復甦並轉為赤紅！第二階段：高速近戰。');
     }
@@ -321,8 +363,14 @@
     if (boss.enrageUntil && now >= boss.enrageUntil) { boss.enrageUntil = 0; boss.damageMultiplier = 1; boss.damageTakenMultiplier = 1; }
     if (boss.bossId === 'prince' && boss.bossFrozen && boss.shieldUntil && now >= boss.shieldUntil) {
       boss.bossFrozen = false; boss.shieldUntil = 0;
-      if (boss.shieldHp > 0) { run.hp = 1; addLog('「那伽那伽密」護盾未能及時打破，玩家生命被削減至 1 點！'); render(); }
-      addLog('神足王子的護盾被擊破，禁錮解除！');
+      if (boss.shieldHp > 0) { run.hp = 1; boss.shieldHp = 0; addLog('「那伽那伽密」護盾未能及時打破，玩家生命被削減至 1 點！護盾消散。'); render(); }
+      else addLog('神足王子的護盾被擊破，禁錮解除！');
+    }
+    if (boss.bullChargeQueue?.remaining > 0 && !(run.projectiles || []).some(p => p.bullCharge && !p.dead)) {
+      const queue = boss.bullChargeQueue;
+      summonBull(boss, queue.angle, queue.golden);
+      queue.remaining--;
+      if (!queue.remaining) boss.bullChargeQueue = null;
     }
     if (boss.shieldHp > 0 && boss.nextHealAt <= now) {
       boss.nextHealAt = now + 1000;
@@ -341,8 +389,8 @@
       newProjectile(boss, Math.atan2(run.player.y - boss.y, run.player.x - boss.x), Number(ranged.projectileSpeed) || 390, ranged.projectileIcon || '◆', { radius: 8, lifetimeMs: Number(ranged.projectileLifetimeMs) || 4000 });
     }
     if (now >= boss.nextSkillAt && !boss.phaseTransitionAt) castCustomSkill(boss, now);
-    const activeSkills = bossSpec(boss.bossId)?.skills || [];
-    run.bossStatus = boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${activeSkills[Math.max(0, (boss.skillStep - 1) % activeSkills.length)]?.name || '蓄勢'}」準備中。`;
+    const activeSkills = (bossSpec(boss.bossId)?.skills || []).filter(skill => !skill.phase || skill.phase === boss.phase);
+    run.bossStatus = boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${activeSkills[Math.max(0, (boss.skillStep - 1) % Math.max(1, activeSkills.length))]?.name || '蓄勢'}」準備中。`;
   };
 
   const oldApplyWeaponHit = applyWeaponHit;
@@ -351,7 +399,7 @@
     if (isCustomBoss(e) && e.shieldHp > 0) {
       const absorbed = Math.min(e.shieldHp, dmg); e.shieldHp -= absorbed; dmg -= absorbed;
       floatDamage(e, absorbed, true);
-      if (e.bossId === 'prince' && e.shieldHp <= 0) { e.bossFrozen = false; e.shieldUntil = 0; addLog('那伽那伽密護盾破裂，神足王子解除靜止。'); }
+      if (e.bossId === 'prince' && e.shieldHp <= 0) { e.shieldHp = 0; e.bossFrozen = false; e.shieldUntil = 0; addLog('那伽那伽密護盾破裂，神足王子解除靜止。'); }
       if (e.shieldHp > 0 || dmg <= 0) { render(); return true; }
     }
     if (isCustomBoss(e) && e.bossId === 'prince' && e.armorStack > 0) dmg = Math.max(1, dmg - e.armorStack);
@@ -373,17 +421,20 @@
       e.boss = false;
       const result = oldHandleDefeat(e);
       e.boss = true;
+      run.bossDefeated = true; run.bossStatus = `${e.name}已倒下；收集戰利品後前往出口完成遠征。`;
       clearBossEffects();
-      if (run && !run.done) {
-        if (!run.isEndless && run.floor >= run.maxFloors) finish(true);
-        // Endless mode now presents the continue/exit choice only after the player reaches the boss room exit.
-      }
       return result;
     }
     if (e?.boss && run?.activeBossSpec?.id === 'dreamKing') {
       const relic = RELICS.find(item => item.bossRelicFor === 'dreamKing');
       run.bossRelicsClaimed ||= [];
       if (relic && !run.bossRelicsClaimed.includes(relic.id) && !(run.relics || []).some(item => item.id === relic.id) && Math.random() < .75) { run.bossRelicsClaimed.push(relic.id); createGroundLoot('relic', e.x, e.y, { relic }); addLog(`首領專屬遺物「${relic.name}」落在地上。`); }
+      e.boss = false;
+      const result = oldHandleDefeat(e);
+      e.boss = true;
+      run.bossDefeated = true; run.bossStatus = `${e.name}已倒下；收集戰利品後前往出口完成遠征。`;
+      clearBossEffects();
+      return result;
     }
     return oldHandleDefeat(e);
   };
@@ -464,9 +515,20 @@
   style.textContent = `
     .difficulty{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
     .boss-fire-warning{position:absolute;z-index:9;transform:translate(-50%,-50%);border:2px solid #d33b2e;border-radius:50%;background:#ed503b38;box-shadow:0 0 0 5px #d5423030;pointer-events:none;animation:bossFirePulse .25s infinite alternate}
-    .boss-range-frame{position:absolute;z-index:8;box-sizing:border-box;border:3px solid #ff4d42;background:#f0443833;box-shadow:0 0 0 1px #ffd0ca88,inset 0 0 16px #ff3b2f55;pointer-events:none;animation:bossRangePulse .35s infinite alternate}
+    .boss-range-frame{position:absolute;z-index:8;box-sizing:border-box;border:0;pointer-events:none;animation:bossRangePulse .35s infinite alternate}
+    .boss-line-any{background:linear-gradient(to bottom,transparent 0%,#ff49312a 16%,#f0443866 50%,#ff49312a 84%,transparent 100%)}
+    .boss-line-any::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #ffe5a9;filter:drop-shadow(0 0 4px #ff4931)}
+    .boss-line-any::after{content:"";position:absolute;left:0;top:50%;width:12px;height:12px;border:2px solid #fff1bb;border-radius:50%;background:#ff4931;box-shadow:0 0 10px 4px #ff4931;transform:translate(-50%,-50%)}
+    .boss-fire-pillar{position:absolute;z-index:12;display:grid;place-items:center;transform:translate(-50%,-50%);font-size:42px;background:linear-gradient(to top,#a91d16dd 0%,#ff6722a8 42%,#ffdb5c22 100%);clip-path:polygon(38% 100%,20% 67%,34% 74%,17% 41%,40% 55%,34% 15%,52% 0,68% 39%,78% 20%,80% 62%,98% 48%,73% 100%);filter:drop-shadow(0 0 12px #ff4b1d);animation:firePillarFall .72s ease-out both;pointer-events:none}
+    .boss-ground-crack{position:absolute;z-index:10;overflow:hidden;pointer-events:none;opacity:.92;background:linear-gradient(to bottom,transparent 38%,#3a2119 42%,#f0bc67 50%,#2c201b 59%,transparent 64%);clip-path:polygon(0 44%,4% 25%,8% 60%,14% 15%,19% 73%,26% 35%,32% 82%,38% 24%,45% 64%,53% 14%,60% 71%,67% 32%,73% 83%,80% 19%,87% 62%,94% 30%,100% 48%,100% 58%,93% 43%,87% 76%,80% 36%,73% 98%,67% 45%,60% 84%,53% 25%,45% 78%,38% 38%,32% 96%,26% 48%,19% 88%,14% 28%,8% 76%,4% 39%,0 57%);filter:drop-shadow(0 0 4px #e7a747);animation:groundCrackFade 2s ease-out both}
+    .boss-thunder-strike{position:absolute;z-index:11;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 7%,#b8f4ffdd 7.2% 7.8%,transparent 8% 14%),linear-gradient(to bottom,transparent,#9beaff88 33%,#e8fcffed 50%,#74ddff88 70%,transparent);animation:thunderStrike .46s steps(2,end) both}
+    .boss-thunder-strike::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px solid #efffff;box-shadow:0 0 10px 5px #54dcff}
+    @keyframes firePillarFall{0%{opacity:.2;transform:translate(-50%,-50%) scaleY(.08)}28%{opacity:1;transform:translate(-50%,-50%) scaleY(1.22)}100%{opacity:.2;transform:translate(-50%,-50%) scaleY(.8)}}
+    @keyframes groundCrackFade{0%{opacity:1}75%{opacity:.9}100%{opacity:0}}
+    @keyframes thunderStrike{0%{opacity:0;filter:brightness(1)}22%{opacity:1;filter:brightness(2.6)}100%{opacity:0;filter:brightness(1)}}
     .boss-flame-cone{position:absolute;z-index:9;transform:translate(-50%,-50%);font-size:34px;pointer-events:none;filter:drop-shadow(0 0 9px #e45a25)}
-    .boss-charge-bull{font-size:52px!important;width:8%!important;min-width:42px;filter:drop-shadow(0 0 8px #a52b22)!important}
+    .boss-charge-bull{font-size:109px!important;width:16.8%!important;min-width:88px;line-height:1!important;filter:drop-shadow(0 0 12px #a52b22)!important}
+    .boss-charge-gold{filter:sepia(1) saturate(6) hue-rotate(350deg) brightness(1.12) drop-shadow(0 0 16px #ffd43b)!important}
     .boss-red-stage .arena-sprite{filter:sepia(1) saturate(6) hue-rotate(320deg) brightness(.82)!important}
     .boss-black-stage .arena-sprite{filter:grayscale(1) brightness(.35)!important}
     .boss-grey .arena-sprite{filter:grayscale(1) brightness(.52)!important;opacity:.65}

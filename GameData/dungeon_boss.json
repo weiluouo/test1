@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "description": "夢境君王與自訂首領平衡及技能設定。編輯此 JSON 即可調整遊戲實際讀取的首領名稱、圖示、基礎數值及技能參數。",
   "dreamKing": {
-    "baseHp": 84,
+    "baseHp": 100,
     "speed": 136,
     "note": "三階段：生命高於 70% 為近戰、70% 以下為遠程、30% 以下為騎兵；每 3000 毫秒嘗試一次技能。王座只召喚支援類小怪。",
     "skillIntervalMs": 3000,
@@ -27,7 +27,7 @@
       "id": "zarian",
       "name": "漆黑的札里安",
       "icon": "🦖",
-      "baseHp": 60,
+      "baseHp": 70,
       "baseAtk": 8,
       "speed": 104,
       "attackRange": 77,
@@ -50,7 +50,7 @@
       "skills": [
         {
           "id": "fireRain",
-          "name": "淵火成雨",
+          "name": "淵火如雨",
           "phase": 1,
           "circleCount": 25,
           "warningMs": 1000,
@@ -68,7 +68,7 @@
           "id": "alienCrystal",
           "name": "異星水晶",
           "phase": 1,
-          "hpRatio": 0.3,
+          "hpRatio": 0.12,
           "healPerSecondRatio": 0.006
         },
         {
@@ -98,9 +98,9 @@
       "id": "prince",
       "name": "大褐黃神足王子",
       "icon": "🐉",
-      "baseHp": 120,
+      "baseHp": 140,
       "baseAtk": 7,
-      "speed": 104,
+      "speed": 135.2,
       "attackRange": 77,
       "attackCooldownMs": 1400,
       "windupMs": 560,
@@ -119,7 +119,7 @@
         {
           "id": "serpentShield",
           "name": "那伽那伽密",
-          "shieldRatio": 0.5,
+          "shieldRatio": 0.75,
           "durationMs": 5000
         }
       ]
@@ -128,7 +128,7 @@
       "id": "trefasha",
       "name": "末代特雷法沙王",
       "icon": "🐂",
-      "baseHp": 100,
+      "baseHp": 120,
       "baseAtk": 8,
       "speed": 104,
       "attackRange": 77,
