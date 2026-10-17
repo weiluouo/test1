@@ -212,11 +212,16 @@
     const tx = ux > 0 ? (maxX - boss.x) / ux : ux < 0 ? (minX - boss.x) / ux : Infinity;
     const ty = uy > 0 ? (maxY - boss.y) / uy : uy < 0 ? (minY - boss.y) / uy : Infinity;
     const length = Math.max(0, Math.min(tx, ty));
-    const angle = Math.atan2(uy, ux);
+    // Draw directly in WORLD coordinates: rotated percentage-sized divs distort
+    // against the map's 9:7 aspect ratio and can appear to stop near the player.
     const frame = addArenaNode($('map'), 'boss-range-frame boss-line-any', '');
-    frame.style.left = `${boss.x / WORLD.width * 100}%`; frame.style.top = `${(boss.y - halfWidth) / WORLD.height * 100}%`;
-    frame.style.width = `${length / WORLD.width * 100}%`; frame.style.height = `${halfWidth * 2 / WORLD.height * 100}%`;
-    frame.style.transformOrigin = '0 50%'; frame.style.transform = `rotate(${angle}rad)`;
+    frame.setAttribute('viewBox', `0 0 ${WORLD.width} ${WORLD.height}`);
+    frame.setAttribute('preserveAspectRatio', 'none');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:8;pointer-events:none;';
+    const nx = -uy, ny = ux, ex = boss.x + ux * length, ey = boss.y + uy * length;
+    const uid = `boss-ray-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    frame.innerHTML = `<defs><linearGradient id="${uid}" gradientUnits="userSpaceOnUse" x1="${boss.x + nx * halfWidth}" y1="${boss.y + ny * halfWidth}" x2="${boss.x - nx * halfWidth}" y2="${boss.y - ny * halfWidth}"><stop offset="0" stop-color="#ff4931" stop-opacity="0"/><stop offset=".2" stop-color="#ff4931" stop-opacity=".2"/><stop offset=".5" stop-color="#f04438" stop-opacity=".62"/><stop offset=".8" stop-color="#ff4931" stop-opacity=".2"/><stop offset="1" stop-color="#ff4931" stop-opacity="0"/></linearGradient></defs><line x1="${boss.x}" y1="${boss.y}" x2="${ex}" y2="${ey}" stroke="url(#${uid})" stroke-width="${halfWidth * 2}" stroke-linecap="butt"/><line x1="${boss.x}" y1="${boss.y}" x2="${ex}" y2="${ey}" stroke="#ffe5a9" stroke-width="2" stroke-dasharray="10 8"/><circle cx="${boss.x}" cy="${boss.y}" r="8" fill="#ff4931" stroke="#fff1bb" stroke-width="3"/>`;
     run.bossEffects.push({ type: 'line', el: frame, ux, uy, length, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
   };
   const createLineAftermath = (effect, cls, durationMs) => {
@@ -390,7 +395,9 @@
     }
     if (now >= boss.nextSkillAt && !boss.phaseTransitionAt) castCustomSkill(boss, now);
     const activeSkills = (bossSpec(boss.bossId)?.skills || []).filter(skill => !skill.phase || skill.phase === boss.phase);
-    run.bossStatus = boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${activeSkills[Math.max(0, (boss.skillStep - 1) % Math.max(1, activeSkills.length))]?.name || '蓄勢'}」準備中。`;
+    run.bossStatus = now < (run.playerSnaredUntil || 0)
+      ? `龍威禁錮：移動速度降低 75%，剩餘 ${((run.playerSnaredUntil - now) / 1000).toFixed(1)} 秒。`
+      : boss.phaseTransitionAt ? '第一階段已潰敗，等待札里安復甦。' : `技能「${activeSkills[Math.max(0, (boss.skillStep - 1) % Math.max(1, activeSkills.length))]?.name || '蓄勢'}」準備中。`;
   };
 
   const oldApplyWeaponHit = applyWeaponHit;
@@ -456,17 +463,6 @@
     oldMoveEnemies(dt, now);
     if (frozen.length) run.enemies.push(...frozen);
   };
-  const oldRealtimeUpdate = realtimeUpdate;
-  realtimeUpdate = function (...args) {
-    if (run && run.playerSnaredUntil > Date.now()) {
-      const previous = run.supportSpeedMultiplier;
-      run.supportSpeedMultiplier = Math.min(Number(previous) || 1, Number(run.playerSnaredMultiplier) || .25);
-      try { return oldRealtimeUpdate(...args); }
-      finally { run.supportSpeedMultiplier = previous || 1; }
-    }
-    return oldRealtimeUpdate(...args);
-  };
-
   const oldRenderArena = renderArena;
   renderArena = function (...args) {
     const value = oldRenderArena(...args);
