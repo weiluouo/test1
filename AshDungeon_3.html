@@ -426,7 +426,7 @@ function emitFx(kind,from,to,label=''){
   if(['fx-arrow','fx-spear','fx-bullet','fx-enemy-projectile'].includes(kind)){const dx=b.x-origin.x,dy=b.y-origin.y,angle=Math.atan2(dy,dx)*180/Math.PI;el.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;const duration=(kind==='fx-bullet'||kind==='fx-enemy-projectile')?240:Math.max(180,Math.min(380,Math.hypot(dx,dy)*.55));el.animate([{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(0)`},{transform:`translate(-50%,-50%) rotate(${angle}deg) translateX(${Math.hypot(dx,dy)}px)`}],{duration,easing:'cubic-bezier(.18,.7,.25,1)'});setTimeout(()=>el.remove(),duration+60)}else setTimeout(()=>el.remove(),kind==='fx-magic'?3060:kind==='fx-magic-beam'?760:kind==='fx-energy'?560:470);
  return el;
 }
-function floatDamage(entity,n,heal=false){const p=elAtWorld('map',entity);if(!p)return;const el=document.createElement('div');el.className='combat-number '+(heal?'healing':'damage');el.textContent=(heal?'+':'−')+Number(n).toFixed(n%1?1:0);el.style.left=p.x+'px';el.style.top=p.y+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),850)}
+function floatDamage(entity,n,heal=false,critical=false){const p=elAtWorld('map',entity);if(!p)return;const el=document.createElement('div');el.className='combat-number '+(heal?'healing':'damage')+(!heal&&critical?' critical':'');el.textContent=(heal?'+':'−')+Number(n).toFixed(n%1?1:0);el.style.left=p.x+'px';el.style.top=p.y+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),850)}
 function currentWeaponFx(){const w=getWeapon();if(w.attackFx)return w.attackFx;const id=w.id;return id==='short'?'fx-short':id==='long'?'fx-long':id==='spear'?'fx-spear':id==='bow'?'fx-arrow':'fx-bullet'}
 function triggerAttack(){
  if(!run||run.done||Date.now()<(run.nextAttackAt||0)||run.magicCharge)return;
@@ -445,7 +445,7 @@ function triggerAttack(){
 }
 function weaponBaseDamage(mult,critChance,weaponId=getWeapon()?.id){return Math.max(1,Math.round((Number(run.atk)||1)*(Number(mult)||1)*(1+(weaponDamageBonus(weaponId))))+(Math.random()<(Number(critChance)||0)?4:0))}
 function handleEnemyDefeat(e){if(!run||!e||e.dead||Number(e.hp)>0)return false;e.hp=0;e.dead=true;run.kills++;const kh=Number(meta.up.underworld)||0;if(kh){run.hp=Math.min(run.maxHp,run.hp+kh);if(kh>0)floatDamage(run.player,kh,true)}const reward=Math.max(1,Math.round((2+run.floor*.5)*run.diff.reward))+run.bonusShard;run.shards+=reward;addLog(`${e.name}倒下了，取得 ${reward} 枚律質。`);if(Math.random()<Number(kd.relicChance??.05)&&RELICS.length){const relic=randomRelicByWeight();if(relic){relic.apply(run);run.relics.push(relic);addLog(`稀有掉落：${relic.name}！`)}}if(Math.random()<.05){run.pots++;addLog('稀有掉落：怪物留下了一瓶藥水。')}if(e.boss){render();finish(true)}return true}
-function applyWeaponHit(e,dmg,w,now){if(!run||!e||e.dead)return false;const target={x:e.x,y:e.y};if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog(`魔王「轉能」將對${e.name}的 ${dmg} 點攻擊轉化為恢復，生命 +${healed}。`);return false}e.hp-=dmg;floatDamage(e,dmg);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`);const bleed=weaponAbility(w,'bleed');if(bleed&&bleed.enabled!==false&&e.hp>0){const duration=Math.max(1000,Number(bleed.durationMs)||5000),tick=Math.max(250,Number(bleed.tickMs)||1000),maxStacks=Math.max(1,Number(bleed.maxStacks)||1),wasActive=e.bleedUntil>now;const current=wasActive?(Number(e.bleedStacks)||1):0;e.bleedStacks=bleed.stackOnHit===false?1:Math.min(maxStacks,current+1);e.bleedData={damagePerStack:Math.max(0,Number(bleed.damagePerStack)||1),maxStacks,tickMs:tick};if(bleed.refreshOnHit!==false||!wasActive)e.bleedUntil=now+duration;e.nextBleedAt=wasActive&&bleed.refreshOnHit===false?e.nextBleedAt:now+tick;addLog(`${e.name}陷入流血：${e.bleedStacks} 層（最多 ${maxStacks} 層），每 ${tick/1000} 秒造成 ${e.bleedStacks*(Number(bleed.damagePerStack)||1)+(Number(run.bleedDamageAdd)||0)} 點傷害，持續 ${Math.round(duration/1000)} 秒。`)}if(e.hp<=0)handleEnemyDefeat(e);return true}
+function applyWeaponHit(e,dmg,w,now){if(!run||!e||e.dead)return false;const target={x:e.x,y:e.y};if(e.boss&&e.shieldUntil>now){const old=e.hp;e.hp=Math.min(e.maxHp,e.hp+dmg);const healed=e.hp-old;if(healed>0){floatDamage(e,healed,true);emitFx('fx-energy',target,target)}addLog(`魔王「轉能」將對${e.name}的 ${dmg} 點攻擊轉化為恢復，生命 +${healed}。`);return false}e.hp-=dmg;floatDamage(e,dmg,false,!!run.lastWeaponHitWasCrit);emitFx('fx-hit',target,target);addLog(`你以${w.name}攻擊${e.name}，造成 ${dmg} 點傷害。`);const bleed=weaponAbility(w,'bleed');if(bleed&&bleed.enabled!==false&&e.hp>0){const duration=Math.max(1000,Number(bleed.durationMs)||5000),tick=Math.max(250,Number(bleed.tickMs)||1000),maxStacks=Math.max(1,Number(bleed.maxStacks)||1),wasActive=e.bleedUntil>now;const current=wasActive?(Number(e.bleedStacks)||1):0;e.bleedStacks=bleed.stackOnHit===false?1:Math.min(maxStacks,current+1);e.bleedData={damagePerStack:Math.max(0,Number(bleed.damagePerStack)||1),maxStacks,tickMs:tick};if(bleed.refreshOnHit!==false||!wasActive)e.bleedUntil=now+duration;e.nextBleedAt=wasActive&&bleed.refreshOnHit===false?e.nextBleedAt:now+tick;addLog(`${e.name}陷入流血：${e.bleedStacks} 層（最多 ${maxStacks} 層），每 ${tick/1000} 秒造成 ${e.bleedStacks*(Number(bleed.damagePerStack)||1)+(Number(run.bleedDamageAdd)||0)} 點傷害，持續 ${Math.round(duration/1000)} 秒。`)}if(e.hp<=0)handleEnemyDefeat(e);return true}
 fight=function(e){
  if(!run||run.done||!e||e.dead||Date.now()<(run.nextAttackAt||0))return;e.aggro=true;const w=getWeapon();if(!inRange(e,w)){addLog('目標超出武器攻擊半徑或被牆壁阻擋。');return}
  const now=Date.now(),from={x:run.player.x,y:run.player.y},fx=w.attackFx||currentWeaponFx();run.nextAttackAt=now+weaponAttackCooldownMs(w);
@@ -524,7 +524,7 @@ function setIconContent(el,source,fallback='◈'){
 function classMapIconFile(e){if(e.mapIconFile)return e.mapIconFile;return ({melee:'近戰.png',cavalry:'騎兵.png',ranged:'遠程.png'})[e.classType]||''}
 function setRelicIcon(el,icon,fallback='✧'){setIconContent(el,icon,fallback)}
 function buildArena(){const mapEl=$('map');mapEl.innerHTML='';mapEl.dataset.floor=String(run.floor);arenaBuiltFloor=run.floor;
-  for(let y=0;y<7;y++)for(let x=0;x<9;x++)if(run.map[y][x]==='wall'){const wall=addArenaNode(mapEl,'arena-wall');wall.style.left=(x/9*100)+'%';wall.style.top=(y/7*100)+'%';wall.style.width=(100/9)+'%';wall.style.height=(100/7)+'%'}
+  for(let y=0;y<7;y++)for(let x=0;x<9;x++)if(run.map[y][x]==='wall'){const wall=addArenaNode(mapEl,'arena-wall');wall.dataset.ruin=String((x*3+y*5)%4);wall.title='古代遺跡障礙物';wall.style.left=(x/9*100)+'%';wall.style.top=(y/7*100)+'%';wall.style.width=(100/9)+'%';wall.style.height=(100/7)+'%'}
   const exit=addArenaNode(mapEl,'arena-exit','🚪');exit.id='arenaExit';
   const ring=addArenaNode(mapEl,'attack-range-ring');ring.id='attackRangeRing';
   const lane=addArenaNode(mapEl,'boss-warning-lane');lane.style.zIndex='4';lane.id='bossWarningLane';lane.style.display='none';
@@ -1079,14 +1079,16 @@ let synergyRuntimeRun=null,synergyRuntimeSignature='';
   weaponBaseDamage=function(mult,critChance,weaponId=getWeapon()?.id){
     let base=Math.max(1,Math.round((Number(run?.atk)||1)*(Number(mult)||1)*(1+(Number(run?.attackPercentBonus)||0))*(1+weaponDamageBonus(weaponId))));
     const chance=Math.max(0,Math.min(.85,Number(critChance)||0));
-    if(Math.random()<chance)base+=4+(Number(run?.critDamageBonus)||0);
+    const critical=Math.random()<chance;if(run)run.lastWeaponHitWasCrit=critical;
+    if(critical)base+=4+(Number(run?.critDamageBonus)||0);
     if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)+(Number(run.synergyLowHpDamageBonus)||0)));
     return Math.max(1,base);
   };
   const oldSnapshotDamage=weaponBaseDamageFromSnapshot;
   weaponBaseDamageFromSnapshot=function(charge){
     let base=Math.max(1,Math.round((Number(charge.atk)||1)*(Number(charge.mult)||1)*(1+(Number(run?.attackPercentBonus)||0))*(1+weaponDamageBonus(charge.weaponId||'staff'))));
-    if(Math.random()<(Number(charge.crit)||0))base+=4+(Number(run?.critDamageBonus)||0);
+    const critical=Math.random()<(Number(charge.crit)||0);if(run)run.lastWeaponHitWasCrit=critical;
+    if(critical)base+=4+(Number(run?.critDamageBonus)||0);
     if(run&&run.hp/run.maxHp<=.35)base=Math.round(base*(1+(Number(run.lowHpDamagePercent)||0)+(Number(run.synergyLowHpDamageBonus)||0)));
     if(run?.prismStaffBonus)base=Math.round(base*(1+run.prismStaffBonus));
     return Math.max(1,base);
@@ -1973,5 +1975,51 @@ button:focus-visible{outline:3px solid #9d773f;outline-offset:2px}
 }
 @media(prefers-reduced-motion:reduce){button,.weapon-item{transition:none!important}}
 </style>
+<style id="silverSwordPaperArenaAndDarkMode">
+/* Card-like parchment arena: visible paper grain without the old grid pattern. */
+#gameScreen .map{background-color:#e7d2a6!important;background-image:radial-gradient(ellipse at 14% 12%,rgba(255,249,221,.86),transparent 38%),radial-gradient(ellipse at 84% 84%,rgba(148,103,48,.16),transparent 43%),radial-gradient(circle at 18% 66%,rgba(121,84,39,.10) 0 1px,transparent 1.6px),radial-gradient(circle at 73% 31%,rgba(255,251,226,.3) 0 1px,transparent 1.8px),repeating-linear-gradient(119deg,rgba(100,72,37,.025) 0 1px,transparent 1px 9px),linear-gradient(135deg,#f0dfb6,#dfc594 55%,#ead8ae)!important;border:8px double #947348!important;border-radius:8px!important;box-shadow:inset 0 0 0 3px #f8edce,inset 0 0 26px rgba(96,65,28,.16),0 7px 18px rgba(71,48,21,.18)!important;isolation:isolate}
+#gameScreen .map:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9!important;background:radial-gradient(ellipse at 0 0,rgba(123,86,39,.18),transparent 29%),radial-gradient(ellipse at 100% 100%,rgba(123,86,39,.17),transparent 28%),radial-gradient(ellipse at 100% 0,rgba(255,248,216,.42),transparent 26%),radial-gradient(ellipse at 0 100%,rgba(255,248,216,.35),transparent 28%),radial-gradient(ellipse at center,transparent 48%,rgba(96,65,28,.13) 100%)!important}
+#gameScreen .map:after{content:"";position:absolute;inset:7px;z-index:25;pointer-events:none;border:1px solid rgba(116,82,39,.62);background:radial-gradient(circle at 0 0,transparent 0 13px,rgba(116,82,39,.72) 13.5px 14.5px,transparent 15px),radial-gradient(circle at 100% 0,transparent 0 13px,rgba(116,82,39,.72) 13.5px 14.5px,transparent 15px),radial-gradient(circle at 0 100%,transparent 0 13px,rgba(116,82,39,.72) 13.5px 14.5px,transparent 15px),radial-gradient(circle at 100% 100%,transparent 0 13px,rgba(116,82,39,.72) 13.5px 14.5px,transparent 15px);box-shadow:inset 0 0 0 1px rgba(255,247,219,.4)}
+#gameScreen .arena-wall{z-index:1!important;display:grid;place-items:center;transform:scale(.82);border:1px solid rgba(102,73,37,.9)!important;border-radius:38% 24% 35% 27% / 26% 38% 23% 37%!important;clip-path:polygon(17% 3%,72% 0,96% 22%,88% 75%,69% 98%,22% 91%,2% 65%,7% 28%)!important;background:radial-gradient(ellipse at 34% 25%,#ead7ac 0,#c5aa79 31%,#927650 66%,#705a3b 100%)!important;box-shadow:inset 0 0 0 2px rgba(244,225,181,.74),inset 0 -9px 12px rgba(67,49,27,.38),0 3px 5px rgba(59,39,18,.42)!important}
+#gameScreen .arena-wall:before{content:"✣";font-family:Georgia,serif;font-size:clamp(18px,3vw,34px);line-height:1;color:rgba(71,53,31,.58);text-shadow:0 1px rgba(255,239,199,.66);transform:rotate(-12deg)}
+#gameScreen .arena-wall:after{content:"";position:absolute;inset:17%;border:1px solid rgba(76,56,32,.28);border-radius:45% 25% 41% 30%;background:linear-gradient(143deg,transparent 45%,rgba(72,52,30,.38) 46% 48%,transparent 49%),linear-gradient(27deg,transparent 62%,rgba(244,222,174,.52) 63% 65%,transparent 66%);pointer-events:none}
+#gameScreen .arena-wall[data-ruin="1"]{filter:hue-rotate(-11deg) brightness(1.04)}
+#gameScreen .arena-wall[data-ruin="2"]{filter:hue-rotate(14deg) brightness(.96)}
+#gameScreen .arena-wall[data-ruin="3"]{filter:saturate(.78) brightness(1.07)}
+.combat-number.critical{z-index:10001!important;font-size:30px!important;line-height:1!important;color:#ffe078!important;-webkit-text-stroke:.45px #fff4c2;text-shadow:0 0 4px #7b3714,0 2px 6px #291608,0 0 14px #f6ae32!important;animation:damageFloatCritical .82s cubic-bezier(.16,.72,.28,1) both!important}
+@keyframes damageFloatCritical{0%{opacity:0;transform:translate(-50%,-20%) scale(.7)}18%{opacity:1;transform:translate(-50%,-64%) scale(1.28)}100%{opacity:0;transform:translate(-50%,-170%) scale(1.12)}}
+#darkModeToggle{margin-left:8px}
+body.dark-mode,body.dark-mode html{color:#e9e1d2!important;background-color:#17191d!important;background-image:radial-gradient(ellipse at 50% -12%,#34312b 0,rgba(25,26,29,.92) 48%,#121417 100%)!important}
+body.dark-mode{--text:#eee8dc;--muted:#b9b0a1;--gold:#e0bb75;--line:#554d40;color:#eee8dc!important}
+body.dark-mode .panel,body.dark-mode .stat,body.dark-mode .live-stat,body.dark-mode .skill,body.dark-mode .weapon-item,body.dark-mode .build-panel,body.dark-mode .target-status,body.dark-mode .codex,body.dark-mode .codex-grid>div{color:#e7dfd0!important;background:linear-gradient(145deg,#302d29,#242427)!important;border-color:#64563f!important;box-shadow:inset 0 1px rgba(255,244,215,.06),0 8px 22px rgba(0,0,0,.25)!important}
+body.dark-mode .brand,body.dark-mode .panel h2,body.dark-mode .panel h3,body.dark-mode .stat strong,body.dark-mode .live-stat strong,body.dark-mode .codex-grid b,body.dark-mode .weapon-item b,body.dark-mode .intro,body.dark-mode .sub,body.dark-mode .codex-grid p,body.dark-mode .upgrade strong,body.dark-mode .upgrade small{color:#e6dcc8!important;text-shadow:none!important}
+body.dark-mode button,body.dark-mode select,body.dark-mode input{color:#eee5d4!important;background:linear-gradient(#46413a,#302e2b)!important;border-color:#766344!important;box-shadow:inset 0 1px rgba(255,242,204,.1),0 2px 4px rgba(0,0,0,.24)!important}
+body.dark-mode button.primary{color:#20190e!important;background:linear-gradient(#e5c77f,#b8904b)!important;border-color:#d1aa63!important}
+body.dark-mode button.danger{color:#f4ddd0!important;background:linear-gradient(#754640,#4b302f)!important;border-color:#986158!important}
+body.dark-mode .diff.active,body.dark-mode .weapon-item.active{background:linear-gradient(#574833,#38332a)!important;border-color:#c4a361!important}
+body.dark-mode .log,body.dark-mode .log p{color:#e3d9c7!important;background:#242426!important;border-color:#50483a!important}
+body.dark-mode .bar{background:#48443d!important}
+body.dark-mode .modal{background:rgba(5,6,8,.82)!important}
+body.dark-mode .modalbox,body.dark-mode #modalContent{color:#e9e0d2!important;background:linear-gradient(145deg,#302d29,#222326)!important;border-color:#716247!important}
+body.dark-mode .modalbox .intro,body.dark-mode #modalContent .intro,body.dark-mode #modalContent p{color:#d0c6b5!important}
+body.dark-mode #gameScreen .map{background-color:#37312a!important;background-image:radial-gradient(ellipse at 14% 12%,rgba(153,132,97,.24),transparent 38%),radial-gradient(ellipse at 84% 84%,rgba(0,0,0,.3),transparent 43%),repeating-linear-gradient(119deg,rgba(230,207,162,.025) 0 1px,transparent 1px 9px),linear-gradient(135deg,#464036,#332f2a 55%,#40392f)!important;border-color:#7e6846!important;box-shadow:inset 0 0 0 3px #514636,inset 0 0 28px rgba(0,0,0,.42),0 7px 18px rgba(0,0,0,.35)!important}
+body.dark-mode #gameScreen .map:before{background:radial-gradient(ellipse at 0 0,rgba(0,0,0,.3),transparent 30%),radial-gradient(ellipse at 100% 100%,rgba(0,0,0,.28),transparent 29%),radial-gradient(ellipse at center,transparent 48%,rgba(0,0,0,.32) 100%)!important}
+body.dark-mode #gameScreen .map:after{border-color:rgba(200,168,111,.54);box-shadow:inset 0 0 0 1px rgba(238,218,174,.12)}
+body.dark-mode #gameScreen .arena-wall{background:radial-gradient(ellipse at 34% 25%,#8b806c 0,#6e604c 34%,#4a4236 68%,#34302a 100%)!important;border-color:#393126!important;box-shadow:inset 0 0 0 2px rgba(203,183,142,.34),inset 0 -9px 12px rgba(0,0,0,.5),0 3px 5px rgba(0,0,0,.6)!important}
+body.dark-mode #gameScreen .arena-wall:before{color:rgba(31,27,22,.8);text-shadow:0 1px rgba(232,212,174,.38)}
+body.dark-mode .combat-number.critical{color:#ffe99a!important}
+body.dark-mode #gameScreen .arena-actor .arena-name,body.dark-mode #gameScreen .arena-actor .arena-name-text,body.dark-mode #gameScreen #liveStats,body.dark-mode #gameScreen #liveStats *,body.dark-mode #gameScreen .live-stat,body.dark-mode #gameScreen .live-stat span,body.dark-mode #gameScreen .live-stat strong{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.9)!important}
+#darkModeToggle.theme-icon-button{width:42px;height:42px;min-width:42px;padding:0;margin:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-family:system-ui,sans-serif!important;font-size:24px;line-height:1}
+.header-tools{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+</style>
+<script id="silverSwordDarkModeToggle">
+(function(){
+  const button=document.createElement('button');button.id='darkModeToggle';button.type='button';button.className='theme-icon-button';button.setAttribute('aria-pressed','false');
+  const headerMeta=document.getElementById('headerMeta');if(headerMeta){const tools=document.createElement('div');tools.className='header-tools';headerMeta.parentNode.insertBefore(tools,headerMeta);tools.append(headerMeta,button)}
+  const key='silverSwordDarkMode';let enabled=false;try{enabled=localStorage.getItem(key)==='1'}catch(_){}
+  function apply(value){enabled=!!value;document.body.classList.toggle('dark-mode',enabled);button.textContent=enabled?'☀':'☾';button.setAttribute('aria-label',enabled?'切換為淺色模式':'切換為深色模式');button.title=enabled?'切換為淺色模式':'切換為深色模式';button.setAttribute('aria-pressed',String(enabled));try{localStorage.setItem(key,enabled?'1':'0')}catch(_){}}
+  apply(enabled);button.addEventListener('click',()=>apply(!enabled));
+})();
+</script>
 </body>
 </html>
