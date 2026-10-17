@@ -1697,6 +1697,8 @@ html,body,body *,button,input,select,textarea{
 /* Mobile-only controls. On desktop, input is keyboard-only: WASD/arrows, E/Space, R, Shift. */
 #gameScreen .dpad,#gameScreen .combat-control-layout,#lockRightBtn,#lockTargetBtn,#targetStatus {display:none!important}
 #gameScreen .mobile-combat-controls{display:none}
+/* Keep every modal and choice screen above the positioned touch-control layer. */
+#modal{z-index:1000!important}
 #attackBtn,#potionBtn{display:none!important}
 #gameScreen .arena-actor.player .arena-cooldown-bar{background:transparent!important;border:0!important;box-shadow:none!important;outline:0!important}
 #gameScreen .arena-actor.player .arena-cooldown-bar span{border:0!important;box-shadow:none!important}
