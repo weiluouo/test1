@@ -1731,12 +1731,12 @@ body.mobile-control-mode #gameScreen .layout{grid-template-columns:minmax(0,1fr)
     // Some mobile browsers (tablet mode, desktop-site mode, or attached mouse)
     // report hover/fine pointer. Keep touch controls available on compact touch screens.
     const touchCapable=(navigator.maxTouchPoints||0)>0||('ontouchstart' in window);
-    const compactTouch=touchCapable&&Math.min(window.innerWidth,window.screen?.width||window.innerWidth)<=1100;
-    const onPhone=!!media.matches||compactTouch;
-    document.body.classList.toggle('mobile-control-mode',onPhone);
+    const tabletOrPhoneTouch=touchCapable&&Math.min(window.innerWidth,window.screen?.width||window.innerWidth)<=1800;
+    const onTouchDevice=!!media.matches||tabletOrPhoneTouch;
+    document.body.classList.toggle('mobile-control-mode',onTouchDevice);
     const controls=$('mobileCombatControls');
-    if(controls)controls.setAttribute('aria-hidden',onPhone?'false':'true');
-    if(!onPhone&&typeof clearHeldDirections==='function')clearHeldDirections();
+    if(controls)controls.setAttribute('aria-hidden',onTouchDevice?'false':'true');
+    if(!onTouchDevice&&typeof clearHeldDirections==='function')clearHeldDirections();
   }
   function buildControls(){
     // Remove all remnants of the former four-button pad and lock controls.
