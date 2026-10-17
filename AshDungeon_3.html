@@ -532,10 +532,10 @@ function buildArena(){const mapEl=$('map');mapEl.innerHTML='';mapEl.dataset.floo
   const search=addArenaNode(mapEl,'arena-search','✧');search.id='arenaSearch';search.title='調查此處的印記';
 }
 function ensureActor(uid,kind){let el=$('arenaActor-'+uid.replace(/[^a-zA-Z0-9_-]/g,'_'));if(!el){el=addArenaNode($('arenaActors'),'arena-actor '+kind,'<div class="arena-name"><span class="arena-name-icon"></span><span class="arena-name-text"></span></div><span class="arena-sprite"></span><div class="arena-hp"><span></span></div>');el.id='arenaActor-'+uid.replace(/[^a-zA-Z0-9_-]/g,'_');el.dataset.uid=uid}return el}
-function positionNode(el,p){el.style.left=pctX(p.x);el.style.top=pctY(p.y)}
+function positionNode(el,p){const left=pctX(p.x),top=pctY(p.y);if(el.style.left!==left)el.style.left=left;if(el.style.top!==top)el.style.top=top}
 function renderArena(){if(arenaBuiltFloor!==run.floor||$('map').dataset.floor!==String(run.floor))buildArena();const mapEl=$('map');const exitEl=$('arenaExit');if(exitEl)positionNode(exitEl,run.exit);
   let ring=$('attackRangeRing');if(ring){const dia=weaponRangePx();ring.style.width=(dia*2/WORLD.width*100)+'%';ring.style.height=(dia*2/WORLD.height*100)+'%';positionNode(ring,run.player)}
-  const actorParent=$('arenaActors');const activeIds=new Set();const p=ensureActor('player','player');if(p.className!=='arena-actor player')p.className='arena-actor player';['background','border','box-shadow','border-radius','outline'].forEach(k=>p.style.setProperty(k,k==='background'?'transparent':(k==='border'?'0':(k==='border-radius'?'0':'none')),'important'));const playerSprite=p.querySelector('.arena-sprite');if(!playerSprite.querySelector('.hero-hand')){const heroImg=document.createElement('img');heroImg.className='hero-hand';heroImg.src=localAssetPath('hand.png');heroImg.alt='冒險者';const heroFallback=document.createElement('span');heroFallback.className='hero-fallback';heroFallback.textContent='🧙';heroFallback.style.display='none';heroImg.addEventListener('error',()=>{heroImg.style.display='none';heroFallback.style.display='inline'});playerSprite.replaceChildren(heroImg,heroFallback);}const playerName=p.querySelector('.arena-name-text');if(playerName.textContent!=='冒險者')playerName.textContent='冒險者';p.querySelector('.arena-name-icon').style.display='none';const playerTitle=`冒險者 ${Math.ceil(run.hp)}/${run.maxHp}`;if(p.title!==playerTitle)p.title=playerTitle;positionNode(p,run.player);activeIds.add(p.id);p.querySelector('.arena-hp span').style.width=Math.max(0,Math.min(100,run.hp/run.maxHp*100))+'%';
+  const actorParent=$('arenaActors');const activeIds=new Set();const p=ensureActor('player','player');if(p.className!=='arena-actor player')p.className='arena-actor player';if(p.dataset.playerStyleReady!=='1'){['background','border','box-shadow','border-radius','outline'].forEach(k=>p.style.setProperty(k,k==='background'?'transparent':(k==='border'?'0':(k==='border-radius'?'0':'none')),'important'));p.dataset.playerStyleReady='1'}const playerSprite=p.querySelector('.arena-sprite');if(!playerSprite.querySelector('.hero-hand')){const heroImg=document.createElement('img');heroImg.className='hero-hand';heroImg.src=localAssetPath('hand.png');heroImg.alt='冒險者';const heroFallback=document.createElement('span');heroFallback.className='hero-fallback';heroFallback.textContent='🧙';heroFallback.style.display='none';heroImg.addEventListener('error',()=>{heroImg.style.display='none';heroFallback.style.display='inline'});playerSprite.replaceChildren(heroImg,heroFallback);}const playerName=p.querySelector('.arena-name-text');if(playerName.textContent!=='冒險者')playerName.textContent='冒險者';p.querySelector('.arena-name-icon').style.display='none';const playerTitle=`冒險者 ${Math.ceil(run.hp)}/${run.maxHp}`;if(p.title!==playerTitle)p.title=playerTitle;positionNode(p,run.player);activeIds.add(p.id);p.querySelector('.arena-hp span').style.width=Math.max(0,Math.min(100,run.hp/run.maxHp*100))+'%';
   for(const e of aliveEnemies()){if(!e.uid)e.uid=`f${run.floor}-summon-${++uidSequence}`;const el=ensureActor(e.uid,e.boss?'boss':'enemy');const actorClass='arena-actor '+(e.boss?'boss':'enemy')+(e.boss&&e.shieldUntil>Date.now()?' shielded':'');if(el.className!==actorClass)el.className=actorClass;const nameIcon=el.querySelector('.arena-name-icon');const iconDisplay=e.icon?'inline-flex':'none';if(nameIcon.style.display!==iconDisplay)nameIcon.style.display=iconDisplay;if(e.icon)setIconContent(nameIcon,e.icon,e.fallbackIcon||'◈');const actorName=el.querySelector('.arena-name-text');const actorNameText=e.boss?`【首領】${e.name}`:e.name;if(actorName.textContent!==actorNameText)actorName.textContent=actorNameText;const sprite=el.querySelector('.arena-sprite');const fallbackIcon=e.fallbackIcon||(isPngIcon(e.icon)?'☠':(e.icon||'☠'));setIconContent(sprite,classMapIconFile(e)||e.icon,fallbackIcon);const actorTitle=`${e.name} ${Math.ceil(e.hp)}/${e.maxHp}`;if(el.title!==actorTitle)el.title=actorTitle;positionNode(el,e);activeIds.add(el.id);let hp=el.querySelector('.arena-hp');const hpWidth=Math.max(0,e.hp/e.maxHp*100)+'%';if(hp.firstElementChild.style.width!==hpWidth)hp.firstElementChild.style.width=hpWidth}
   actorParent.querySelectorAll('.arena-actor').forEach(el=>{if(!activeIds.has(el.id))el.remove()});
   const searchNode=$('arenaSearch');if(searchNode&&run.searchPoint){positionNode(searchNode,run.searchPoint);searchNode.style.display=run.roomSearched?'none':'flex'}
@@ -585,7 +585,7 @@ function damagePlayerFromEnemy(e,now,projectile=false){
  e.nextAttackAt=now+(e.attackCooldown||(e.boss?1200:1450));return applyEnemyDamageToPlayer(e,now,false)
 }
 function pointSegmentDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y;const l2=dx*dx+dy*dy;if(!l2)return dist(p,a);const t=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/l2));return Math.hypot(p.x-(a.x+t*dx),p.y-(a.y+t*dy))}
-function updateProjectiles(dt,now){if(!run)return;const items=run.projectiles||[];for(const p of items){if(p.dead)continue;if(Number(p.lifetimeMs)>0&&now-(Number(p.createdAt)||now)>=Number(p.lifetimeMs)){p.dead=true;p.el?.remove();continue}const from={x:p.x,y:p.y},to={x:p.x+p.vx*dt,y:p.y+p.vy*dt};if(segmentHitsWall(from,to)||to.x<WORLD.cell||to.x>WORLD.width-WORLD.cell||to.y<WORLD.cell||to.y>WORLD.height-WORLD.cell){p.dead=true;p.el?.remove();continue}p.x=to.x;p.y=to.y;if(p.el)positionNode(p.el,p);if(pointSegmentDistance(run.player,from,to)<=WORLD.playerRadius+(p.radius||8)){p.dead=true;p.el?.remove();applyEnemyDamageToPlayer(p.owner,now,true)}}run.projectiles=items.filter(p=>!p.dead);if(run.hp<=0)finish(false)}
+function updateProjectiles(dt,now){if(!run)return;const items=run.projectiles||[];for(const p of items){if(p.dead)continue;if(Number(p.lifetimeMs)>0&&now-(Number(p.createdAt)||now)>=Number(p.lifetimeMs)){p.dead=true;p.el?.remove();continue}const from={x:p.x,y:p.y},to={x:p.x+p.vx*dt,y:p.y+p.vy*dt};if((!p.bullCharge&&segmentHitsWall(from,to))||to.x<WORLD.cell||to.x>WORLD.width-WORLD.cell||to.y<WORLD.cell||to.y>WORLD.height-WORLD.cell){p.dead=true;p.el?.remove();continue}p.x=to.x;p.y=to.y;if(p.el)positionNode(p.el,p);if(pointSegmentDistance(run.player,from,to)<=WORLD.playerRadius+(p.radius||8)){p.dead=true;p.el?.remove();applyEnemyDamageToPlayer(p.owner,now,true)}}run.projectiles=items.filter(p=>!p.dead);if(run.hp<=0)finish(false)}
 function moveTowardPoint(e,target,dt,speed){
  if(!target||!e)return false;
  const dx=target.x-e.x,dy=target.y-e.y,len=Math.hypot(dx,dy);
@@ -1909,5 +1909,62 @@ body.mobile-control-mode .mobile-combat-controls{display:flex!important}
 
 <script src="./GameData/ashen_boss_modes.js"></script>
 <script src="./GameData/ashen_requested_features.js"></script>
+<style>
+/* 動態角色不預先建立 left/top 合成圖層；把樣式與版面影響限制在角色容器內。 */
+#arenaActors{contain:layout style!important}
+#gameScreen .arena-actor{will-change:auto!important;transition:none!important}
+</style>
+<style id="visual-polish">
+/* A quieter, more legible parchment treatment; gameplay elements and dimensions stay intact. */
+:root{--ink:#3d2b1b;--ink-soft:#725b3d;--paper:#f6e9c9;--paper-light:#fff6dc;--paper-deep:#e8d2a5;--brass:#a17a3c;--brass-light:#cfb27a;--edge:#c8ad7d;--shadow:rgba(67,45,19,.13)}
+body{color:var(--ink);background-color:#efe0bd;background-image:radial-gradient(ellipse at 50% -12%,#fff9e7 0,rgba(255,249,231,.48) 32%,transparent 70%),radial-gradient(ellipse at 100% 55%,rgba(190,153,91,.12),transparent 48%),linear-gradient(115deg,#f6ebcf,#ead8b2 52%,#f5e8c8);background-attachment:fixed}
+.wrap{max-width:1320px;padding:clamp(14px,2.2vw,28px)}
+.top{position:relative;padding:10px 4px 17px;margin-bottom:22px;border-bottom:1px solid #bca071}
+.top:after{content:"";position:absolute;left:4px;bottom:-2px;width:clamp(110px,16vw,210px);height:3px;border-radius:99px;background:linear-gradient(90deg,#9b7134,#d4b36e,transparent)}
+.brand{color:#392718;text-shadow:0 1px 0 #fff5d8;letter-spacing:.2px}
+.eyebrow{color:#8b642d;letter-spacing:2.3px}
+.badge{border-color:#b99c69;background:linear-gradient(145deg,#fff5d9,#ead6a8);box-shadow:0 2px 6px #65461b12,inset 0 1px #fffdf0}
+.panel{border:1px solid rgba(168,137,83,.68);border-radius:15px;background:linear-gradient(145deg,rgba(255,247,222,.96),rgba(242,225,187,.97));box-shadow:0 12px 30px var(--shadow),0 2px 5px rgba(67,45,19,.08),inset 0 1px 0 rgba(255,255,255,.82)}
+.panel h2{color:#50371f;letter-spacing:.25px}
+.panel h3{color:#805a28;letter-spacing:.45px}
+button{border-radius:11px;box-shadow:0 2px 0 rgba(117,84,37,.18),inset 0 1px rgba(255,255,255,.55);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease,filter .15s ease}
+button:hover:not(:disabled){filter:brightness(1.025);box-shadow:0 4px 9px rgba(87,59,24,.13),inset 0 1px rgba(255,255,255,.65)}
+button:focus-visible{outline:3px solid #9d773f;outline-offset:2px}
+.primary{box-shadow:0 3px 8px rgba(116,78,28,.2),inset 0 1px rgba(255,255,255,.25)}
+.stat,.live-stat{border-radius:12px;background:linear-gradient(155deg,#fbf0d2,#ead6ae);box-shadow:inset 0 1px rgba(255,255,255,.78),0 2px 5px rgba(76,51,20,.06)}
+.stat label,.live-stat span{color:#786143}
+.stat strong,.live-stat strong{color:#352719}
+.skill,.weapon-item,.build-panel,.target-status{border-radius:12px;box-shadow:inset 0 1px rgba(255,255,255,.7),0 2px 5px rgba(76,51,20,.045)}
+.weapon-item{transition:border-color .15s ease,background-color .15s ease,box-shadow .15s ease}
+.weapon-item.active{box-shadow:inset 0 0 0 1px rgba(159,119,54,.25),0 3px 8px rgba(76,51,20,.08)}
+.log{border-radius:12px;background:rgba(255,246,220,.52);scrollbar-color:#b99a65 transparent}
+.log p{border:1px solid rgba(188,157,103,.28);border-left:3px solid #c5a66d;border-radius:8px;background:linear-gradient(100deg,rgba(255,250,232,.9),rgba(245,231,198,.88));box-shadow:0 1px 2px rgba(71,49,22,.035)}
+.log p:first-child{border-left-color:#977037}
+.section{padding-top:14px}
+.section>h3{padding-bottom:7px;border-bottom:1px solid rgba(172,140,87,.3)}
+#gameScreen .layout{gap:18px;align-items:start}
+#gameScreen #map.map{border-radius:14px!important;box-shadow:inset 0 0 0 1px rgba(255,249,228,.55),inset 0 0 24px rgba(110,76,34,.08),0 5px 15px rgba(79,54,22,.08)!important}
+#gameScreen .arena-wall{border-radius:4px!important;box-shadow:inset 0 0 0 1px rgba(255,242,208,.43),0 3px 7px rgba(69,48,22,.22)!important}
+#gameScreen .arena-chest,#gameScreen .arena-exit,#gameScreen .arena-search{filter:drop-shadow(0 2px 3px rgba(72,49,22,.32))}
+#gameScreen .combat-readout,#gameScreen .live-stat{border-radius:11px}
+#gameScreen .dpad button,.mobile-actions button{border-radius:12px}
+.modalbox{border-radius:18px;box-shadow:0 24px 72px rgba(47,31,14,.28),inset 0 0 0 2px rgba(255,248,225,.6)}
+.mobile-combat-controls{margin:12px 0 4px;padding:12px;border:1px solid rgba(172,140,87,.55);border-radius:16px;background:linear-gradient(145deg,rgba(255,247,222,.98),rgba(234,215,176,.98));box-shadow:0 7px 18px rgba(67,45,19,.1),inset 0 1px rgba(255,255,255,.75)}
+.mobile-joystick{border-color:#9a7b48;box-shadow:inset 0 0 0 4px rgba(255,248,225,.85),inset 0 0 16px rgba(93,63,27,.2),0 4px 11px rgba(68,45,19,.13)}
+.mobile-actions button{min-height:46px;font-weight:750;box-shadow:0 2px 4px rgba(76,51,20,.14),inset 0 1px rgba(255,255,255,.42)}
+@media(max-width:760px){
+ .wrap{padding:12px}
+ .top{gap:10px;margin-bottom:14px;padding-bottom:13px}
+ .brand{font-size:clamp(23px,6vw,31px);line-height:1.15}
+ .panel{border-radius:13px;padding:14px;box-shadow:0 7px 20px rgba(67,45,19,.1),inset 0 1px rgba(255,255,255,.75)}
+ #gameScreen .layout{gap:13px}
+ #gameScreen #map.map{margin:10px auto;border-radius:12px!important}
+ .mobile-combat-controls{gap:clamp(8px,3vw,18px);padding:10px}
+ .mobile-actions{gap:7px}
+ .mobile-actions button{font-size:clamp(12px,3.4vw,15px);padding:9px 5px}
+ .section{margin-top:13px;padding-top:11px}
+}
+@media(prefers-reduced-motion:reduce){button,.weapon-item{transition:none!important}}
+</style>
 </body>
 </html>
