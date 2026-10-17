@@ -208,13 +208,15 @@
   const castLineTelegraph = (boss, duration, halfWidth, multiplier, label) => {
     const dx = run.player.x - boss.x, dy = run.player.y - boss.y;
     const lengthToPlayer = Math.hypot(dx, dy) || 1, ux = dx / lengthToPlayer, uy = dy / lengthToPlayer;
-    const minX = WORLD.cell, maxX = WORLD.width - WORLD.cell, minY = WORLD.cell, maxY = WORLD.height - WORLD.cell;
+    const minX = 0, maxX = WORLD.width, minY = 0, maxY = WORLD.height;
     const tx = ux > 0 ? (maxX - boss.x) / ux : ux < 0 ? (minX - boss.x) / ux : Infinity;
     const ty = uy > 0 ? (maxY - boss.y) / uy : uy < 0 ? (minY - boss.y) / uy : Infinity;
     const length = Math.max(0, Math.min(tx, ty));
     // Draw directly in WORLD coordinates: rotated percentage-sized divs distort
     // against the map's 9:7 aspect ratio and can appear to stop near the player.
-    const frame = addArenaNode($('map'), 'boss-range-frame boss-line-any', '');
+    const frame = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    frame.setAttribute('class', 'boss-range-frame boss-line-any');
+    $('map').appendChild(frame);
     frame.setAttribute('viewBox', `0 0 ${WORLD.width} ${WORLD.height}`);
     frame.setAttribute('preserveAspectRatio', 'none');
     frame.setAttribute('aria-hidden', 'true');
@@ -225,13 +227,28 @@
     run.bossEffects.push({ type: 'line', el: frame, ux, uy, length, halfWidth, multiplier, label, landsAt: Date.now() + duration, boss });
   };
   const createLineAftermath = (effect, cls, durationMs) => {
-    const el = addArenaNode($('map'), cls, '');
-    el.style.left = `${effect.boss.x / WORLD.width * 100}%`;
-    const halfHeight = cls === 'boss-ground-crack' ? 7 : effect.halfWidth;
-    el.style.top = `${(effect.boss.y - halfHeight) / WORLD.height * 100}%`;
-    el.style.width = `${effect.length / WORLD.width * 100}%`;
-    el.style.height = `${halfHeight * 2 / WORLD.height * 100}%`;
-    el.style.transformOrigin = '0 50%'; el.style.transform = `rotate(${Math.atan2(effect.uy, effect.ux)}rad)`;
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    el.setAttribute('class', cls);
+    $('map').appendChild(el);
+    el.setAttribute('viewBox', `0 0 ${WORLD.width} ${WORLD.height}`);
+    el.setAttribute('preserveAspectRatio', 'none');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:${cls === 'boss-thunder-strike' ? 11 : 10};pointer-events:none;`;
+    const { boss, ux, uy, length, halfWidth } = effect;
+    const nx = -uy, ny = ux, ex = boss.x + ux * length, ey = boss.y + uy * length;
+    const points = `${boss.x + nx * halfWidth},${boss.y + ny * halfWidth} ${ex + nx * halfWidth},${ey + ny * halfWidth} ${ex - nx * halfWidth},${ey - ny * halfWidth} ${boss.x - nx * halfWidth},${boss.y - ny * halfWidth}`;
+    const count = Math.max(4, Math.ceil(length / 85));
+    const path = [];
+    for (let i = 0; i <= count; i++) {
+      const t = i / count, offset = i === 0 || i === count ? 0 : (i % 2 ? 5 : -5);
+      path.push(`${(boss.x + ux * length * t + nx * offset).toFixed(1)},${(boss.y + uy * length * t + ny * offset).toFixed(1)}`);
+    }
+    const fill = cls === 'boss-thunder-strike' ? '#72dfff' : '#a34830';
+    const opacity = cls === 'boss-thunder-strike' ? '.36' : '.32';
+    const uid = `${cls}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const glow = cls === 'boss-thunder-strike' ? `<filter id="${uid}-glow"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>` : '';
+    const filter = cls === 'boss-thunder-strike' ? ` filter="url(#${uid}-glow)"` : '';
+    el.innerHTML = `<defs><linearGradient id="${uid}-along" gradientUnits="userSpaceOnUse" x1="${boss.x}" y1="${boss.y}" x2="${ex}" y2="${ey}"><stop offset="0" stop-color="${fill}" stop-opacity="${opacity}"/><stop offset="1" stop-color="${fill}" stop-opacity="${opacity}"/></linearGradient>${glow}</defs><polygon points="${points}" fill="url(#${uid}-along)"/><line x1="${boss.x}" y1="${boss.y}" x2="${ex}" y2="${ey}" stroke="${cls === 'boss-thunder-strike' ? '#c6f6ff' : '#f0bc67'}" stroke-width="2" stroke-dasharray="9 7" opacity=".9"/><polyline points="${path.join(' ')}" fill="none" stroke="${cls === 'boss-thunder-strike' ? '#e8fcff' : '#3a2119'}" stroke-width="${cls === 'boss-thunder-strike' ? 6 : 12}" stroke-linecap="round" stroke-linejoin="round"${filter}/>${cls === 'boss-ground-crack' ? `<polyline points="${path.join(' ')}" fill="none" stroke="#f0bc67" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>` : ''}`;
     setTimeout(() => el.remove(), durationMs);
   };
   const summonMud = (boss, count = 2) => {
@@ -516,9 +533,8 @@
     .boss-line-any::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #ffe5a9;filter:drop-shadow(0 0 4px #ff4931)}
     .boss-line-any::after{content:"";position:absolute;left:0;top:50%;width:12px;height:12px;border:2px solid #fff1bb;border-radius:50%;background:#ff4931;box-shadow:0 0 10px 4px #ff4931;transform:translate(-50%,-50%)}
     .boss-fire-pillar{position:absolute;z-index:12;display:grid;place-items:center;transform:translate(-50%,-50%);font-size:42px;background:linear-gradient(to top,#a91d16dd 0%,#ff6722a8 42%,#ffdb5c22 100%);clip-path:polygon(38% 100%,20% 67%,34% 74%,17% 41%,40% 55%,34% 15%,52% 0,68% 39%,78% 20%,80% 62%,98% 48%,73% 100%);filter:drop-shadow(0 0 12px #ff4b1d);animation:firePillarFall .72s ease-out both;pointer-events:none}
-    .boss-ground-crack{position:absolute;z-index:10;overflow:hidden;pointer-events:none;opacity:.92;background:linear-gradient(to bottom,transparent 38%,#3a2119 42%,#f0bc67 50%,#2c201b 59%,transparent 64%);clip-path:polygon(0 44%,4% 25%,8% 60%,14% 15%,19% 73%,26% 35%,32% 82%,38% 24%,45% 64%,53% 14%,60% 71%,67% 32%,73% 83%,80% 19%,87% 62%,94% 30%,100% 48%,100% 58%,93% 43%,87% 76%,80% 36%,73% 98%,67% 45%,60% 84%,53% 25%,45% 78%,38% 38%,32% 96%,26% 48%,19% 88%,14% 28%,8% 76%,4% 39%,0 57%);filter:drop-shadow(0 0 4px #e7a747);animation:groundCrackFade 2s ease-out both}
-    .boss-thunder-strike{position:absolute;z-index:11;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 7%,#b8f4ffdd 7.2% 7.8%,transparent 8% 14%),linear-gradient(to bottom,transparent,#9beaff88 33%,#e8fcffed 50%,#74ddff88 70%,transparent);animation:thunderStrike .46s steps(2,end) both}
-    .boss-thunder-strike::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px solid #efffff;box-shadow:0 0 10px 5px #54dcff}
+    .boss-ground-crack{position:absolute;z-index:10;overflow:hidden;pointer-events:none;opacity:.92;filter:drop-shadow(0 0 4px #e7a747);animation:groundCrackFade 2s ease-out both}
+    .boss-thunder-strike{position:absolute;z-index:11;pointer-events:none;filter:drop-shadow(0 0 7px #54dcff);animation:thunderStrike .46s steps(2,end) both}
     @keyframes firePillarFall{0%{opacity:.2;transform:translate(-50%,-50%) scaleY(.08)}28%{opacity:1;transform:translate(-50%,-50%) scaleY(1.22)}100%{opacity:.2;transform:translate(-50%,-50%) scaleY(.8)}}
     @keyframes groundCrackFade{0%{opacity:1}75%{opacity:.9}100%{opacity:0}}
     @keyframes thunderStrike{0%{opacity:0;filter:brightness(1)}22%{opacity:1;filter:brightness(2.6)}100%{opacity:0;filter:brightness(1)}}
