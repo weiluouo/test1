@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "description": "夢境君王與自訂首領平衡及技能設定。編輯此 JSON 即可調整遊戲實際讀取的首領名稱、圖示、基礎數值及技能參數。",
+  "description": "夢境君王與自訂首領平衡、技能與環境設定。編輯此 JSON 即可調整遊戲實際讀取的首領名稱、圖示、基礎數值及技能參數。environments 定義每十層區段的場景、障礙物及對應首領；cinematicSlots 與各環境 contentSlots 為未啟用的預留欄位，供未來播片、小怪、情報道具使用，目前不影響遊戲。",
   "dreamKing": {
     "baseHp": 100,
     "speed": 136,
@@ -182,5 +182,159 @@
         }
       ]
     }
-  ]
+  ],
+  "environments": [
+    {
+      "name": "王子尖塔環境",
+      "id": "prince-spires",
+      "description": "尖塔群聳立於金色夢境",
+      "scene": "golden-spires",
+      "bossId": "prince",
+      "obstacleStyle": "spires",
+      "contentSlots": {
+        "bossDeathCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "environmentEntryCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "smallMobs": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "intelItems": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "bossIntroCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        }
+      }
+    },
+    {
+      "name": "札里安廢墟環境",
+      "id": "zarian-ruins",
+      "description": "龍影盤踞的焦黑廢墟",
+      "scene": "ashen-ruins",
+      "bossId": "zarian",
+      "obstacleStyle": "ruins",
+      "contentSlots": {
+        "bossDeathCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "environmentEntryCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "smallMobs": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "intelItems": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "bossIntroCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        }
+      }
+    },
+    {
+      "name": "特雷法沙王獸塚環境",
+      "id": "trefasha-bones",
+      "description": "牛王遺骸堆砌的古老戰場",
+      "scene": "beast-tomb",
+      "bossId": "trefasha",
+      "obstacleStyle": "bull-skulls",
+      "contentSlots": {
+        "bossDeathCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "environmentEntryCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "smallMobs": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "intelItems": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "bossIntroCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        }
+      }
+    },
+    {
+      "name": "夢境王座環境",
+      "id": "dream-kingdom",
+      "description": "維持夢境王座原有場景",
+      "scene": "dream-throne",
+      "bossId": "dreamKing",
+      "obstacleStyle": "original",
+      "contentSlots": {
+        "bossDeathCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "environmentEntryCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "smallMobs": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "intelItems": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        },
+        "bossIntroCinematic": {
+          "items": [],
+          "status": "reserved",
+          "enabled": false
+        }
+      }
+    }
+  ],
+  "cinematicSlots": {
+    "arrivalCinematic": {
+      "items": [],
+      "status": "reserved",
+      "enabled": false
+    },
+    "evacuationCinematic": {
+      "items": [],
+      "status": "reserved",
+      "enabled": false
+    }
+  }
 }

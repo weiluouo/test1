@@ -60,7 +60,7 @@
       "xp": 5,
       "classType": "melee",
       "speed": 62,
-      "damageMultiplier": 2,
+      "damageMultiplier": 1.2,
       "aggroRange": 275,
       "attackRange": 92,
       "attackCooldown": 1850,

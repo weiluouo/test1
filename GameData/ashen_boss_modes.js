@@ -29,7 +29,13 @@
 
   const bossFloor = floor => floor > 0 && floor % 10 === 0;
   const modeFloorCount = () => DIFFS[difficulty]?.floors || 10;
-  const pickBoss = floor => roster()[Math.floor(Math.random() * roster().length)];
+  const environments = () => Array.isArray(BOSS_DATA.environments) && BOSS_DATA.environments.length
+    ? BOSS_DATA.environments : roster().map(spec => ({ id: `${spec.id}-legacy`, name: `${spec.name}環境`, bossId: spec.id, obstacleStyle: 'original', scene: 'dream-throne' }));
+  const pickEnvironment = () => environments()[Math.floor(Math.random() * environments().length)];
+  const pickBoss = floor => {
+    const env = run?.currentEnvironment;
+    return roster().find(spec => spec.id === env?.bossId) || roster()[Math.floor(Math.random() * roster().length)];
+  };
   const worldPoint = (x, y) => ({ x: x * WORLD.cell + WORLD.cell / 2, y: y * WORLD.cell + WORLD.cell / 2 });
   const isCustomBoss = e => !!e?.customBoss;
   const addBossMarker = (cls, x, y, radius, text = '') => {
@@ -117,6 +123,15 @@
     if (run) {
       run.maxFloors = modeFloorCount();
       run.isEndless = !!DIFFS[difficulty]?.endless;
+      if (run.floor === 1 || (run.floor - 1) % 10 === 0 || !run.currentEnvironment) {
+        run.currentEnvironment = pickEnvironment();
+      }
+      const map = $('map');
+      if (map) {
+        map.dataset.environment = run.currentEnvironment?.id || 'dream-kingdom';
+        map.dataset.obstacleStyle = run.currentEnvironment?.obstacleStyle || 'original';
+        map.dataset.sceneStyle = run.currentEnvironment?.scene || 'dream-throne';
+      }
       if (run.isEndless) {
         const base = DIFFS[difficulty];
         const growth = Math.max(0, (run.floor - 1) * .045);
@@ -125,6 +140,12 @@
     }
     oldMakeRoom();
     if (!run) return;
+    const map = $('map');
+    if (map) {
+      map.dataset.environment = run.currentEnvironment?.id || 'dream-kingdom';
+      map.dataset.obstacleStyle = run.currentEnvironment?.obstacleStyle || 'original';
+      map.dataset.sceneStyle = run.currentEnvironment?.scene || 'dream-throne';
+    }
     run.maxFloors = modeFloorCount();
     run.isEndless = !!DIFFS[difficulty]?.endless;
     if (bossFloor(run.floor)) { createBoss(run.floor); return; }
@@ -480,10 +501,36 @@
     oldMoveEnemies(dt, now);
     if (frozen.length) run.enemies.push(...frozen);
   };
+  const bossTotems = {
+    zarian: '<img class="boss-totem-image" src="./GameData/札里安.png" alt="札里安暴龍圖騰">',
+    prince: '<img class="boss-totem-image" src="./GameData/蛇頭.png" alt="神足王子娜迦巨蛇圖騰">',
+    trefasha: '<img class="boss-totem-image" src="./GameData/牛頭.png" alt="特雷法沙王牛頭人圖騰">',
+    dreamKing: '<img class="boss-totem-image" src="./GameData/夢境.png" alt="夢境君王圖騰">'
+  };
   const oldRenderArena = renderArena;
   renderArena = function (...args) {
     const value = oldRenderArena(...args);
     if (!run) return value;
+    const map = $('map');
+    const sceneMarks = { 'prince-spires': '蓮華.png', 'trefasha-bones': '鷹幟.png', 'dream-kingdom': '染塵.png' };
+    const markFile = sceneMarks[run.currentEnvironment?.id];
+    let mark = map?.querySelector('.arena-scene-mark');
+    if (markFile && map) {
+      if (!mark) { mark = document.createElement('img'); mark.className = 'arena-scene-mark'; mark.alt = ''; mark.setAttribute('aria-hidden', 'true'); map.insertBefore(mark, map.firstChild); }
+      const source = `./GameData/${markFile}`;
+      if (mark.dataset.source !== source) { mark.src = source; mark.dataset.source = source; }
+    } else mark?.remove();
+    for (const e of run.enemies || []) if (e.boss) {
+      const id = e.bossId || run.activeBossSpec?.id || 'dreamKing';
+      const actor = $('arenaActor-' + String(e.uid).replace(/[^a-zA-Z0-9_-]/g, '_'));
+      const sprite = actor?.querySelector('.arena-sprite');
+      if (sprite && sprite.dataset.totemId !== id && bossTotems[id]) {
+        sprite.innerHTML = bossTotems[id];
+        sprite.dataset.totemId = id;
+        sprite.setAttribute('role', 'img');
+        sprite.setAttribute('aria-label', `${e.name}圖騰`);
+      }
+    }
     for (const e of run.enemies || []) if (isCustomBoss(e)) {
       const actor = $('arenaActor-' + String(e.uid).replace(/[^a-zA-Z0-9_-]/g, '_'));
       if (!actor) continue;
@@ -510,6 +557,10 @@
       : `${run.floor} / ${total} 層 · ${(roomCatalog[run.roomType] || roomCatalog.combat).name}`;
     const boss = getBoss(), info = $('bossInfo');
     if (boss && info) { info.classList.remove('hidden'); info.textContent = `${boss.name}・第 ${boss.phase} 階段｜${run.bossStatus || '首領正在蓄勢。'}${boss.shieldHp ? `｜護盾 ${Math.ceil(boss.shieldHp)}` : ''}`; }
+    const environment = run.currentEnvironment;
+    const desc = $('roomDesc');
+    if (environment?.name && desc && !desc.textContent.startsWith(`【${environment.name}】`)) desc.textContent = `【${environment.name}】${desc.textContent}`;
+    if ($('map') && environment?.name) $('map').setAttribute('aria-label', `${environment.name}地圖`);
     document.body.classList.toggle('boss-gold-scene', !!boss && boss.goldUntil > Date.now());
     return result;
   };
@@ -526,6 +577,24 @@
 
   const style = document.createElement('style');
   style.textContent = `
+    #gameScreen #map.map[data-scene-style]{background-color:#171827!important;background-image:linear-gradient(rgba(10,12,28,.13),rgba(10,12,28,.13)),url("./GameData/背景.png")!important;background-size:cover!important;background-position:center!important}
+    body:not(.dark-mode) #gameScreen #map.map[data-scene-style]{background-color:#eee6d3!important;background-image:url("./GameData/背景2.png")!important;background-size:cover!important;background-position:center!important}
+    .arena-scene-mark{position:absolute;z-index:0;left:50%;top:50%;width:92%;height:92%;object-fit:contain;opacity:.35;transform:translate(-50%,-50%);pointer-events:none;user-select:none}
+    .arena-actor.boss .arena-sprite{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:50%!important;overflow:hidden!important}
+    .arena-actor.boss .boss-totem-image{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:drop-shadow(0 1px 2px #000b);pointer-events:none}
+    body:not(.dark-mode) #gameScreen .arena-actor .arena-name,body:not(.dark-mode) #gameScreen .arena-actor .arena-name-text{color:#24180e!important;-webkit-text-stroke:.65px #fff;paint-order:stroke fill;text-shadow:0 0 2px #fff,0 0 4px #fff,0 1px 6px #fff!important}
+    #gameScreen .arena-actor.boss{background:#17171a!important;border:1px solid rgba(219,210,191,.42)!important;box-shadow:0 1px 4px rgba(0,0,0,.45)!important}
+    .arena-actor.boss.boss-black-stage{border:2px solid #fff!important;box-shadow:0 0 0 2px rgba(255,255,255,.8),0 0 12px rgba(255,255,255,.45)!important}
+    #gameScreen .map[data-scene-style="golden-spires"]{background-color:#d7bd82!important;background-image:radial-gradient(ellipse at 50% 45%,#f2dfa9 0,transparent 46%),linear-gradient(145deg,#b69a62,#66533d)!important}
+    #gameScreen .map[data-scene-style="ashen-ruins"]{background-color:#332c28!important;background-image:radial-gradient(ellipse at 50% 45%,#514139 0,transparent 55%),linear-gradient(145deg,#41352f,#211d1b)!important}
+    #gameScreen .map[data-scene-style="beast-tomb"]{background-color:#59453a!important;background-image:radial-gradient(ellipse at 50% 45%,#8b6b4e 0,transparent 52%),linear-gradient(145deg,#47362d,#201c1a)!important}
+    #gameScreen .map[data-obstacle-style="spires"] .arena-wall{clip-path:polygon(50% 0,63% 28%,60% 43%,83% 51%,74% 63%,87% 100%,12% 100%,27% 63%,17% 51%,40% 43%,37% 28%)!important;border-radius:18% 18% 4% 4%!important;background:linear-gradient(90deg,#8f754c,#e0c580 45%,#766042)!important;box-shadow:inset 0 0 0 2px #f1dba0,0 3px 6px #32231388!important}
+    #gameScreen .map[data-obstacle-style="spires"] .arena-wall:before{content:"✦";position:absolute;inset:8% 0 auto;text-align:center;color:#fff0bd;font-size:clamp(12px,2vw,22px);text-shadow:0 0 8px #ffe594}
+    #gameScreen .map[data-obstacle-style="ruins"] .arena-wall{clip-path:polygon(12% 4%,78% 0,100% 26%,89% 88%,62% 100%,8% 87%,0 27%)!important;border-radius:5% 12% 3% 15%!important;background:linear-gradient(140deg,#777064,#433d37 55%,#292522)!important;box-shadow:inset 0 0 0 2px #a69a81,0 3px 7px #090807aa!important}
+    #gameScreen .map[data-obstacle-style="ruins"] .arena-wall:before{content:"╱";position:absolute;inset:4% 0 0;text-align:center;color:#c4b39388;font:bold clamp(22px,4vw,42px)/1 Georgia,serif}
+    #gameScreen .map[data-obstacle-style="bull-skulls"] .arena-wall{display:grid;place-items:center;clip-path:polygon(4% 23%,25% 16%,37% 24%,63% 24%,76% 16%,96% 23%,89% 48%,84% 86%,64% 100%,36% 100%,16% 86%,11% 48%)!important;border-radius:38% 38% 25% 25%!important;background:radial-gradient(ellipse at 48% 34%,#e2d1a7,#927d61 66%,#46392e)!important;box-shadow:inset 0 0 0 2px #efdfb9,0 3px 7px #09080799!important}
+    #gameScreen .map[data-obstacle-style="bull-skulls"] .arena-wall:before{content:"☠";color:#4e3a2caa;font-size:clamp(14px,2.4vw,28px);text-shadow:0 1px #fff0cd}
+    @media(pointer:coarse){.arena-actor{will-change:auto}.target-lock-marker,.enemy-attack-warning:not(.boss-charge-warning),.arena-search{animation:none!important}#gameScreen .arena-actor{box-shadow:0 1px 3px #0008!important}.combat-fx{filter:none!important}}
     .difficulty{grid-template-columns:repeat(auto-fit,minmax(125px,1fr))}
     .boss-fire-warning{position:absolute;z-index:9;transform:translate(-50%,-50%);border:2px solid #d33b2e;border-radius:50%;background:#ed503b38;box-shadow:0 0 0 5px #d5423030;pointer-events:none;animation:bossFirePulse .25s infinite alternate}
     .boss-range-frame{position:absolute;z-index:8;box-sizing:border-box;border:0;pointer-events:none;animation:bossRangePulse .35s infinite alternate}
