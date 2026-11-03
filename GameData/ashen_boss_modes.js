@@ -31,7 +31,11 @@
   const modeFloorCount = () => DIFFS[difficulty]?.floors || 10;
   const environments = () => Array.isArray(BOSS_DATA.environments) && BOSS_DATA.environments.length
     ? BOSS_DATA.environments : roster().map(spec => ({ id: `${spec.id}-legacy`, name: `${spec.name}環境`, bossId: spec.id, obstacleStyle: 'original', scene: 'dream-throne' }));
-  const pickEnvironment = () => environments()[Math.floor(Math.random() * environments().length)];
+  const pickEnvironment = previousId => {
+    const all = environments();
+    const candidates = previousId && all.length > 1 ? all.filter(environment => environment.id !== previousId) : all;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  };
   const pickBoss = floor => {
     const env = run?.currentEnvironment;
     return roster().find(spec => spec.id === env?.bossId) || roster()[Math.floor(Math.random() * roster().length)];
@@ -124,7 +128,7 @@
       run.maxFloors = modeFloorCount();
       run.isEndless = !!DIFFS[difficulty]?.endless;
       if (run.floor === 1 || (run.floor - 1) % 10 === 0 || !run.currentEnvironment) {
-        run.currentEnvironment = pickEnvironment();
+        run.currentEnvironment = pickEnvironment(run.currentEnvironment?.id);
       }
       const map = $('map');
       if (map) {
@@ -196,14 +200,14 @@
       if (!run.endlessBossChoiceShown) {
         run.endlessBossChoiceShown = true;
         showModal(`<div class="eyebrow">ENDLESS FLOOR ${run.floor}</div><h2>首領戰利品已收集</h2><p class="intro">你已走到出口。要繼續深入，還是結束本次遠征？</p><div class="actions"><button class="primary" id="endlessContinue">繼續深入</button><button id="endlessExit">結束遠征</button></div>`);
-        $('endlessContinue').onclick = () => { closeModal(); advanceToNextFloor(); };
+        $('endlessContinue').onclick = () => { closeModal(); const proceed = () => advanceToNextFloor(); if (run.floor > 10 && Math.random() < .5) showExpeditionScenario(proceed); else proceed(); };
         $('endlessExit').onclick = () => finish(true);
       }
       return;
     }
     run.exitHandled = true;
     if (!run.isEndless && run.floor >= run.maxFloors) { finish(true); return; }
-    if (run.floor % 2 === 1) showExpeditionScenario(() => advanceToNextFloor());
+    if (run.floor > 10 ? Math.random() < .5 : run.floor % 2 === 1) showExpeditionScenario(() => advanceToNextFloor());
     else advanceToNextFloor();
   };
 
@@ -278,7 +282,7 @@
       const preferred = worldPoint(i ? 6 : 2, i ? 2 : 4), p = findOpenSummonPoint(preferred, Number(cfg.radius) || 20);
       if (!p) { addLog('亞空黑泥召喚失敗：周圍沒有可用的空地。'); continue; }
       const hp = Math.max(1, Math.round(boss.maxHp * (Number(cfg.hpRatio) || .12)));
-      run.enemies.push({ ...cfg, id: cfg.id || 'zarian-black-mud', name: cfg.name || '亞空黑泥', icon: cfg.icon || '🖤', x: p.x, y: p.y, hp, maxHp: hp,
+        run.enemies.push({ ...cfg, id: cfg.id || 'zarian-black-mud', name: cfg.name || '亞空黑泥', icon: cfg.icon || '🖤', mapIconFile: cfg.icon || '🖤', x: p.x, y: p.y, hp, maxHp: hp,
         atk: Math.max(1, Math.round(boss.atk * (Number(cfg.attackRatio) || .38))), boss: false, dead: false, summoned: true, aggro: true,
         classType: cfg.classType || 'ranged', speed: Number(cfg.speed) || 0, attackRange: Number(cfg.attackRange) || 620, keepDistance: Number(cfg.keepDistance) || 220, attackCooldown: Number(cfg.attackCooldownMs) || 1800,
         projectileSpeed: Number(cfg.projectileSpeed) || 225, projectileIcon: cfg.projectileIcon || '●', projectileLifetimeMs: Number(cfg.projectileLifetimeMs) || 5000, radius: Number(cfg.radius) || 20,
@@ -502,7 +506,7 @@
     if (frozen.length) run.enemies.push(...frozen);
   };
   const bossTotems = {
-    zarian: '<img class="boss-totem-image" src="./GameData/札里安.png" alt="札里安暴龍圖騰">',
+    zarian: '<img class="boss-totem-image" src="./GameData/札里安.png" alt="札里安圖示">',
     prince: '<img class="boss-totem-image" src="./GameData/蛇頭.png" alt="神足王子娜迦巨蛇圖騰">',
     trefasha: '<img class="boss-totem-image" src="./GameData/牛頭.png" alt="特雷法沙王牛頭人圖騰">',
     dreamKing: '<img class="boss-totem-image" src="./GameData/夢境.png" alt="夢境君王圖騰">'
@@ -535,7 +539,8 @@
       const actor = $('arenaActor-' + String(e.uid).replace(/[^a-zA-Z0-9_-]/g, '_'));
       if (!actor) continue;
       actor.classList.toggle('boss-black-stage', e.bossId === 'zarian' && e.phase === 1);
-      actor.classList.toggle('boss-red-stage', e.bossId === 'zarian' && e.phase === 2 || e.bossId === 'trefasha' && e.enrageUntil > Date.now());
+      actor.classList.toggle('boss-zarian', e.bossId === 'zarian');
+      actor.classList.toggle('boss-red-stage', e.bossId === 'trefasha' && e.enrageUntil > Date.now());
       actor.classList.toggle('boss-grey', !!e.frameGrey);
       actor.classList.toggle('boss-shielded', e.shieldHp > 0);
       let shield = actor.querySelector('.arena-shield-bar');
@@ -582,6 +587,7 @@
     .arena-scene-mark{position:absolute;z-index:0;left:50%;top:50%;width:92%;height:92%;object-fit:contain;opacity:.35;transform:translate(-50%,-50%);pointer-events:none;user-select:none}
     .arena-actor.boss .arena-sprite{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border-radius:50%!important;overflow:hidden!important}
     .arena-actor.boss .boss-totem-image{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;border-radius:50%;filter:drop-shadow(0 1px 2px #000b);pointer-events:none}
+    .arena-actor.boss.boss-zarian .boss-totem-image{filter:none!important}
     body:not(.dark-mode) #gameScreen .arena-actor .arena-name,body:not(.dark-mode) #gameScreen .arena-actor .arena-name-text{color:#24180e!important;-webkit-text-stroke:.65px #fff;paint-order:stroke fill;text-shadow:0 0 2px #fff,0 0 4px #fff,0 1px 6px #fff!important}
     #gameScreen .arena-actor.boss{background:#17171a!important;border:1px solid rgba(219,210,191,.42)!important;box-shadow:0 1px 4px rgba(0,0,0,.45)!important}
     .arena-actor.boss.boss-black-stage{border:2px solid #fff!important;box-shadow:0 0 0 2px rgba(255,255,255,.8),0 0 12px rgba(255,255,255,.45)!important}
@@ -611,7 +617,6 @@
     .boss-charge-bull{font-size:109px!important;width:16.8%!important;min-width:88px;line-height:1!important;filter:drop-shadow(0 0 12px #a52b22)!important}
     .boss-charge-gold{filter:sepia(1) saturate(6) hue-rotate(350deg) brightness(1.12) drop-shadow(0 0 16px #ffd43b)!important}
     .boss-red-stage .arena-sprite{filter:sepia(1) saturate(6) hue-rotate(320deg) brightness(.82)!important}
-    .boss-black-stage .arena-sprite{filter:grayscale(1) brightness(.35)!important}
     .boss-grey .arena-sprite{filter:grayscale(1) brightness(.52)!important;opacity:.65}
     .boss-shielded .arena-sprite{filter:drop-shadow(0 0 12px #5d9de8)!important}
     .boss-gold-scene #gameScreen{filter:sepia(.65) saturate(1.45)}

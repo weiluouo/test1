@@ -62,7 +62,7 @@
     {
       "type": "change_crit",
       "params": "value",
-      "description": "改變本局暴擊率；介於 0 與 0.75。"
+      "description": "改變本局暴擊率；介於 0 與 1（100%）。"
     },
     {
       "type": "change_regen",
@@ -3031,7 +3031,7 @@
       {
         "type": "change_crit",
         "params": "value",
-        "description": "改變本局暴擊率；介於 0 與 0.75。"
+        "description": "改變本局暴擊率；介於 0 與 1（上限 100%）。"
       },
       {
         "type": "change_regen",

@@ -11,7 +11,7 @@
     #gameScreen .arena-actor.player .hero-held-weapon{transform:rotate(145deg)!important}
     #gameScreen .arena-actor.player .hero-held-weapon.is-staff{transform:rotate(60deg)!important}
     #gameScreen .arena-actor.player .hero-held-weapon.is-gunlance{transform:rotate(325deg)!important}
-    #gameScreen .arena-actor.player .hero-held-weapon.is-bow{transform:rotate(55deg)!important}
+    #gameScreen .arena-actor.player .hero-held-weapon.is-bow{transform:rotate(115deg)!important}
   `;
   document.head.appendChild(css);
 
